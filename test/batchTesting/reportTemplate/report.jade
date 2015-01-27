@@ -1,0 +1,112 @@
+doctype html
+html
+	head
+		meta(charset='utf-8')
+		title BatchTest Report
+
+	body
+		.container
+			h1 Test Report
+
+			p
+				| This report was generated from commit
+				= ' '
+				code= gitInfo.commit.substr(0,6)
+				= ' '
+				| on branch
+				= ' '
+				code= gitInfo.branch
+				| .
+
+			.alert.alert-warning
+				p.
+					This report is work in progress,
+					reload the page to check for updates
+
+				button#reloadStatistics Reload
+
+			h2 General Statistics
+
+			table.table.table-hover
+				thead
+					tr
+						th Metric
+						each s in stats
+							th= s.variableName
+				tbody
+					tr
+						td
+							strong Min
+						each s in stats
+							td= s.min
+					tr
+						td
+							strong Max
+						each s in stats
+							td= s.max
+					tr
+						td
+							strong Sum
+						each s in stats
+							td= s.sum
+					tr
+						td
+							strong Avg
+						each s in stats
+							td= s.avg.toFixed(3)
+					tr
+						td
+							strong Avg per 1000 Polys
+						each s in stats
+							td= s.avgPer1000Polys.toFixed(3)
+
+			h2 Individual Models - absolute values
+			table.table.table-striped.table-hover
+				thead
+					tr
+						th Filename
+						th stl Parsing Time
+						th stl Import Errors
+						th stl Invalid Polygons
+						th stl recalculated Normals
+						th stl Cleansing Time
+						th Optimization Time
+						th #Polygons
+						th #Points
+						th is 2-manifold
+						th 2-mnf check Time
+				tbody
+					//each result in results
+						tr
+							td= result.fileName
+							td= result.stlParsingTime + ' ms'
+							td= result.numStlParsingErrors
+							td= result.stlDeletedPolygons
+							td= result.stlRecalculatedNormals
+							td= result.stlCleansingTime + ' ms'
+							td= result.optimizationTime + ' ms'
+							td= result.numPolygons
+							td= result.numPoints
+							td= result.isTwoManifold
+							td= result.twoManifoldCheckTime  + ' ms'
+
+			h2 Individual Models - values relative to model size
+			p All metrics are relative to 1000 polygons
+			table.table.table-striped.table-hover
+				thead
+					tr
+						th Filename
+						th #Polygons
+						th stl Parsing Time
+						th stl Cleansing Time
+						th Optimization Time
+						th 2-mnf check Time
+				tbody
+					//each result in results
+						tr
+							td= result.fileName
+							td= result.numPolygons
+							td=  + ' ms'
+							td= ((result.stlCleansingTime / result.numPolygons) * 1000).toFixed(3) + ' ms'
+							td= ((result.optimizationTime / result.numPolygons) * 1000).toFixed(3)+ ' ms'
+							td= ((result.twoManifoldCheckTime/ result.numPolygons) * 1000).toFixed(3)  + ' ms'
