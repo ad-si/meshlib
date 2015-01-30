@@ -1,4 +1,5 @@
-saveAs = require 'filesaver.js'
+if typeof window is not 'undefined'
+	saveAs = require 'filesaver.js'
 
 toAsciiStl = (model) ->
 	{faceNormals, indices, positions, originalFileName} = model
