@@ -1,7 +1,9 @@
 fs = require 'fs'
 path = require 'path'
-meshlib = require '../index'
 assert = require 'assert'
+
+meshlib = require '../src/index'
+
 
 models = [
 	'unitCube'

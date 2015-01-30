@@ -1,8 +1,9 @@
 {
   "name": "meshlib",
   "version": "0.1.0",
-  "description": "Powerful library to handle 3D files",
-  "main": "index.coffee",
+  "description": "JavaScript library for importing, handling & exporting various 3D file formats",
+  "main": "index.js",
+  "browser": "build/index",
   "directories": {
     "test": "test"
   },
@@ -21,9 +22,14 @@
   "devDependencies": {
     "es6-promise": "^2.0.1",
     "express": "^4.11.1",
+    "filesaver.js": "^0.1.1",
     "fsp": "^0.1.2",
     "mkdirp": "^0.5.0",
-    "string.prototype.endswith": "^0.2.0"
+    "string.prototype.endswith": "^0.2.0",
+    "string.prototype.includes": "^1.0.0",
+    "string.prototype.startswith": "^0.2.0",
+    "text-encoding": "^0.5.2",
+    "three": "^0.69.0"
   },
   "dependencies": {
     "coffee-script": "^1.8.0",

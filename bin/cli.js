@@ -1,7 +1,5 @@
 #! /usr/bin/env node
 
-require('coffee-script').register()
-
 var fs = require('fs'),
 	program = require('commander'),
 	meshlib = require('../index'),
