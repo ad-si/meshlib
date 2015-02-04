@@ -2,7 +2,7 @@ fs = require 'fs'
 path = require 'path'
 assert = require 'assert'
 
-meshlib = require '../src/index'
+meshlib = require '../source/index'
 
 
 models = [

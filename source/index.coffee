@@ -8,8 +8,37 @@ meshData = {}
 model = {}
 
 
-toArrayBuffer = (buffer) ->
+class Model
+	constructor: (@mesh, @options) ->
 
+
+parseBuffer = (fileBuffer, options) ->
+	if not fileBuffer
+		throw new Error 'STL buffer is empty'
+	else
+		importFileBuffer = fileBuffer
+
+	options ?= {}
+	options.format ?= 'stl'
+
+	if options.format is 'stl'
+		try
+			stl = new Stl toArrayBuffer fileBuffer
+			model = stl.model()
+		catch error
+			if typeof callback is 'function'
+				callback error
+				return meshlib
+			else
+				throw error
+
+	if typeof callback is 'function'
+		callback(null, model)
+
+	return model
+
+
+toArrayBuffer = (buffer) ->
 	if Buffer && Buffer.isBuffer buffer
 		tempArrayBuffer = new ArrayBuffer buffer.length
 		view = new Uint8Array tempArrayBuffer
@@ -21,6 +50,14 @@ toArrayBuffer = (buffer) ->
 
 	else
 		return buffer
+
+
+meshlib = (model, options) ->
+	if not model.positions? or not model.indices? or
+		not model.vertexNormals? or not model.faceNormals?
+		model = parseBuffer(model, options)
+
+	return new Model model, options
 
 
 meshlib.meshData = () ->
@@ -35,7 +72,6 @@ meshlib.optimize = () ->
 	model = optimizeModel model
 
 meshlib.export = (options, callback) ->
-
 	options ?= {}
 	options.format ?= 'stl'
 	options.encoding ?= 'binary'
@@ -54,7 +90,6 @@ meshlib.export = (options, callback) ->
 
 
 meshlib.parse = (fileBuffer, options, callback) ->
-
 	if not fileBuffer
 		throw new Error 'STL buffer is empty'
 	else
