@@ -114,5 +114,9 @@ meshlib.parse = (fileBuffer, options, callback) ->
 
 	return meshlib
 
+meshlib.separateGeometry = require('./separateGeometry')
+meshlib.OptimizedModel = require('./OptimizedModel')
+meshlib.StlLoader = require('./Stl')
+meshlib.Vec3 = require('./Vector')
 
 module.exports = meshlib
