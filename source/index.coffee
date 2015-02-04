@@ -53,9 +53,9 @@ toArrayBuffer = (buffer) ->
 
 
 meshlib = (model, options) ->
-	if not model.positions? or not model.indices? or
-		not model.vertexNormals? or not model.faceNormals?
-		model = parseBuffer(model, options)
+	if not model.positions? or not model.indices? or not
+	    model.vertexNormals? or not model.faceNormals?
+			model = parseBuffer(model, options)
 
 	return new Model model, options
 
