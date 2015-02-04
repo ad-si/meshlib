@@ -8,6 +8,10 @@ meshlib = require '../source/index'
 models = [
 	'unitCube'
 	'gearwheel'
+	'geoSplit2'
+	'geoSplit4'
+	'geoSplit5'
+	'geoSplit7'
 	'bunny'
 ]
 
@@ -63,3 +67,8 @@ describe 'Model Parsing', () ->
 					'vertexNormals', 'faceNormals']
 					it 'should yield the same model', () ->
 						checkEquality fromAscii, fromBinary, arrayName
+
+
+			it 'should split individual geometries in STL file', () ->
+				@timeout('30s')
+				meshlib.separateGeometry(fromBinary)
