@@ -26,17 +26,10 @@ describe 'OptimizedMesh', () ->
 				inBetweenGeometry = model.createStandardGeometry()
 				model2 = new OptimizedModel()
 				model2.fromThreeGeometry(inBetweenGeometry)	
+			
+				expect(model.indices).to.eql(model2.indices)
+				expect(model.positions).to.eql(model2.positions)
 
-				arrayEquality = (a, b) ->
-					if a.length != b.length
-						return false
-					for i in [0..a.length - 1] by 1
-						if a[i] != b[i]
-							return false
-					return true
-
-				expect(arrayEquality(model.positions, model2.positions)).to.equal(true)
-				expect(arrayEquality(model.indices, model2.indices)).to.equal(true)
 				done()
 
 	after () ->
