@@ -27,8 +27,8 @@ describe 'OptimizedMesh', () ->
 				model2 = new OptimizedModel()
 				model2.fromThreeGeometry(inBetweenGeometry)	
 			
-				expect(model.indices).to.eql(model2.indices)
-				expect(model.positions).to.eql(model2.positions)
+				expect(model.indices).to.deep.equal(model2.indices)
+				expect(model.positions).to.deep.equal(model2.positions)
 
 				done()
 
