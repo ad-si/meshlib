@@ -7,10 +7,10 @@ util = require 'util'
 stream = require 'stream'
 
 fsp = require 'fs-promise'
-winston = require 'winston'
 mkdirp = require 'mkdirp'
+winston = require 'winston'
 
-meshlib = require '../../index'
+meshlib = require '../index'
 reportGenerator = require './reportGenerator',
 #LegoPipeline = require '../src/plugins/newBrickator/LegoPipeline'
 
@@ -21,16 +21,18 @@ outputPath = path.join __dirname, 'results'
 models = []
 jsonStream = null
 htmlStream = null
-logger = new winston.Logger({
+
+modelCounter = 0
+
+
+logger = new winston.Logger {
 	transports: [
 		new winston.transports.Console {
 			level: 'info'
-			colorize: 'true'
+			colorize: true
 		}
 	]
-})
-
-modelCounter = 0
+}
 
 Tester = (options) ->
 	options = options or {}
@@ -182,3 +184,6 @@ jsonStream.on 'open', () ->
 	tester.pipe(jsonStream)
 
 	reportGenerator.generateReport(htmlPath)
+
+	jsonStream.on 'finish', () ->
+		logger.info 'Finished performance test!'
