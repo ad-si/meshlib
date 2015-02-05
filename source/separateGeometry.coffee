@@ -1,4 +1,4 @@
-OptimizedModel = require './OptimizedModel.coffee'
+OptimizedModel = require './OptimizedModel'
 
 # Takes an optimized model and looks for connected geometry
 # returns a list of optimized models if the original model

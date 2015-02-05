@@ -3,7 +3,7 @@
   var Hashmap, OptimizedModel, compactClasses, createEquivalenceClasses, createModelFromEquivalenceClass, separateGeometry,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  OptimizedModel = require('./OptimizedModel.coffee');
+  OptimizedModel = require('./OptimizedModel');
 
   separateGeometry = function(optimizedModel) {
     var eq, equivalenceClasses, models, _i, _len;
