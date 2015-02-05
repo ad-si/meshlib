@@ -173,19 +173,52 @@ class OptimizedModel
 		geometry = new THREE.Geometry()
 
 		for vi in [0..@positions.length - 1] by 3
-			geometry.vertices.push new THREE.Vector3(@positions[vi],
-				@positions[vi + 1], @positions[vi + 2])
+			geometry.vertices.push new THREE.Vector3(
+				@positions[vi],
+				@positions[vi + 1], 
+				@positions[vi + 2]
+				)
 
 		for fi in [0..@indices.length - 1] by 3
-			geometry.faces.push new THREE.Face3(@indices[fi],
-				@indices[fi + 1], @indices[fi + 2],
-				new THREE.Vector3(@faceNormals[fi],
+			geometry.faces.push new THREE.Face3(
+				@indices[fi],
+				@indices[fi + 1],
+				@indices[fi + 2],
+				new THREE.Vector3(
+					@faceNormals[fi],
 					@faceNormals[fi + 1],
-					@faceNormals[fi + 2]))
+					@faceNormals[fi + 2]
+					)
+				)
 
 		return geometry
 
+	# Imports from a THREE.Geometry
+	# Imports vertices (positions) and faces (indices), and face normals
+	fromThreeGeometry: (threeGeometry, originalFileName = 'Three.Geometry') =>
+		# clear data, if exists
+		@positions = []
+		@indices = []
+		@faceNormals = []
+		@vertexNormals = []
+		@originalFileName = originalFileName
 
+		# convert point positions
+		for vertex in threeGeometry.vertices
+			@positions.push vertex.x
+			@positions.push vertex.y
+			@positions.push vertex.z
+
+		# convert polygons (indexed) and their normals
+		for face in threeGeometry.faces
+			@indices.push face.a
+			@indices.push face.b
+			@indices.push face.c
+
+			@faceNormals.push face.normal.x
+			@faceNormals.push face.normal.y
+			@faceNormals.push face.normal.z
+	
 	boundingBox: ->
 		if @_boundingBox
 			return @_boundingBox
