@@ -8,6 +8,7 @@ stream = require 'stream'
 
 fsp = require 'fs-promise'
 mkdirp = require 'mkdirp'
+readdirp = require 'readdirp'
 winston = require 'winston'
 
 meshlib = require '../index'
@@ -18,7 +19,6 @@ reportGenerator = require './reportGenerator',
 #legoPipeline = new LegoPipeline({length: 8, width: 8, height: 3.2})
 modelPath = path.join __dirname, 'models'
 outputPath = path.join __dirname, 'results'
-models = []
 jsonStream = null
 htmlStream = null
 
@@ -37,18 +37,17 @@ logger = new winston.Logger {
 Tester = (options) ->
 	options = options or {}
 	options.objectMode = true
-	stream.Readable.call(@, options)
+	stream.Transform.call(@, options)
 
-util.inherits(Tester, stream.Readable)
+util.inherits(Tester, stream.Transform)
 
-Tester.prototype._read = () ->
+Tester.prototype._transform = (entry, encoding, callback) ->
 
-	testModel ++modelCounter, (testResult) =>
-		if modelCounter < (models.length - 1)
-			@push(JSON.stringify testResult)
-			@push('\n')
-		else
-			@push(null)
+	testModel entry, (testResult) =>
+		@push(JSON.stringify testResult)
+		@push('\n')
+
+		callback()
 
 
 getDateTimeString = () ->
@@ -70,11 +69,11 @@ tryToWrite = (testResult) ->
 		jsonStream.once 'drain', -> tryToWrite(testResult)
 
 
-testModel = (number, callback) ->
+testModel = (entry, callback) ->
 
-	logger.info models[number]
+	logger.info entry.name
 
-	fileContent = fs.readFileSync path.join __dirname, 'models', models[number]
+	fileContent = fs.readFileSync entry.fullPath
 
 	begin = new Date()
 
@@ -84,11 +83,11 @@ testModel = (number, callback) ->
 			throw error
 
 		if not meshModel
-			throw new Error "Model '#{models[number]}' was not properly loaded"
+			throw new Error "Model '#{entry.name}' was not properly loaded"
 
 		testResult = {
-			number: number
-			fileName: path.basename models[number], '.stl'
+			number: ++modelCounter
+			fileName: entry.name
 			stlParsingTime: new Date() - begin
 			numStlParsingErrors: 0
 			stlCleansingTime: 0
@@ -103,7 +102,7 @@ testModel = (number, callback) ->
 			volumeFillTime: 0
 		}
 
-		logger.debug "Testing model '#{models[number]}'"
+		logger.debug "Testing model '#{entry.fullPath}'"
 		#testResult.numStlParsingErrors = meshModel.importErrors.length
 		logger.debug "model parsed in #{testResult.stlParsingTime} ms with"
 
@@ -170,20 +169,17 @@ jsonStream.on 'error', (error) ->
 	throw error
 
 jsonStream.on 'open', () ->
-	logger.info 'Starting batch-test'
+	logger.info 'Starting performance test'
 
-	models = fs
-		.readdirSync(modelPath)
-		.filter (file) -> file.endsWith('.stl')
-
-	logger.info "Testing #{models.length} models"
-
-
-	tester = new Tester()
-
-	tester.pipe(jsonStream)
+	readdirp { root: modelPath, fileFilter: '*.stl' }
+		.on 'warn', (warning) ->
+			logger.warn warning
+		.on 'error', (error) ->
+			logger.error error
+		.pipe new Tester
+		.pipe jsonStream
 
 	reportGenerator.generateReport(htmlPath)
 
-	jsonStream.on 'finish', () ->
+	jsonStream.on 'end', () ->
 		logger.info 'Finished performance test!'
