@@ -1,4 +1,3 @@
-test/performance/models
-test/performance/results
-test/models/thingiverse
 /node_modules
+/test/results
+/test/models/thingiverse
