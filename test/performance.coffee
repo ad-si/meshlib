@@ -12,12 +12,12 @@ readdirp = require 'readdirp'
 winston = require 'winston'
 
 meshlib = require '../index'
-reportGenerator = require './reportGenerator',
+reportGenerator = require './reportGenerator'
 #LegoPipeline = require '../src/plugins/newBrickator/LegoPipeline'
 
 
 #legoPipeline = new LegoPipeline({length: 8, width: 8, height: 3.2})
-modelPath = path.join __dirname, 'models'
+modelsPath = path.join __dirname, 'models'
 outputPath = path.join __dirname, 'results'
 jsonStream = null
 htmlStream = null
@@ -42,7 +42,6 @@ Tester = (options) ->
 util.inherits(Tester, stream.Transform)
 
 Tester.prototype._transform = (entry, encoding, callback) ->
-
 	testModel entry, (testResult) =>
 		@push(JSON.stringify testResult)
 		@push('\n')
@@ -70,7 +69,6 @@ tryToWrite = (testResult) ->
 
 
 testModel = (entry, callback) ->
-
 	logger.info entry.name
 
 	fileContent = fs.readFileSync entry.fullPath
@@ -78,7 +76,6 @@ testModel = (entry, callback) ->
 	begin = new Date()
 
 	meshlib.parse fileContent, null, (error, meshModel) ->
-
 		if error
 			throw error
 
@@ -163,23 +160,29 @@ logger.add winston.transports.File, {
 
 htmlPath = path.join reportDirectory, 'report.html'
 
-jsonPath = path.join reportDirectory, 'data.jsonl' # See http://jsonlines.org
-jsonStream = fs.createWriteStream jsonPath, {encoding: 'utf-8'}
-jsonStream.on 'error', (error) ->
-	throw error
+describe 'Performance', () ->
 
-jsonStream.on 'open', () ->
-	logger.info 'Starting performance test'
+	@timeout('1h')
 
-	readdirp { root: modelPath, fileFilter: '*.stl' }
-		.on 'warn', (warning) ->
-			logger.warn warning
-		.on 'error', (error) ->
-			logger.error error
-		.pipe new Tester
-		.pipe jsonStream
+	it 'should test each model', (done) ->
+		jsonPath = path.join reportDirectory, 'data.jsonl' # See jsonlines.org
+		jsonStream = fs.createWriteStream jsonPath, {encoding: 'utf-8'}
+		jsonStream.on 'error', (error) ->
+			throw error
 
-	reportGenerator.generateReport(htmlPath)
+		jsonStream.on 'open', () ->
+			logger.info 'Starting performance test'
 
-	jsonStream.on 'end', () ->
-		logger.info 'Finished performance test!'
+			readdirp {root: modelsPath, fileFilter: '*.stl'}
+			.on 'warn', (warning) ->
+				logger.warn warning
+			.on 'error', (error) ->
+				logger.error error
+			.pipe new Tester
+			.pipe jsonStream
+
+			reportGenerator.generateReport(htmlPath)
+
+			jsonStream.on 'end', () ->
+				logger.info 'Finished performance test!'
+				done()
