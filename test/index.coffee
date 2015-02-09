@@ -42,7 +42,7 @@ describe 'Model Parsing', () ->
 			fromBinary = undefined
 
 			it 'should load and parse ASCII STL file', (done) ->
-				@timeout('6s')
+				@timeout('8s')
 
 				asciiStlBuffer = fs.readFileSync path.join __dirname,
 					'models', model + '.ascii.stl'
@@ -60,7 +60,7 @@ describe 'Model Parsing', () ->
 
 
 			it 'should load and parse binary STL file', (done) ->
-				@timeout('6s')
+				@timeout('8s')
 
 				binaryStlBuffer = fs.readFileSync path.join __dirname,
 					'models', model + '.bin.stl'
@@ -83,5 +83,5 @@ describe 'Model Parsing', () ->
 
 
 			it 'should split individual geometries in STL file', () ->
-				@timeout('30s')
+				@timeout('45s')
 				meshlib.separateGeometry(fromBinary)
