@@ -2,6 +2,7 @@ fs = require 'fs'
 path = require 'path'
 expect = require('chai').expect
 
+Model = require '../source/Model'
 meshlib = require '../source/index'
 
 
@@ -20,6 +21,18 @@ checkEquality = (dataFromAscii, dataFromBinary, arrayName) ->
 	fromBinary = dataFromBinary[arrayName].map (position) -> Math.round position
 
 	expect(fromAscii).to.deep.equal(fromBinary)
+
+
+describe 'Meshlib', () ->
+	it 'should return a model object', (done) ->
+
+		meshlib minimalStl, {format: 'stl'}
+			.then (model) ->
+				expect(model).to.be.an.instanceof Model
+			.then ->
+				done()
+			.catch (error) ->
+				done error
 
 
 describe 'Model Parsing', () ->
