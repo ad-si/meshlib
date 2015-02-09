@@ -11,22 +11,20 @@ meshData = {}
 model = {}
 
 
-class Model
-	constructor: (@mesh, @options) ->
-
-
-parseBuffer = (fileBuffer, options) ->
-	if not fileBuffer
-		throw new Error 'STL buffer is empty'
-	else
-		importFileBuffer = fileBuffer
+parse = (fileBuffer, options, callback) ->
 
 	options ?= {}
 	options.format ?= 'stl'
 
+	if not fileBuffer
+		throw new Error 'STL buffer is empty'
+
+	else if typeof fileBuffer isnt 'string'
+		fileBuffer = toArrayBuffer fileBuffer
+
 	if options.format is 'stl'
 		try
-			stl = new Stl toArrayBuffer fileBuffer
+			stl = new Stl fileBuffer
 			model = stl.model()
 		catch error
 			if typeof callback is 'function'
@@ -38,7 +36,31 @@ parseBuffer = (fileBuffer, options) ->
 	if typeof callback is 'function'
 		callback(null, model)
 
-	return model
+	return meshlib
+
+
+parseString = (modelString, options) ->
+
+	options ?= {}
+	options.format ?= 'stl'
+	options.encoding ?= 'utf-8'
+
+	return new Promise (resolve, reject) ->
+
+		if not modelString
+			reject new Error 'Model string is empty!'
+
+		if options.format is 'stl'
+			try
+				stl = new Stl modelString
+				model = stl.model()
+			catch error
+				return reject error
+
+			return resolve(model)
+
+		return reject new Error 'Model string can not be parsed!'
+
 
 
 toArrayBuffer = (buffer) ->
@@ -55,12 +77,18 @@ toArrayBuffer = (buffer) ->
 		return buffer
 
 
-meshlib = (model, options) ->
+meshlib = (modelData, options) ->
+
+	if typeof modelData is 'string'
+		return parseString modelData, options
+			.then (model) ->
+				return new Model model
+
 	if not model.positions? or not model.indices? or not
 	    model.vertexNormals? or not model.faceNormals?
 			model = parseBuffer(model, options)
 
-	return new Model model, options
+			return new Model model, options
 
 
 meshlib.meshData = () ->
@@ -92,30 +120,7 @@ meshlib.export = (options, callback) ->
 	return meshlib
 
 
-meshlib.parse = (fileBuffer, options, callback) ->
-	if not fileBuffer
-		throw new Error 'STL buffer is empty'
-	else
-		importFileBuffer = fileBuffer
-
-	options ?= {}
-	options.format ?= 'stl'
-
-	if options.format is 'stl'
-		try
-			stl = new Stl toArrayBuffer fileBuffer
-			model = stl.model()
-		catch error
-			if typeof callback is 'function'
-				callback error
-				return meshlib
-			else
-				throw error
-
-	if typeof callback is 'function'
-		callback(null, model)
-
-	return meshlib
+meshlib.parse = parse
 
 meshlib.separateGeometry = require('./separateGeometry')
 meshlib.OptimizedModel = require('./OptimizedModel')

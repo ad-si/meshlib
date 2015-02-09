@@ -249,8 +249,11 @@ class Stl
 		options.optimize ?= true
 		options.cleanse ?= true
 
-		if Buffer
-			stlString = new Buffer(new Uint8Array(stlBuffer)).toString()
+		if typeof stlBuffer is 'string'
+			stlString = stlBuffer
+
+		else if Buffer
+			stlString = new Buffer(new Uint8Array stlBuffer).toString()
 
 		else
 			stlString = textEncoding
@@ -260,7 +263,7 @@ class Stl
 
 		# TODO: Just try to parse as Ascii and handle possible errors
 		if stlString.startsWith('solid') and stlString.includes('facet') and
-		stlString.includes ('vertex')
+		  stlString.includes ('vertex')
 			try
 				@modelObject = parseAscii stlString
 			catch error
