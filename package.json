@@ -40,6 +40,7 @@
   "dependencies": {
     "coffee-script": "^1.9.0",
     "commander": "^2.6.0",
+    "es6-promise": "^2.0.1",
     "fs-promise": "^0.3.1"
   }
 }
