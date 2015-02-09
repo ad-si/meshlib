@@ -5,6 +5,7 @@ textEncoding = require 'text-encoding'
 
 Vec3 = require './Vector'
 optimizeModel = require './optimizeModel'
+Polygon = require './Polygon'
 
 
 FileError = (message, calcDataLength, dataLength) ->
@@ -55,7 +56,7 @@ parseAscii = (fileContent) ->
 					throw new FacetError
 					stl.addPolygon currentPoly
 					currentPoly = null
-				currentPoly = new Poly()
+				currentPoly = new Polygon()
 
 			when 'endfacet'
 				if !(currentPoly?)
@@ -75,7 +76,7 @@ parseAscii = (fileContent) ->
 					if not (currentPoly?)
 						throw new NormalError 'Normal definition
 									without an existing polygon!'
-						currentPoly = new Poly()
+						currentPoly = new Polygon()
 					currentPoly.setNormal new Vec3(nx, ny, nz)
 
 			when 'vertex'
@@ -90,7 +91,7 @@ parseAscii = (fileContent) ->
 					if not (currentPoly?)
 						throw new VertexError 'Point definition without
 											an existing polygon!'
-						currentPoly = new Poly()
+						currentPoly = new Polygon()
 					currentPoly.addPoint new Vec3(vx, vy, vz)
 
 	return stl
@@ -112,7 +113,7 @@ parseBinary = (stlBuffer) ->
 
 	binaryIndex = 4
 	while (binaryIndex - 4) + polyLength <= dataLength
-		poly = new Poly()
+		poly = new Polygon()
 		nx = reader.getFloat32 binaryIndex, true
 		binaryIndex += 4
 		ny = reader.getFloat32 binaryIndex, true
@@ -226,18 +227,6 @@ class Binary
 		result.deletedPolygons = @removeInvalidPolygons infoResult
 		result.recalculatedNormals = @recalculateNormals infoResult
 		return result
-
-
-class Poly
-	constructor: () ->
-		@points = []
-		@normal = new Vec3(0, 0, 0)
-
-	setNormal: (@normal) ->
-		return undefined
-
-	addPoint: (p) ->
-		@points.push p
 
 
 class Stl
