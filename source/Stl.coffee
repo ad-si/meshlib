@@ -3,7 +3,7 @@ require 'string.prototype.includes'
 
 textEncoding = require 'text-encoding'
 
-Vec3 = require './Vector'
+Vector = require './Vector'
 optimizeModel = require './optimizeModel'
 Polygon = require './Polygon'
 
@@ -77,7 +77,7 @@ parseAscii = (fileContent) ->
 						throw new NormalError 'Normal definition
 									without an existing polygon!'
 						currentPoly = new Polygon()
-					currentPoly.setNormal new Vec3(nx, ny, nz)
+					currentPoly.setNormal new Vector(nx, ny, nz)
 
 			when 'vertex'
 				vx = parseFloat astl.nextText()
@@ -92,7 +92,7 @@ parseAscii = (fileContent) ->
 						throw new VertexError 'Point definition without
 											an existing polygon!'
 						currentPoly = new Polygon()
-					currentPoly.addPoint new Vec3(vx, vy, vz)
+					currentPoly.addPoint new Vector(vx, vy, vz)
 
 	return stl
 
@@ -120,7 +120,7 @@ parseBinary = (stlBuffer) ->
 		binaryIndex += 4
 		nz = reader.getFloat32 binaryIndex, true
 		binaryIndex += 4
-		poly.setNormal new Vec3(nx, ny, nz)
+		poly.setNormal new Vector(nx, ny, nz)
 		for i in [0..2]
 			vx = reader.getFloat32 binaryIndex, true
 			binaryIndex += 4
@@ -128,7 +128,7 @@ parseBinary = (stlBuffer) ->
 			binaryIndex += 4
 			vz = reader.getFloat32 binaryIndex, true
 			binaryIndex += 4
-			poly.addPoint new Vec3(vx, vy, vz)
+			poly.addPoint new Vector(vx, vy, vz)
 		#skip uint 16
 		binaryIndex += 2
 		stl.addPolygon poly
