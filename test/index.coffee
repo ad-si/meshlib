@@ -5,6 +5,16 @@ expect = require('chai').expect
 Model = require '../source/Model'
 meshlib = require '../source/index'
 
+minimalStl = 'solid triangle
+    facet normal  1 1 1
+        outer loop
+	      vertex  0 0 1
+	      vertex   0 1 0
+	      vertex  1 0 0
+        endloop
+	endfacet
+endsolid triangle'
+
 
 models = [
 	'unitCube'
