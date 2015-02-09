@@ -1,5 +1,6 @@
 require('es6-promise').polyfill()
 
+Model = require './Model'
 Stl = require './Stl'
 stlExport = require './stlExport'
 optimizeModel = require './optimizeModel'
