@@ -1,12 +1,12 @@
 fs = require 'fs'
 path = require 'path'
-chai = require('chai')
-chaiAsPromised = require("chai-as-promised")
+chai = require 'chai'
 
 Model = require '../source/Model'
 meshlib = require '../source/index'
 
-chai.use(chaiAsPromised)
+chai.use require './chaiHelper'
+chai.use require 'chai-as-promised'
 expect = chai.expect
 
 minimalStl = 'solid triangle
@@ -19,6 +19,9 @@ minimalStl = 'solid triangle
 	endfacet
 endsolid triangle'
 
+mediumStl = fs.readFileSync(
+	path.join(__dirname, './models/gearwheel.ascii.stl'), {encoding: 'utf-8'}
+)
 
 models = [
 	'unitCube'
@@ -30,6 +33,7 @@ models = [
 	'bunny'
 ]
 
+
 checkEquality = (dataFromAscii, dataFromBinary, arrayName) ->
 	fromAscii = dataFromAscii[arrayName].map (position) -> Math.round position
 	fromBinary = dataFromBinary[arrayName].map (position) -> Math.round position
@@ -40,10 +44,11 @@ checkEquality = (dataFromAscii, dataFromBinary, arrayName) ->
 describe 'Meshlib', ->
 	it 'should return a model object', () ->
 		return expect(meshlib minimalStl, {format: 'stl'})
-			.to.eventually.be.an.instanceof Model
+			.to.eventually.be.a.model
+
 
 	it.skip 'should be optimizable', ->
-		modelPromise = meshlib(minimalStl, {format: 'stl'}).optimize()
+		modelPromise = meshlib(mediumStl, {format: 'stl'}).optimize()
 		return expect(modelPromise).to.eventually.be.optimized
 
 
