@@ -1,15 +1,19 @@
 fs = require 'fs'
 path = require 'path'
-expect = require('chai').expect
+chai = require('chai')
+chaiAsPromised = require("chai-as-promised")
 
 Model = require '../source/Model'
 meshlib = require '../source/index'
+
+chai.use(chaiAsPromised)
+expect = chai.expect
 
 minimalStl = 'solid triangle
     facet normal  1 1 1
         outer loop
 	      vertex  0 0 1
-	      vertex   0 1 0
+	      vertex  0 1 0
 	      vertex  1 0 0
         endloop
 	endfacet
@@ -33,16 +37,14 @@ checkEquality = (dataFromAscii, dataFromBinary, arrayName) ->
 	expect(fromAscii).to.deep.equal(fromBinary)
 
 
-describe 'Meshlib', () ->
-	it 'should return a model object', (done) ->
+describe 'Meshlib', ->
+	it 'should return a model object', () ->
+		return expect(meshlib minimalStl, {format: 'stl'})
+			.to.eventually.be.an.instanceof Model
 
-		meshlib minimalStl, {format: 'stl'}
-			.then (model) ->
-				expect(model).to.be.an.instanceof Model
-			.then ->
-				done()
-			.catch (error) ->
-				done error
+	it.skip 'should be optimizable', ->
+		modelPromise = meshlib(minimalStl, {format: 'stl'}).optimize()
+		return expect(modelPromise).to.eventually.be.optimized
 
 
 describe 'Model Parsing', () ->
