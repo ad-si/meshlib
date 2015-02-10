@@ -1,6 +1,6 @@
 require('es6-promise').polyfill()
 
-Model = require './Model'
+ModelPromise = require './ModelPromise'
 Stl = require './Stl'
 stlExport = require './stlExport'
 optimizeModel = require './optimizeModel'
@@ -45,19 +45,18 @@ parseString = (modelString, options) ->
 	options.format ?= 'stl'
 	options.encoding ?= 'utf-8'
 
-	return new Promise (resolve, reject) ->
+	return new Promise (fulfill, reject) ->
 
 		if not modelString
 			reject new Error 'Model string is empty!'
 
 		if options.format is 'stl'
 			try
-				stl = new Stl modelString
-				model = stl.model()
+				model = new Stl(modelString).model()
 			catch error
 				return reject error
 
-			return resolve(model)
+			return fulfill model
 
 		return reject new Error 'Model string can not be parsed!'
 
@@ -82,13 +81,13 @@ meshlib = (modelData, options) ->
 	if typeof modelData is 'string'
 		return parseString modelData, options
 			.then (model) ->
-				return new Model model
+				return new ModelPromise model
 
-	if not model.positions? or not model.indices? or not
-	    model.vertexNormals? or not model.faceNormals?
-			model = parseBuffer(model, options)
-
-			return new Model model, options
+#	if not model.positions? or not model.indices? or not
+#	    model.vertexNormals? or not model.faceNormals?
+#			model = parseBuffer(model, options)
+#
+#			return new Model model, options
 
 
 meshlib.meshData = () ->
