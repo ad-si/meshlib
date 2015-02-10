@@ -37,10 +37,6 @@ parseAscii = (fileContent) ->
 	astl = new Ascii(fileContent)
 	stl = new Binary()
 
-	# TODO:
-	# if calcDataLength > dataLength
-	#   throw new FileError null, calcDataLength, dataLength
-
 	currentPoly = null
 
 	while !astl.reachedEnd()
@@ -230,7 +226,7 @@ class Binary
 
 
 class Stl
-	constructor: (stlBuffer, options) ->
+	constructor: (stl, options) ->
 
 		@modelObject = {}
 
@@ -238,31 +234,31 @@ class Stl
 		options.optimize ?= true
 		options.cleanse ?= true
 
-		if typeof stlBuffer is 'string'
-			stlString = stlBuffer
+		containsKeywords = (stlString) ->
+			return stlString.startsWith('solid') and
+					stlString.includes('facet') and
+					stlString.includes ('vertex')
 
-		else if Buffer
-			stlString = new Buffer(new Uint8Array stlBuffer).toString()
-
+		if typeof stl is 'string'
+			if containsKeywords stl
+				@modelObject = parseAscii stl
+			else
+				throw new Error 'STL string does not contain all stl-keywords!'
 		else
-			stlString = textEncoding
-				.TextDecoder 'utf-8'
-				.decode new Uint8Array stlBuffer
+			if Buffer
+				stlString = new Buffer(new Uint8Array stl).toString()
+			else
+				stlString = textEncoding
+					.TextDecoder 'utf-8'
+					.decode new Uint8Array stl
 
-
-		# TODO: Just try to parse as Ascii and handle possible errors
-		if stlString.startsWith('solid') and stlString.includes('facet') and
-		  stlString.includes ('vertex')
-			try
+			if containsKeywords stlString
 				@modelObject = parseAscii stlString
-			catch error
-				console.error error
-				@modelObject = parseBinary stlBuffer
+				return
 
-		else @modelObject = parseBinary stlBuffer
+			@modelObject = parseBinary stl
 
-		if options.optimize
-			@modelObject = optimizeModel @modelObject, options
+		return @
 
 	model: () ->
 		return @modelObject
