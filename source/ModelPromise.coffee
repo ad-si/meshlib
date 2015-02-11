@@ -5,7 +5,7 @@ Model = require './Model'
 
 class ModelPromise
 	constructor: (@mesh, @options) ->
-		@ready = new Promise (fulfill, reject) ->
+		@ready = new Promise (fulfill, reject) =>
 			try
 				@model = new Model @mesh, @options
 			catch error
@@ -14,9 +14,20 @@ class ModelPromise
 			fulfill @model
 		return @
 
+	setPolygons: (polygons) =>
+		@ready = @ready.then =>
+			new Promise (fulfill, reject) =>
+				try
+					@model.setPolygons(polygons)
+				catch error
+					reject error
+
+				fulfill @model
+		return @
+
 	optimize: () =>
-		@ready = @ready.then ->
-			return new Promise (fulfill, reject) ->
+		@ready = @ready.then =>
+			return new Promise (fulfill, reject) =>
 				try
 					@model = @model.optimize()
 				catch error
@@ -27,12 +38,12 @@ class ModelPromise
 
 	thenDo: (callback) =>
 		@ready = @ready
-			.then () ->
+			.then () =>
 				return callback @model
 		return @
 
 	then: (callback) =>
-		@ready = @ready.then ->
+		@ready = @ready.then =>
 			return callback @model
 		return @ready
 

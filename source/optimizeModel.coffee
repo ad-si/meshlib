@@ -7,7 +7,7 @@ module.exports = (importedStl, options) ->
 
 	options ?= {}
 
-	cleanseStl = options.cleanseStl || true
+	cleanseStl = options.cleanseStl || false
 	pointDistanceEpsilon = options.pointDistanceEpsilon || 0.0001
 
 	if cleanseStl

@@ -1,24 +1,24 @@
-# Abstracts the actual model from the external fluid api
+optimizeModel = require './optimizeModel'
 
+
+# Abstracts the actual model from the external fluid api
 class Model
 	constructor: (@mesh, @options) ->
+		@mesh ?= {}
+		@options ?= {}
 
 	toStl: (options) ->
 		options ?= {}
 		options.encoding ?= 'binary' # ascii
 		options.type ?= 'buffer' # string
+		return @
 
 	optimize: () =>
-		@ready = @ready.then (model) ->
-			return new Promise (fulfill, reject) ->
-				try
-					@mesh = optimizeModel @mesh
-				catch error
-					return reject error
+		@mesh = optimizeModel @mesh
+		return @
 
-				fulfill model
-
-		return @ready
-
+	setPolygons: (polygons) =>
+		@mesh.polygons = polygons
+		return @
 
 module.exports = Model

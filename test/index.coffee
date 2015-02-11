@@ -41,13 +41,12 @@ checkEquality = (dataFromAscii, dataFromBinary, arrayName) ->
 	expect(fromAscii).to.deep.equal(fromBinary)
 
 
-describe 'Meshlib', ->
+describe.only 'Meshlib', ->
 	it 'should return a model object', () ->
 		return expect(meshlib minimalStl, {format: 'stl'})
 			.to.eventually.be.a.model
 
-
-	it.skip 'should be optimizable', ->
+	it 'should be optimizable', ->
 		modelPromise = meshlib(mediumStl, {format: 'stl'}).optimize()
 		return expect(modelPromise).to.eventually.be.optimized
 

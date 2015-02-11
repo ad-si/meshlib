@@ -52,11 +52,11 @@ parseString = (modelString, options) ->
 
 		if options.format is 'stl'
 			try
-				model = new Stl(modelString).model()
+				polygonModel = new Stl(modelString).model()
 			catch error
 				return reject error
 
-			return fulfill model
+			return fulfill polygonModel
 
 		reject new Error 'Model string can not be parsed!'
 
@@ -79,9 +79,13 @@ toArrayBuffer = (buffer) ->
 meshlib = (modelData, options) ->
 
 	if typeof modelData is 'string'
-		return parseString modelData, options
-			.then (model) ->
-				return new ModelPromise model
+
+		return new ModelPromise()
+			.thenDo (model) ->
+				return parseString modelData, options
+					.then (polygonModel) ->
+						return model.setPolygons(polygonModel.polygons)
+
 
 #	if not model.positions? or not model.indices? or not
 #	    model.vertexNormals? or not model.faceNormals?
@@ -96,10 +100,6 @@ meshlib.meshData = () ->
 meshlib.model = (newModel) ->
 	model = newModel
 	return meshlib
-
-meshlib.optimize = () ->
-	# TODO: fix
-	model = optimizeModel model
 
 meshlib.export = (options, callback) ->
 	options ?= {}
