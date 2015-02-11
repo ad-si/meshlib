@@ -17,6 +17,10 @@
     "stl",
     "mesh"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Lowfab/meshlib.git"
+  },
   "author": "Lowfab",
   "license": "MIT",
   "devDependencies": {
