@@ -10,7 +10,10 @@ module.exports = (chai, utils) ->
 
 	chai.Assertion.addProperty 'optimized', () ->
 		@assert(
-			@_obj instanceof Model,
+			@_obj.hasOwnProperty 'indices' and
+				@_obj.hasOwnProperty 'positions' and
+					@_obj.hasOwnProperty 'vertexNormals' and
+						@_obj.hasOwnProperty 'faceNormals'
 			'expected #{this} to be a Model',
 			'expected #{this} to not be a Model'
 		)
