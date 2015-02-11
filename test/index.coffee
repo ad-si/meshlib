@@ -50,6 +50,10 @@ describe.only 'Meshlib', ->
 		modelPromise = meshlib(mediumStl, {format: 'stl'}).optimize()
 		return expect(modelPromise).to.eventually.be.optimized
 
+	it 'should be optimizable', ->
+		modelPromise = meshlib(mediumStl, {format: 'stl'}).optimize()
+		return expect(modelPromise).to.eventually.be.optimized
+
 
 describe 'Model Parsing', () ->
 	models.forEach (model) ->
