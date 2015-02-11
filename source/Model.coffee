@@ -1,9 +1,7 @@
+# Abstracts the actual model from the external fluid api
+
 class Model
-
-	# Abstracts the actual model from the external fluid api
-
 	constructor: (@mesh, @options) ->
-		@ready = Promise.resolve null
 
 	toStl: (options) ->
 		options ?= {}

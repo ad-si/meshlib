@@ -58,7 +58,7 @@ parseString = (modelString, options) ->
 
 			return fulfill model
 
-		return reject new Error 'Model string can not be parsed!'
+		reject new Error 'Model string can not be parsed!'
 
 
 
