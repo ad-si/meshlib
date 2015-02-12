@@ -9,15 +9,6 @@ chai.use require './chaiHelper'
 chai.use require 'chai-as-promised'
 expect = chai.expect
 
-minimalStl = 'solid triangle
-    facet normal  1 1 1
-        outer loop
-	      vertex  0 0 1
-	      vertex  0 1 0
-	      vertex  1 0 0
-        endloop
-	endfacet
-endsolid triangle'
 
 mediumStl = fs.readFileSync(
 	path.join(__dirname, './models/gearwheel.ascii.stl'), {encoding: 'utf-8'}
