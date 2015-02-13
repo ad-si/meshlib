@@ -1,4 +1,4 @@
-solid minimal model
+solid tetrahedron
     facet normal 0.57735027 0.57735027 0.57735027
         outer loop
 	      vertex 1 0 0
@@ -27,4 +27,4 @@ solid minimal model
 	      vertex 1 0 0
         endloop
 	endfacet
-endsolid minimal model
+endsolid tetrahedron
