@@ -6,6 +6,7 @@ textEncoding = require 'text-encoding'
 Vector = require './Vector'
 optimizeModel = require './optimizeModel'
 Polygon = require './Polygon'
+converters = require './converters'
 
 
 FileError = (message, calcDataLength, dataLength) ->

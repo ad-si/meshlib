@@ -4,6 +4,7 @@ ModelPromise = require './ModelPromise'
 Stl = require './Stl'
 stlExport = require './stlExport'
 optimizeModel = require './optimizeModel'
+converters = require './converters'
 
 importFileBuffer = ''
 meshlib = {}
@@ -59,21 +60,6 @@ parseString = (modelString, options) ->
 			return fulfill polygonModel
 
 		reject new Error 'Model string can not be parsed!'
-
-
-
-toArrayBuffer = (buffer) ->
-	if Buffer && Buffer.isBuffer buffer
-		tempArrayBuffer = new ArrayBuffer buffer.length
-		view = new Uint8Array tempArrayBuffer
-
-		for i in [0...buffer.length]
-			view[i] = buffer[i]
-
-		return tempArrayBuffer
-
-	else
-		return buffer
 
 
 meshlib = (modelData, options) ->
