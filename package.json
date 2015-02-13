@@ -25,7 +25,6 @@
   "license": "MIT",
   "devDependencies": {
     "chai": "^1.10.0",
-    "es6-promise": "^2.0.1",
     "express": "^4.11.1",
     "filesaver.js": "^0.1.1",
     "fsp": "^0.1.2",
@@ -34,10 +33,6 @@
     "mkdirp": "^0.5.0",
     "mocha": "^2.1.0",
     "readdirp": "^1.3.0",
-    "string.prototype.endswith": "^0.2.0",
-    "string.prototype.includes": "^1.0.0",
-    "string.prototype.startswith": "^0.2.0",
-    "text-encoding": "^0.5.2",
     "three": "^0.69.0",
     "winston": "^0.9.0"
   },
@@ -46,6 +41,10 @@
     "coffee-script": "^1.9.0",
     "commander": "^2.6.0",
     "es6-promise": "^2.0.1",
-    "fs-promise": "^0.3.1"
+    "fs-promise": "^0.3.1",
+    "text-encoding": "^0.5.2",
+    "string.prototype.endswith": "^0.2.0",
+    "string.prototype.includes": "^1.0.0",
+    "string.prototype.startswith": "^0.2.0"
   }
 }
