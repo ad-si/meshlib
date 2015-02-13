@@ -9,20 +9,26 @@ chai.use require './chaiHelper'
 chai.use require 'chai-as-promised'
 expect = chai.expect
 
-
-mediumStl = fs.readFileSync(
-	path.join(__dirname, './models/gearwheel.ascii.stl'), {encoding: 'utf-8'}
-)
-
 models = [
-	'unitCube'
+	'polytopes/triangle'
+	'polytopes/cube'
 	'gearwheel'
 	'geoSplit2'
 	'geoSplit4'
 	'geoSplit5'
 	'geoSplit7'
 	'bunny'
-]
+].map (model) ->
+	return {
+		name: model
+		asciiPath: path.join __dirname, 'models', model + '.ascii.stl'
+		binaryPath: path.join __dirname, 'models', model + '.bin.stl'
+	}
+
+modelsMap = models.reduce (previous, current, index) ->
+	previous[current.name] = models[index]
+	return previous
+, {}
 
 
 checkEquality = (dataFromAscii, dataFromBinary, arrayName) ->
@@ -33,30 +39,43 @@ checkEquality = (dataFromAscii, dataFromBinary, arrayName) ->
 
 
 describe.only 'Meshlib', ->
-	it 'should return a model object', () ->
-		return expect(meshlib minimalStl, {format: 'stl'})
-			.to.eventually.be.a.model
+	it 'should return a model object', ->
+		asciiStl = fs.readFileSync modelsMap['polytopes/triangle'].asciiPath
+		binaryStl = fs.readFileSync modelsMap['polytopes/triangle'].binaryPath
+
+		modelPromise = meshlib asciiStl, {format: 'stl'}
+			.done (model) ->
+				return model
+
+		return expect(modelPromise).to.eventually.be.a.model
 
 	it 'should be optimizable', ->
-		modelPromise = meshlib(mediumStl, {format: 'stl'}).optimize()
+		asciiStl = fs.readFileSync modelsMap.gearwheel.asciiPath
+		binaryStl = fs.readFileSync modelsMap.gearwheel.binaryPath
+
+		modelPromise = meshlib asciiStl, {format: 'stl'}
+			.optimize()
+			.done (model) ->
+				return model
+
 		return expect(modelPromise).to.eventually.be.optimized
 
-	it 'should be optimizable', ->
+	it.skip 'should be optimizable', ->
 		modelPromise = meshlib(mediumStl, {format: 'stl'}).optimize()
 		return expect(modelPromise).to.eventually.be.optimized
 
 
 describe 'Model Parsing', () ->
 	models.forEach (model) ->
-		describe model, () ->
-			fromAscii = undefined
-			fromBinary = undefined
+		describe model.name, () ->
+
+			fromAscii = null
+			fromBinary = null
 
 			it 'should load and parse ASCII STL file', (done) ->
 				@timeout('8s')
 
-				asciiStlBuffer = fs.readFileSync path.join __dirname,
-					'models', model + '.ascii.stl'
+				asciiStlBuffer = fs.readFileSync model.asciiPath
 
 				meshlib.parse asciiStlBuffer, null, (error, dataFromAscii) ->
 					if error
@@ -73,8 +92,7 @@ describe 'Model Parsing', () ->
 			it 'should load and parse binary STL file', (done) ->
 				@timeout('8s')
 
-				binaryStlBuffer = fs.readFileSync path.join __dirname,
-					'models', model + '.bin.stl'
+				binaryStlBuffer = fs.readFileSync model.binaryPath
 
 				meshlib.parse binaryStlBuffer, null, (error, dataFromBinary) ->
 					if error

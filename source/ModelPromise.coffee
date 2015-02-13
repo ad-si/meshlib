@@ -4,10 +4,10 @@ Model = require './Model'
 
 
 class ModelPromise
-	constructor: (@mesh, @options) ->
+	constructor: (mesh, options) ->
 		@ready = new Promise (fulfill, reject) =>
 			try
-				@model = new Model @mesh, @options
+				@model = new Model mesh, options
 			catch error
 				reject error
 
@@ -25,7 +25,7 @@ class ModelPromise
 				fulfill @model
 		return @
 
-	optimize: () =>
+	optimize: =>
 		@ready = @ready.then =>
 			return new Promise (fulfill, reject) =>
 				try
@@ -36,15 +36,17 @@ class ModelPromise
 				fulfill @model
 		return @
 
-	thenDo: (callback) =>
-		@ready = @ready
-			.then () =>
-				return callback @model
+	next: (onFulfilled, onRejected) =>
+		@done onFulfilled, onRejected
 		return @
 
-	then: (callback) =>
-		@ready = @ready.then =>
-			return callback @model
+	done: (onFulfilled, onRejected) =>
+		onFulfilledTemp = => onFulfilled? @model
+		@ready = @ready.then onFulfilledTemp, onRejected
+		return @ready
+
+	catch: (onRejected) =>
+		@ready = @ready.catch onRejected
 		return @ready
 
 module.exports = ModelPromise
