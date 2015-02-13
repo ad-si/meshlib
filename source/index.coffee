@@ -12,48 +12,18 @@ meshData = {}
 model = {}
 
 
-parse = (fileBuffer, options, callback) ->
+parse = (modelData, options = {}) ->
 
-	options ?= {}
 	options.format ?= 'stl'
-
-	if not fileBuffer
-		throw new Error 'STL buffer is empty'
-
-	else if typeof fileBuffer isnt 'string'
-		fileBuffer = toArrayBuffer fileBuffer
-
-	if options.format is 'stl'
-		try
-			stl = new Stl fileBuffer
-			model = stl.model()
-		catch error
-			if typeof callback is 'function'
-				callback error
-				return meshlib
-			else
-				throw error
-
-	if typeof callback is 'function'
-		callback(null, model)
-
-	return meshlib
-
-
-parseString = (modelString, options) ->
-
-	options ?= {}
-	options.format ?= 'stl'
-	options.encoding ?= 'utf-8'
 
 	return new Promise (fulfill, reject) ->
 
-		if not modelString
+		if not modelData
 			reject new Error 'Model string is empty!'
 
 		if options.format is 'stl'
 			try
-				polygonModel = new Stl(modelString).model()
+				polygonModel = new Stl(modelData).model()
 			catch error
 				return reject error
 
@@ -64,20 +34,19 @@ parseString = (modelString, options) ->
 
 meshlib = (modelData, options) ->
 
-	if typeof modelData is 'string'
+	if typeof modelData isnt 'string'
+		modelData = converters.toArrayBuffer modelData
 
-		return new ModelPromise()
-			.thenDo (model) ->
-				return parseString modelData, options
-					.then (polygonModel) ->
-						return model.setPolygons(polygonModel.polygons)
+	return new ModelPromise()
+		.next (model) ->
+			return parse modelData, options
+				.then (polygonModel) ->
+					try
+						model.setPolygons polygonModel.polygons
+					catch error
+						console.error error
 
-
-#	if not model.positions? or not model.indices? or not
-#	    model.vertexNormals? or not model.faceNormals?
-#			model = parseBuffer(model, options)
-#
-#			return new Model model, options
+					return model
 
 
 meshlib.meshData = () ->
