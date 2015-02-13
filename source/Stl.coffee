@@ -193,7 +193,6 @@ class Stl
 
 		options ?= {}
 		options.optimize ?= true
-		options.cleanse ?= true
 
 		containsKeywords = (stlString) ->
 			return stlString.startsWith('solid') and
@@ -206,8 +205,12 @@ class Stl
 			else
 				throw new Error 'STL string does not contain all stl-keywords!'
 		else
+			# TODO: Remove if branch when textEncoding is fixed under node 0.12
+			# https://github.com/inexorabletash/text-encoding/issues/29
 			if Buffer
-				stlString = new Buffer(new Uint8Array stl).toString()
+				stlString = converters
+					.toBuffer(stl)
+					.toString()
 			else
 				stlString = textEncoding
 					.TextDecoder 'utf-8'
