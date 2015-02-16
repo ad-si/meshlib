@@ -36,6 +36,17 @@ class ModelPromise
 				fulfill @model
 		return @
 
+	removeInvalidPolygons: =>
+		@ready = @ready.then =>
+			return new Promise (fulfill, reject) =>
+				try
+					@model = @model.removeInvalidPolygons()
+				catch error
+					return reject error
+
+				fulfill @model
+		return @
+
 	next: (onFulfilled, onRejected) =>
 		@done onFulfilled, onRejected
 		return @

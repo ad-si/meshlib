@@ -17,18 +17,25 @@ class Model
 		@mesh = optimizeModel @mesh
 		return @
 
-	removeInvalidPolygons = () =>
-
+	removeInvalidPolygons: () =>
 		deletedPolygons = []
 
-		return @mesh.polygons.map (polygon) ->
-			if polygon.points.length is 3
-				return polygon
-			else
-				deletedPolygons.push polygon
+		if @mesh.polygons
+			console.log(@mesh.polygons)
+			@mesh.polygons = @mesh.polygons.map (polygon) ->
+				if polygon.vertices.length is 3
+					return polygon
+				else
+					deletedPolygons.push polygon
+					polygon.vertices = polygon.vertices.slice(0, 3)
+					return polygon
+			console.log(@mesh.polygons)
+		else
+			throw new Error 'No polygons available.
+							Make sure to generate them first.'
+		return @
 
-	recalculateNormals = () =>
-
+	recalculateNormals: () =>
 		newNormals = []
 
 		@polygons = @polygons.map (polygon) ->
@@ -44,7 +51,7 @@ class Model
 
 			polygon.normal = normal
 
-		return newNormals
+		return @
 
 	setPolygons: (polygons) =>
 		@mesh.polygons = polygons
