@@ -13,6 +13,7 @@ models = [
 	'polytopes/triangle'
 	'polytopes/cube'
 	'broken/fourVertices'
+	'broken/twoVertices'
 	'gearwheel'
 	'geoSplit2'
 	'geoSplit4'
@@ -42,7 +43,6 @@ checkEquality = (dataFromAscii, dataFromBinary, arrayName) ->
 describe.only 'Meshlib', ->
 	it 'should return a model object', ->
 		asciiStl = fs.readFileSync modelsMap['polytopes/triangle'].asciiPath
-		binaryStl = fs.readFileSync modelsMap['polytopes/triangle'].binaryPath
 
 		modelPromise = meshlib asciiStl, {format: 'stl'}
 			.done (model) ->
@@ -51,9 +51,8 @@ describe.only 'Meshlib', ->
 		return expect(modelPromise).to.eventually.be.a.model
 
 
-	it 'should be optimizable', ->
+	it 'should create a face-vertex mesh', ->
 		asciiStl = fs.readFileSync modelsMap.gearwheel.asciiPath
-		binaryStl = fs.readFileSync modelsMap.gearwheel.binaryPath
 
 		modelPromise = meshlib asciiStl, {format: 'stl'}
 			.optimize()
@@ -63,11 +62,22 @@ describe.only 'Meshlib', ->
 		return expect(modelPromise).to.eventually.be.optimized
 
 
-	it 'should fix polygons with 4 or more vertices', ->
+	it 'should fix faces with 4 or more vertices', ->
 		asciiStl = fs.readFileSync modelsMap['broken/fourVertices'].asciiPath
 
 		modelPromise = meshlib asciiStl, {format: 'stl'}
-			.removeInvalidPolygons()
+			.fixFaces()
+			.done (model) ->
+				return model
+
+		return expect(modelPromise).to.eventually.be.a.triangleMesh
+
+
+	it 'should fix faces with 2 or less vertices', ->
+		asciiStl = fs.readFileSync modelsMap['broken/twoVertices'].asciiPath
+
+		modelPromise = meshlib asciiStl, {format: 'stl'}
+			.fixFaces()
 			.done (model) ->
 				return model
 
