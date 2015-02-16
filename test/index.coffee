@@ -12,6 +12,7 @@ expect = chai.expect
 models = [
 	'polytopes/triangle'
 	'polytopes/cube'
+	'broken/fourVertices'
 	'gearwheel'
 	'geoSplit2'
 	'geoSplit4'
@@ -49,6 +50,7 @@ describe.only 'Meshlib', ->
 
 		return expect(modelPromise).to.eventually.be.a.model
 
+
 	it 'should be optimizable', ->
 		asciiStl = fs.readFileSync modelsMap.gearwheel.asciiPath
 		binaryStl = fs.readFileSync modelsMap.gearwheel.binaryPath
@@ -60,9 +62,16 @@ describe.only 'Meshlib', ->
 
 		return expect(modelPromise).to.eventually.be.optimized
 
-	it.skip 'should be optimizable', ->
-		modelPromise = meshlib(mediumStl, {format: 'stl'}).optimize()
-		return expect(modelPromise).to.eventually.be.optimized
+
+	it 'should fix polygons with 4 or more vertices', ->
+		asciiStl = fs.readFileSync modelsMap['broken/fourVertices'].asciiPath
+
+		modelPromise = meshlib asciiStl, {format: 'stl'}
+			.removeInvalidPolygons()
+			.done (model) ->
+				return model
+
+		return expect(modelPromise).to.eventually.be.a.triangleMesh
 
 
 describe 'Model Parsing', () ->

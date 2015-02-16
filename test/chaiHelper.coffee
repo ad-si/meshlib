@@ -30,3 +30,14 @@ module.exports = (chai, utils) ->
 			'expected #{this} to have faceNormals',
 			'expected #{this} to not have faceNormals'
 		)
+
+	chai.Assertion.addProperty 'triangleMesh', () ->
+
+		allTriangles = @_obj.mesh.polygons.every (polygon) ->
+			return polygon.vertices.length is 3
+
+		@assert(
+			allTriangles
+			'expected mesh #{this} to consist only of triangles',
+			'expected mesh #{this} to not consist only of triangles'
+		)
