@@ -89,7 +89,7 @@ parseAscii = (fileContent) ->
 						throw new VertexError 'Point definition without
 											an existing polygon!'
 						currentPoly = new Polygon()
-					currentPoly.addPoint new Vector(vx, vy, vz)
+					currentPoly.addVertex new Vector(vx, vy, vz)
 
 	return stl
 
@@ -125,7 +125,7 @@ parseBinary = (stlBuffer) ->
 			binaryIndex += 4
 			vz = reader.getFloat32 binaryIndex, true
 			binaryIndex += 4
-			poly.addPoint new Vector(vx, vy, vz)
+			poly.addVertex new Vector(vx, vy, vz)
 		#skip uint 16
 		binaryIndex += 2
 		stl.addPolygon poly

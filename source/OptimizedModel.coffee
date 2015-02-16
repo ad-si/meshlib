@@ -140,7 +140,7 @@ class OptimizedModel
 	# if bufferGeoemtry is set to true, a BufferGeometry using
 	# the vertex normals will be created
 	# else, a normal Geometry with face normals will be created
-	# (contains duplicate points, but provides better shading for sharp edges)
+	# (contains duplicate vertices, but provides better shading for sharp edges)
 	convertToThreeGeometry: (bufferGeometry = false) ->
 		if (bufferGeometry)
 			return @createBufferGeometry()

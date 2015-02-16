@@ -2,13 +2,13 @@ Vector = require './Vector'
 
 class Polygon
 	constructor: () ->
-		@points = []
+		@vertices = []
 		@normal = new Vector(0, 0, 0)
 
 	setNormal: (@normal) ->
 		return
 
-	addPoint: (point) ->
-		@points.push point
+	addVertex: (vertex) ->
+		@vertices.push vertex
 
 module.exports = Polygon

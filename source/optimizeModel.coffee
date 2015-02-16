@@ -20,23 +20,30 @@ module.exports = (importedStl, options) ->
 	octreeRoot = new Octree(pointDistanceEpsilon)
 	biggestPointIndex = -1
 
-	for poly in importedStl.polygons
-		#add points if they don't exist, or get index of these points
+	for polygon in importedStl.polygons
+		# Add vertices if they don't exist, or get index of these vertices
 		indices = [-1,-1,-1]
 		for vertexIndex in [0..2]
-			point = poly.points[vertexIndex]
-			newPointIndex = octreeRoot.add point,
-				new Vec3(poly.normal.x, poly.normal.y, poly.normal.z), biggestPointIndex
+			vertex = polygon.vertices[vertexIndex]
+			newPointIndex = octreeRoot.add vertex,
+				new Vec3(
+					polygon.normal.x,
+					polygon.normal.y,
+					polygon.normal.z
+				),
+				biggestPointIndex
+
 			indices[vertexIndex] = newPointIndex
+
 			if newPointIndex > biggestPointIndex
 				biggestPointIndex = newPointIndex
 
 		index.push indices[0]
 		index.push indices[1]
 		index.push indices[2]
-		faceNormals.push poly.normal.x
-		faceNormals.push poly.normal.y
-		faceNormals.push poly.normal.z
+		faceNormals.push polygon.normal.x
+		faceNormals.push polygon.normal.y
+		faceNormals.push polygon.normal.z
 
 	#get a list out of the octree
 	vertexPositions = new Array((biggestPointIndex + 1) * 3)

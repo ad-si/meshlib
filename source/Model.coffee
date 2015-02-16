@@ -32,8 +32,8 @@ class Model
 		newNormals = []
 
 		@polygons = @polygons.map (polygon) ->
-			d1 = polygon.points[1].minus polygon.points[0]
-			d2 = polygon.points[2].minus polygon.points[0]
+			d1 = polygon.vertices[1].minus polygon.vertices[0]
+			d2 = polygon.vertices[2].minus polygon.vertices[0]
 			normal = d1.crossProduct d2
 			normal = normal.normalized()
 
