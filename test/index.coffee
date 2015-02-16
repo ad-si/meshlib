@@ -14,6 +14,7 @@ models = [
 	'polytopes/cube'
 	'broken/fourVertices'
 	'broken/twoVertices'
+	'broken/wrongNormals'
 	'gearwheel'
 	'geoSplit2'
 	'geoSplit4'
@@ -82,6 +83,16 @@ describe.only 'Meshlib', ->
 				return model
 
 		return expect(modelPromise).to.eventually.be.a.triangleMesh
+
+
+	it 'should calculate face-normals', ->
+		asciiStl = fs.readFileSync modelsMap['broken/wrongNormals'].asciiPath
+
+		modelPromise = meshlib asciiStl, {format: 'stl'}
+			.calculateNormals()
+			.done (model) -> model
+
+		return expect(modelPromise).to.eventually.have.correctNormals
 
 
 describe 'Model Parsing', () ->

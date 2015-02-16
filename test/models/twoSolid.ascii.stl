@@ -1,0 +1,96 @@
+solid unit cube
+  facet normal  0 -1  0
+    outer loop
+      vertex  -1 -1 -1
+      vertex   1 -1  1
+      vertex  -1 -1  1
+    endloop
+  endfacet
+  facet normal  0 -1  0
+    outer loop
+      vertex  -1 -1 -1
+      vertex   1 -1 -1
+      vertex   1 -1  1
+    endloop
+  endfacet
+  facet normal  1  0  0
+    outer loop
+      vertex   1 -1 -1
+      vertex   1  1  1
+      vertex   1 -1  1
+    endloop
+  endfacet
+  facet normal  1  0  0
+    outer loop
+      vertex   1 -1 -1
+      vertex   1  1 -1
+      vertex   1  1  1
+    endloop
+  endfacet
+  facet normal  0  1 -0
+    outer loop
+      vertex   1  1 -1
+      vertex  -1  1  1
+      vertex   1  1  1
+    endloop
+  endfacet
+  facet normal  0  1  0
+    outer loop
+      vertex   1  1 -1
+      vertex  -1  1 -1
+      vertex  -1  1  1
+    endloop
+  endfacet
+  facet normal -1  0  0
+    outer loop
+      vertex  -1  1 -1
+      vertex  -1 -1  1
+      vertex  -1  1  1
+    endloop
+  endfacet
+  facet normal -1  0  0
+    outer loop
+      vertex  -1  1 -1
+      vertex  -1 -1 -1
+      vertex  -1 -1  1
+    endloop
+  endfacet
+  facet normal  0  0  1
+    outer loop
+      vertex  -1 -1  1
+      vertex   1  1  1
+      vertex  -1  1  1
+    endloop
+  endfacet
+  facet normal  0  0  1
+    outer loop
+      vertex  -1 -1  1
+      vertex   1 -1  1
+      vertex   1  1  1
+    endloop
+  endfacet
+  facet normal  0  0 -1
+    outer loop
+      vertex  -1  1 -1
+      vertex   1 -1 -1
+      vertex  -1 -1 -1
+    endloop
+  endfacet
+  facet normal  0  0 -1
+    outer loop
+      vertex  -1  1 -1
+      vertex   1  1 -1
+      vertex   1 -1 -1
+    endloop
+  endfacet
+endsolid unit cube
+
+solid triangle
+    facet normal  1 1 1
+        outer loop
+	      vertex  0 0 5
+	      vertex  0 5 0
+	      vertex  5 0 0
+        endloop
+	endfacet
+endsolid triangle
