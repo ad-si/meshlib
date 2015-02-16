@@ -1,4 +1,5 @@
 optimizeModel = require './optimizeModel'
+Vector = require './Vector'
 
 
 # Abstracts the actual model from the external fluid api
@@ -17,19 +18,30 @@ class Model
 		@mesh = optimizeModel @mesh
 		return @
 
-	removeInvalidPolygons: () =>
+	fixFaces: () =>
 		deletedPolygons = []
 
 		if @mesh.polygons
-			console.log(@mesh.polygons)
 			@mesh.polygons = @mesh.polygons.map (polygon) ->
 				if polygon.vertices.length is 3
 					return polygon
-				else
+
+				else if polygon.vertices.length > 3
 					deletedPolygons.push polygon
 					polygon.vertices = polygon.vertices.slice(0, 3)
 					return polygon
-			console.log(@mesh.polygons)
+
+				else if polygon.vertices.length is 2
+					polygon.addVertex new Vector 0,0,0
+					return polygon
+
+				else if polygon.vertices.length is 1
+					polygon.addVertex new Vector 0, 0, 0
+					polygon.addVertex new Vector 1, 1, 1
+					return polygon
+
+				else
+					return null
 		else
 			throw new Error 'No polygons available.
 							Make sure to generate them first.'

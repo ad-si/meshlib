@@ -36,11 +36,11 @@ class ModelPromise
 				fulfill @model
 		return @
 
-	removeInvalidPolygons: =>
+	fixFaces: =>
 		@ready = @ready.then =>
 			return new Promise (fulfill, reject) =>
 				try
-					@model = @model.removeInvalidPolygons()
+					@model = @model.fixFaces()
 				catch error
 					return reject error
 
