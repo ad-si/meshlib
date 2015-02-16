@@ -41,7 +41,7 @@ checkEquality = (dataFromAscii, dataFromBinary, arrayName) ->
 	expect(fromAscii).to.deep.equal(fromBinary)
 
 
-describe.only 'Meshlib', ->
+describe 'Meshlib', ->
 	it 'should return a model object', ->
 		asciiStl = fs.readFileSync modelsMap['polytopes/triangle'].asciiPath
 
@@ -91,52 +91,12 @@ describe.only 'Meshlib', ->
 		return expect(modelPromise).to.eventually.have.correctNormals
 
 
-describe 'Model Parsing', () ->
-	models.forEach (model) ->
-		describe model.name, () ->
+	it.skip 'ascii & binary version should yield the same model', () ->
+		for arrayName in ['positions', 'indices',
+			'vertexNormals', 'faceNormals']
+			it 'should yield the same model', () ->
+				checkEquality fromAscii, fromBinary, arrayName
 
-			fromAscii = null
-			fromBinary = null
-
-			it 'should load and parse ASCII STL file', (done) ->
-				@timeout('8s')
-
-				asciiStlBuffer = fs.readFileSync model.asciiPath
-
-				meshlib.parse asciiStlBuffer, null, (error, dataFromAscii) ->
-					if error
-						throw error
-
-					else if not dataFromAscii
-						throw new Error 'Data is empty!'
-
-					else
-						fromAscii = dataFromAscii
-						done()
-
-
-			it 'should load and parse binary STL file', (done) ->
-				@timeout('8s')
-
-				binaryStlBuffer = fs.readFileSync model.binaryPath
-
-				meshlib.parse binaryStlBuffer, null, (error, dataFromBinary) ->
-					if error
-						throw error
-					else if not dataFromBinary
-						throw new Error 'Data is empty!'
-					else
-						fromBinary = dataFromBinary
-						done()
-
-
-			it 'ascii & binary version should yield the same model', () ->
-				for arrayName in ['positions', 'indices',
-					'vertexNormals', 'faceNormals']
-					it 'should yield the same model', () ->
-						checkEquality fromAscii, fromBinary, arrayName
-
-
-			it 'should split individual geometries in STL file', () ->
-				@timeout('45s')
-				meshlib.separateGeometry(fromBinary)
+	it.skip 'should split individual geometries in STL file', () ->
+		@timeout('45s')
+		meshlib.separateGeometry(fromBinary)

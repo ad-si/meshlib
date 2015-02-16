@@ -21,12 +21,12 @@ describe 'OptimizedMesh', () ->
 			done()
 
 	describe 'THREE.js integration', () ->
-		it 'should import a THREE.Geometry', (done) ->
-			loadOptimizedModel 'test/models/unitCube.bin.stl', (model) ->				
+		it.skip 'should import a THREE.Geometry', (done) ->
+			loadOptimizedModel 'test/models/unitCube.bin.stl', (model) ->
 				inBetweenGeometry = model.createStandardGeometry()
 				model2 = new OptimizedModel()
-				model2.fromThreeGeometry(inBetweenGeometry)	
-			
+				model2.fromThreeGeometry(inBetweenGeometry)
+
 				expect(model.indices).to.deep.equal(model2.indices)
 				expect(model.positions).to.deep.equal(model2.positions)
 
