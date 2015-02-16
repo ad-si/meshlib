@@ -46,8 +46,7 @@ describe.only 'Meshlib', ->
 		asciiStl = fs.readFileSync modelsMap['polytopes/triangle'].asciiPath
 
 		modelPromise = meshlib asciiStl, {format: 'stl'}
-			.done (model) ->
-				return model
+			.done (model) -> model
 
 		return expect(modelPromise).to.eventually.be.a.model
 
@@ -57,8 +56,7 @@ describe.only 'Meshlib', ->
 
 		modelPromise = meshlib asciiStl, {format: 'stl'}
 			.optimize()
-			.done (model) ->
-				return model
+			.done (model) -> model
 
 		return expect(modelPromise).to.eventually.be.optimized
 
@@ -68,8 +66,7 @@ describe.only 'Meshlib', ->
 
 		modelPromise = meshlib asciiStl, {format: 'stl'}
 			.fixFaces()
-			.done (model) ->
-				return model
+			.done (model) -> model
 
 		return expect(modelPromise).to.eventually.be.a.triangleMesh
 
@@ -79,8 +76,7 @@ describe.only 'Meshlib', ->
 
 		modelPromise = meshlib asciiStl, {format: 'stl'}
 			.fixFaces()
-			.done (model) ->
-				return model
+			.done (model) -> model
 
 		return expect(modelPromise).to.eventually.be.a.triangleMesh
 
