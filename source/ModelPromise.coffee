@@ -47,6 +47,17 @@ class ModelPromise
 				fulfill @model
 		return @
 
+	calculateNormals: =>
+		@ready = @ready.then =>
+			return new Promise (fulfill, reject) =>
+				try
+					@model = @model.calculateNormals()
+				catch error
+					return reject error
+
+				fulfill @model
+		return @
+
 	next: (onFulfilled, onRejected) =>
 		@done onFulfilled, onRejected
 		return @

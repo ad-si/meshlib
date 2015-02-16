@@ -1,6 +1,11 @@
 optimizeModel = require './optimizeModel'
 Vector = require './Vector'
 
+NoFacesError = (message) ->
+	this.name = 'NoFacesError'
+	this.message = message or
+		'No faces available. Make sure to generate them first.'
+NoFacesError.prototype = new Error
 
 # Abstracts the actual model from the external fluid api
 class Model
@@ -43,25 +48,28 @@ class Model
 				else
 					return null
 		else
-			throw new Error 'No polygons available.
-							Make sure to generate them first.'
+			throw new NoFacesError
 		return @
 
-	recalculateNormals: () =>
+	calculateNormals: () =>
 		newNormals = []
 
-		@polygons = @polygons.map (polygon) ->
-			d1 = polygon.vertices[1].minus polygon.vertices[0]
-			d2 = polygon.vertices[2].minus polygon.vertices[0]
-			normal = d1.crossProduct d2
-			normal = normal.normalized()
+		if @mesh.polygons
+			@mesh.polygons = @mesh.polygons.map (polygon) ->
+				d1 = polygon.vertices[1].minus polygon.vertices[0]
+				d2 = polygon.vertices[2].minus polygon.vertices[0]
+				normal = d1.crossProduct d2
+				normal = normal.normalized()
 
-			if polygon.normal?
-				distance = poly.normal.euclideanDistanceTo normal
-				if distance > 0.001
-					newNormals.push normal
+				if polygon.normal?
+					distance = polygon.normal.euclideanDistanceTo normal
+					if distance > 0.001
+						newNormals.push normal
 
-			polygon.normal = normal
+				polygon.normal = normal
+				return polygon
+		else
+			throw new NoFacesError
 
 		return @
 
