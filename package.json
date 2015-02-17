@@ -1,6 +1,6 @@
 {
   "name": "meshlib",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "JavaScript library for importing, handling & exporting various 3D file formats",
   "main": "index.js",
   "browser": "build/index",
