@@ -13,12 +13,6 @@ class Model
 		@mesh ?= {}
 		@options ?= {}
 
-	toStl: (options) ->
-		options ?= {}
-		options.encoding ?= 'binary' # ascii
-		options.type ?= 'buffer' # string
-		return @
-
 	optimize: () =>
 		@mesh = optimizeModel @mesh
 		return @
