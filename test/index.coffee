@@ -91,11 +91,25 @@ describe 'Meshlib', ->
 		return expect(modelPromise).to.eventually.have.correctNormals
 
 
-	it.skip 'ascii & binary version should yield the same model', () ->
-		for arrayName in ['positions', 'indices',
-			'vertexNormals', 'faceNormals']
-			it 'should yield the same model', () ->
-				checkEquality fromAscii, fromBinary, arrayName
+	it 'ascii & binary version should have equal faces', () ->
+
+		@timeout('10s')
+
+		asciiStl = fs.readFileSync modelsMap.gearwheel.asciiPath
+		binaryStl = fs.readFileSync modelsMap.gearwheel.binaryPath
+
+		return Promise
+			.all([
+				meshlib(asciiStl, {format: 'stl'})
+					.done((model) -> model)
+				,
+				meshlib(binaryStl, {format: 'stl'})
+					.done((model) -> model)
+			])
+			.then (models) =>
+				expect(models[0].mesh.polygons).to
+					.equalFaces(models[1].mesh.polygons)
+
 
 	it.skip 'should split individual geometries in STL file', () ->
 		@timeout('45s')
