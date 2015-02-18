@@ -1,7 +1,10 @@
-if typeof window is not 'undefined'
+if typeof window isnt 'undefined'
 	saveAs = require 'filesaver.js'
 
-toAsciiStl = (model) ->
+
+toAsciiStl = (model, options = {}) ->
+	options.beautify ?= false
+
 	{faceNormals, indices, positions, originalFileName} = model
 
 	stringifyFaceNormal = (i) ->
@@ -17,15 +20,26 @@ toAsciiStl = (model) ->
 
 	stl = "solid #{originalFileName}\n"
 
-	for i in [0...indices.length] by 3
-		stl +=
-			"facet normal #{stringifyFaceNormal(i)}\n" +
-				'\touter loop\n' +
-				"\t\tvertex #{stringifyVector(indices[i])}\n" +
-				"\t\tvertex #{stringifyVector(indices[i + 1])}\n" +
-				"\t\tvertex #{stringifyVector(indices[i + 2])}\n" +
-				'\tendloop\n' +
-				'endfacet\n'
+	if options.beautify
+		for i in [0...indices.length] by 3
+			stl +=
+				"facet normal #{stringifyFaceNormal(i)}\n" +
+					'\touter loop\n' +
+					"\t\tvertex #{stringifyVector(indices[i])}\n" +
+					"\t\tvertex #{stringifyVector(indices[i + 1])}\n" +
+					"\t\tvertex #{stringifyVector(indices[i + 2])}\n" +
+					'\tendloop\n' +
+					'endfacet\n'
+	else
+		for i in [0...indices.length] by 3
+			stl +=
+				"facet normal #{stringifyFaceNormal(i)}\n" +
+					'outer loop\n' +
+					"vertex #{stringifyVector(indices[i])}\n" +
+					"vertex #{stringifyVector(indices[i + 1])}\n" +
+					"vertex #{stringifyVector(indices[i + 2])}\n" +
+					'endloop\n' +
+					'endfacet\n'
 
 	stl += "endsolid #{originalFileName}\n"
 
@@ -77,14 +91,12 @@ toBinaryStl = (model) ->
 
 
 saveAsBinaryStl = (model) =>
-
 	blob = new Blob [toBinaryStl(model)]
 
 	saveAs blob, model.fileName
 
 
 saveAsAsciiStl = (model) =>
-
 	blob = new Blob [toAsciiStl(model)], {type: 'text/plain;charset=utf-8'}
 
 	saveAs blob, model.fileName
