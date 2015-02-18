@@ -29,7 +29,7 @@ toAsciiStl = (model) ->
 
 	stl += "endsolid #{originalFileName}\n"
 
-	new Blob [stl], {type: 'text/plain;charset=utf-8'}
+	return stl
 
 
 toBinaryStl = (model) ->
@@ -73,17 +73,21 @@ toBinaryStl = (model) ->
 		dataView.setUint16(offset += 4, 0, le)
 		offset += 2
 
-	new Blob [buffer]
+	return buffer
 
 
 saveAsBinaryStl = (model) =>
 
-	saveAs toBinaryStl(model), model.fileName
+	blob = new Blob [toBinaryStl(model)]
+
+	saveAs blob, model.fileName
 
 
 saveAsAsciiStl = (model) =>
 
-	saveAs toAsciiStl(model), model.fileName
+	blob = new Blob [toAsciiStl(model)], {type: 'text/plain;charset=utf-8'}
+
+	saveAs blob, model.fileName
 
 
 module.exports =
