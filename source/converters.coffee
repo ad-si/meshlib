@@ -16,13 +16,19 @@ module.exports.toArrayBuffer = (buffer) ->
 	else
 		throw new Error "Can not convert #{typeof buffer} to ArrayBuffer!"
 
+
 module.exports.toBuffer = (arrayBuffer) ->
-	buffer = new Buffer(arrayBuffer.byteLength)
-	view = new Uint8Array(arrayBuffer)
-	i = 0
 
-	while i < buffer.length
-		buffer[i] = view[i]
-		++i
+	if Buffer and Buffer.isBuffer arrayBuffer
+		return arrayBuffer
 
-	return buffer
+	else
+		buffer = new Buffer(arrayBuffer.byteLength)
+		view = new Uint8Array(arrayBuffer)
+		i = 0
+
+		while i < buffer.length
+			buffer[i] = view[i]
+			++i
+
+		return buffer
