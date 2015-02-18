@@ -5,7 +5,7 @@ Meshlib is a javaScript library for importing, handling and exporting various 3D
 
 ## Architecture
 
-![System Architecture](img/architecture.svg)
+![System Architecture](img/architecture.png)
 
 
 ## Contribution
