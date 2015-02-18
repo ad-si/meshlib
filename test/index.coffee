@@ -15,17 +15,17 @@ models = [
 	'broken/fourVertices'
 	'broken/twoVertices'
 	'broken/wrongNormals'
-	'gearwheel'
-	'geoSplit2'
-	'geoSplit4'
-	'geoSplit5'
-	'geoSplit7'
-	'bunny'
+	'objects/gearwheel'
+	'objects/bunny'
 ].map (model) ->
 	return {
 		name: model
-		asciiPath: path.join __dirname, 'models', model + '.ascii.stl'
-		binaryPath: path.join __dirname, 'models', model + '.bin.stl'
+		asciiPath: path.resolve(
+			__dirname, '../node_modules/stl-models/', model + '.ascii.stl'
+		)
+		binaryPath: path.resolve(
+			__dirname, '../node_modules/stl-models/', model + '.bin.stl'
+		)
 	}
 
 modelsMap = models.reduce (previous, current, index) ->
@@ -52,7 +52,7 @@ describe 'Meshlib', ->
 
 
 	it 'should create a face-vertex mesh', ->
-		asciiStl = fs.readFileSync modelsMap.gearwheel.asciiPath
+		asciiStl = fs.readFileSync modelsMap['objects/gearwheel'].asciiPath
 
 		modelPromise = meshlib asciiStl, {format: 'stl'}
 			.optimize()
@@ -95,8 +95,8 @@ describe 'Meshlib', ->
 
 		@timeout('10s')
 
-		asciiStl = fs.readFileSync modelsMap.gearwheel.asciiPath
-		binaryStl = fs.readFileSync modelsMap.gearwheel.binaryPath
+		asciiStl = fs.readFileSync modelsMap['objects/gearwheel'].asciiPath
+		binaryStl = fs.readFileSync modelsMap['objects/gearwheel'].binaryPath
 
 		return Promise
 			.all([
