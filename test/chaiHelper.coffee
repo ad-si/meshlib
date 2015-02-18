@@ -1,6 +1,9 @@
 Model = require '../source/Model'
 Vector = require '../source/Vector'
 
+maxCoordinateDelta = 0.00001
+
+
 module.exports = (chai, utils) ->
 	chai.Assertion.addProperty 'model', () ->
 		@assert(
@@ -32,6 +35,7 @@ module.exports = (chai, utils) ->
 			'expected #{this} to not have faceNormals'
 		)
 
+
 	chai.Assertion.addProperty 'triangleMesh', () ->
 
 		allTriangles = @_obj.mesh.polygons.every (polygon) ->
@@ -42,6 +46,32 @@ module.exports = (chai, utils) ->
 			'expected mesh #{this} to consist only of triangles',
 			'expected mesh #{this} to not consist only of triangles'
 		)
+
+
+	chai.Assertion.addMethod 'equalVector', (vertex) ->
+
+			['x', 'y', 'z'].every (coordinate) =>
+
+				actualCoordinate = @_obj[coordinate]
+				expectedCoordinate = vertex[coordinate]
+
+				chai.expect(actualCoordinate).to.be
+					.closeTo(expectedCoordinate, maxCoordinateDelta)
+
+
+	chai.Assertion.addMethod 'equalFace', (face) ->
+
+		@_obj.vertices.every (vertex, vertexIndex) =>
+			chai.expect(vertex).to.equalVector(face.vertices[vertexIndex])
+
+		chai.expect(@_obj.normal).to.equalVector(face.normal)
+
+
+	chai.Assertion.addMethod 'equalFaces', (faces) ->
+
+		@_obj.forEach (face, faceIndex) =>
+			chai.expect(face).to.equalFace(faces[faceIndex])
+
 
 	chai.Assertion.addProperty 'correctNormals', () ->
 
