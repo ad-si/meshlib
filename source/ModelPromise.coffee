@@ -1,4 +1,3 @@
-Stl = require './Stl'
 optimizeModel = require './optimizeModel'
 Model = require './Model'
 

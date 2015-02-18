@@ -1,0 +1,16 @@
+{
+  "name": "stl-importer",
+  "version": "0.1.0",
+  "scripts": {
+    "test": "./node_modules/.bin/mocha --compilers coffee:coffee-script/register"
+  },
+  "devDependencies": {
+    "chai": "^2.0.0",
+    "chai-as-promised": "^4.2.0",
+    "mocha": "^2.1.0",
+    "stl-models": "Lowfab/stl-models#af96ff593d3490eac9f708f26a05d6261aed49a4"
+  },
+  "dependencies": {
+    "coffee-script": "^1.9.0"
+  }
+}
