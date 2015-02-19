@@ -9,29 +9,25 @@ chai.use require './chaiHelper'
 chai.use require 'chai-as-promised'
 expect = chai.expect
 
+
+generateMap = (collection) ->
+	return collection.reduce (previous, current, index) ->
+		previous[current.name] = models[index]
+		return previous
+	, {}
+
+
 models = [
-	'polytopes/triangle'
-	'polytopes/cube'
-	'broken/fourVertices'
-	'broken/twoVertices'
-	'broken/wrongNormals'
-	'objects/gearwheel'
-	'objects/bunny'
+	'cube'
 ].map (model) ->
 	return {
 		name: model
-		asciiPath: path.resolve(
-			__dirname, '../node_modules/stl-models/', model + '.ascii.stl'
-		)
-		binaryPath: path.resolve(
-			__dirname, '../node_modules/stl-models/', model + '.bin.stl'
+		filePath: path.join(
+			__dirname, 'models/', model + '.json'
 		)
 	}
 
-modelsMap = models.reduce (previous, current, index) ->
-	previous[current.name] = models[index]
-	return previous
-, {}
+modelsMap = generateMap models
 
 
 checkEquality = (dataFromAscii, dataFromBinary, arrayName) ->
@@ -43,18 +39,18 @@ checkEquality = (dataFromAscii, dataFromBinary, arrayName) ->
 
 describe 'Meshlib', ->
 	it 'should return a model object', ->
-		asciiStl = fs.readFileSync modelsMap['polytopes/triangle'].asciiPath
+		jsonModel = fs.readFileSync modelsMap['cube'].filePath
 
-		modelPromise = meshlib asciiStl, {format: 'stl'}
+		modelPromise = meshlib jsonModel
 			.done (model) -> model
 
 		return expect(modelPromise).to.eventually.be.a.model
 
 
 	it 'should create a face-vertex mesh', ->
-		asciiStl = fs.readFileSync modelsMap['objects/gearwheel'].asciiPath
+		jsonModel = require modelsMap['cube'].filePath
 
-		modelPromise = meshlib asciiStl, {format: 'stl'}
+		modelPromise = meshlib jsonModel
 			.optimize()
 			.done (model) -> model
 
