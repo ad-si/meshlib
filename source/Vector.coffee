@@ -1,6 +1,18 @@
 class Vector
 	constructor: (@x, @y, @z) ->
-		return 0
+		return
+
+	fromObject: (object) ->
+		@x = object.x
+		@y = object.y
+		@z = object.z
+		return @
+
+	fromArray: (array) ->
+		@x = array[0]
+		@y = array[1]
+		@z = array[2]
+		return @
 
 	minus: (vec) ->
 		return new Vector(@x - vec.x, @y - vec.y, @z - vec.z)

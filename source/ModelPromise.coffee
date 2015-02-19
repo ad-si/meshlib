@@ -1,4 +1,3 @@
-optimizeModel = require './optimizeModel'
 Model = require './Model'
 
 

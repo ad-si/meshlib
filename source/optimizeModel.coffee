@@ -3,15 +3,15 @@ Octree = require './Octree'
 Vec3 = require './Vector'
 
 
-module.exports = (importedStl, options) ->
+module.exports = (faceVertexMesh, options) ->
 
 	options ?= {}
 
-	cleanseStl = options.cleanseStl || false
+	cleanse = options.cleanse || false
 	pointDistanceEpsilon = options.pointDistanceEpsilon || 0.0001
 
-	if cleanseStl
-		importedStl.cleanse()
+	if cleanse
+		faceVertexMesh.cleanse()
 
 	vertexnormals = []
 	faceNormals = []
@@ -20,11 +20,11 @@ module.exports = (importedStl, options) ->
 	octreeRoot = new Octree(pointDistanceEpsilon)
 	biggestPointIndex = -1
 
-	for polygon in importedStl.polygons
+	for polygon in faceVertexMesh.polygons
 		# Add vertices if they don't exist, or get index of these vertices
 		indices = [-1,-1,-1]
 		for vertexIndex in [0..2]
-			vertex = polygon.vertices[vertexIndex]
+			vertex = new Vec3 polygon.vertices[vertexIndex]
 			newPointIndex = octreeRoot.add vertex,
 				new Vec3(
 					polygon.normal.x,

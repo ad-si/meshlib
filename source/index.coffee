@@ -11,15 +11,7 @@ model = {}
 
 
 meshlib = (modelData, options) ->
-
-	return new ModelPromise()
-		.next (model) ->
-			try
-				model.setPolygons modelData.polygons
-			catch error
-				console.error error
-
-			return model
+	return new ModelPromise(modelData, options)
 
 
 meshlib.meshData = () ->
