@@ -74,24 +74,6 @@ describe 'Meshlib', ->
 		return expect(modelPromise).to.eventually.have.correctNormals
 
 
-	it.skip 'ascii & binary version should have equal faces', () ->
-
-		@timeout('10s')
-
-		asciiStl = fs.readFileSync modelsMap['objects/gearwheel'].asciiPath
-		binaryStl = fs.readFileSync modelsMap['objects/gearwheel'].binaryPath
-
-		return Promise
-			.all([
-				meshlib(asciiStl, {format: 'stl'})
-					.done((model) -> model)
-				,
-				meshlib(binaryStl, {format: 'stl'})
-					.done((model) -> model)
-			])
-			.then (models) =>
-				expect(models[0].mesh.faces).to
-					.equalFaces(models[1].mesh.faces)
 
 
 	it.skip 'should split individual geometries in STL file', () ->
