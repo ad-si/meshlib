@@ -38,3 +38,23 @@ describe 'STL Importer', ->
 
 		return expect(stlImporter asciiStl).to.eventually
 			.have.property('polygons').that.is.an('array')
+
+
+	it 'should fix faces with 4 or more vertices', ->
+		asciiStl = fs.readFileSync modelsMap['broken/fourVertices'].asciiPath
+
+		modelPromise = meshlib asciiStl, {format: 'stl'}
+			.fixFaces()
+			.done (model) -> model
+
+		return expect(modelPromise).to.eventually.be.a.triangleMesh
+
+
+	it 'should fix faces with 2 or less vertices', ->
+		asciiStl = fs.readFileSync modelsMap['broken/twoVertices'].asciiPath
+
+		modelPromise = meshlib asciiStl, {format: 'stl'}
+			.fixFaces()
+			.done (model) -> model
+
+		return expect(modelPromise).to.eventually.be.a.triangleMesh
