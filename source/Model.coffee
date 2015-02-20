@@ -1,5 +1,6 @@
 optimizeModel = require './optimizeModel'
 Vector = require './Vector'
+Face = require './Face'
 
 NoFacesError = (message) ->
 	this.name = 'NoFacesError'
@@ -49,19 +50,26 @@ class Model
 		newNormals = []
 
 		if @mesh.polygons
-			@mesh.polygons = @mesh.polygons.map (polygon) ->
-				d1 = polygon.vertices[1].minus polygon.vertices[0]
-				d2 = polygon.vertices[2].minus polygon.vertices[0]
+			@mesh.polygons = @mesh.polygons.map (face) ->
+
+				face = Face.fromVertexArray face.vertices
+
+				d1 = Vector.fromObject(face.vertices[1]).minus (
+					Vector.fromObject face.vertices[0]
+				)
+				d2 = Vector.fromObject(face.vertices[2]).minus (
+					Vector.fromObject face.vertices[0]
+				)
 				normal = d1.crossProduct d2
 				normal = normal.normalized()
 
-				if polygon.normal?
-					distance = polygon.normal.euclideanDistanceTo normal
+				if face.normal?
+					distance = face.normal.euclideanDistanceTo normal
 					if distance > 0.001
 						newNormals.push normal
 
-				polygon.normal = normal
-				return polygon
+				face.normal = normal
+				return face
 		else
 			throw new NoFacesError
 
