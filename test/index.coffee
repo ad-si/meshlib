@@ -39,7 +39,7 @@ checkEquality = (dataFromAscii, dataFromBinary, arrayName) ->
 
 describe 'Meshlib', ->
 	it 'should return a model object', ->
-		jsonModel = fs.readFileSync modelsMap['cube'].filePath
+		jsonModel = require modelsMap['cube'].filePath
 
 		modelPromise = meshlib jsonModel
 			.done (model) -> model
@@ -58,16 +58,19 @@ describe 'Meshlib', ->
 
 
 	it 'should calculate face-normals', ->
-		asciiStl = fs.readFileSync modelsMap['broken/wrongNormals'].asciiPath
+		jsonModel = require modelsMap['cube'].filePath
 
-		modelPromise = meshlib asciiStl, {format: 'stl'}
+		jsonModel.polygons.forEach (face) ->
+			delete face.normal
+
+		modelPromise = meshlib jsonModel
 			.calculateNormals()
 			.done (model) -> model
 
 		return expect(modelPromise).to.eventually.have.correctNormals
 
 
-	it 'ascii & binary version should have equal faces', () ->
+	it.skip 'ascii & binary version should have equal faces', () ->
 
 		@timeout('10s')
 
