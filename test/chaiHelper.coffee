@@ -77,7 +77,7 @@ module.exports = (chai, utils) ->
 
 		### TODO
 
-		correctDirection = @_obj.mesh.polygons.every (polygon) ->
+		correctDirection = @_obj.mesh.faces.every (face) ->
 			TODO
 
 		@assert(
@@ -87,8 +87,8 @@ module.exports = (chai, utils) ->
 		)
         ###
 
-		normalizedLength = @_obj.mesh.polygons.every (polygon) ->
-			return polygon.normal.length() is 1
+		normalizedLength = @_obj.mesh.faces.every (face) ->
+			return face.normal.length() is 1
 
 		@assert(
 			normalizedLength

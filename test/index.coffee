@@ -60,7 +60,7 @@ describe 'Meshlib', ->
 	it 'should calculate face-normals', ->
 		jsonModel = require modelsMap['cube'].filePath
 
-		jsonModel.polygons.forEach (face) ->
+		jsonModel.faces.forEach (face) ->
 			delete face.normal
 
 		modelPromise = meshlib jsonModel
@@ -86,8 +86,8 @@ describe 'Meshlib', ->
 					.done((model) -> model)
 			])
 			.then (models) =>
-				expect(models[0].mesh.polygons).to
-					.equalFaces(models[1].mesh.polygons)
+				expect(models[0].mesh.faces).to
+					.equalFaces(models[1].mesh.faces)
 
 
 	it.skip 'should split individual geometries in STL file', () ->

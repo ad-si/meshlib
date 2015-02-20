@@ -12,11 +12,11 @@ class ModelPromise
 			fulfill @model
 		return @
 
-	setPolygons: (polygons) =>
+	setFaces: (faces) =>
 		@ready = @ready.then =>
 			new Promise (fulfill, reject) =>
 				try
-					@model.setPolygons(polygons)
+					@model.setFaces(faces)
 				catch error
 					reject error
 

@@ -18,27 +18,31 @@ class Model
 		@mesh = optimizeModel @mesh
 		return @
 
+	setFaces: (faces) =>
+		@mesh.faces = faces
+		return @
+
 	fixFaces: () =>
-		deletedPolygons = []
+		deletedFaces = []
 
-		if @mesh.polygons
-			@mesh.polygons = @mesh.polygons.map (polygon) ->
-				if polygon.vertices.length is 3
-					return polygon
+		if @mesh.faces
+			@mesh.faces = @mesh.faces.map (face) ->
+				if face.vertices.length is 3
+					return face
 
-				else if polygon.vertices.length > 3
-					deletedPolygons.push polygon
-					polygon.vertices = polygon.vertices.slice(0, 3)
-					return polygon
+				else if face.vertices.length > 3
+					deletedFaces.push face
+					face.vertices = face.vertices.slice(0, 3)
+					return face
 
-				else if polygon.vertices.length is 2
-					polygon.addVertex new Vector 0,0,0
-					return polygon
+				else if face.vertices.length is 2
+					face.addVertex new Vector 0,0,0
+					return face
 
-				else if polygon.vertices.length is 1
-					polygon.addVertex new Vector 0, 0, 0
-					polygon.addVertex new Vector 1, 1, 1
-					return polygon
+				else if face.vertices.length is 1
+					face.addVertex new Vector 0, 0, 0
+					face.addVertex new Vector 1, 1, 1
+					return face
 
 				else
 					return null
@@ -49,8 +53,8 @@ class Model
 	calculateNormals: () =>
 		newNormals = []
 
-		if @mesh.polygons
-			@mesh.polygons = @mesh.polygons.map (face) ->
+		if @mesh.faces
+			@mesh.faces = @mesh.faces.map (face) ->
 
 				face = Face.fromVertexArray face.vertices
 
@@ -73,10 +77,6 @@ class Model
 		else
 			throw new NoFacesError
 
-		return @
-
-	setPolygons: (polygons) =>
-		@mesh.polygons = polygons
 		return @
 
 module.exports = Model

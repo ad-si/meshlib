@@ -150,8 +150,8 @@ class OptimizedModel
 	# Creates a THREE.BufferGeometry using vertex normals
 	createBufferGeometry: ->
 		geometry = new THREE.BufferGeometry()
-		#officially, threejs supports normal array, but in fact,
-		#you have to use this lowlevel datatype to view something
+		# Officially, threejs supports normal array, but in fact,
+		# you have to use this lowlevel datatype to view something
 		parray = new Float32Array(@positions.length)
 		for i in [0..@positions.length - 1]
 			parray[i] = @positions[i]
@@ -168,14 +168,14 @@ class OptimizedModel
 		geometry.computeBoundingSphere()
 		return geometry
 
-	# uses a THREE.Geometry using face normals
+	# Uses a THREE.Geometry using face normals
 	createStandardGeometry: ->
 		geometry = new THREE.Geometry()
 
 		for vi in [0..@positions.length - 1] by 3
 			geometry.vertices.push new THREE.Vector3(
 				@positions[vi],
-				@positions[vi + 1], 
+				@positions[vi + 1],
 				@positions[vi + 2]
 				)
 
@@ -196,20 +196,20 @@ class OptimizedModel
 	# Imports from a THREE.Geometry
 	# Imports vertices (positions) and faces (indices), and face normals
 	fromThreeGeometry: (threeGeometry, originalFileName = 'Three.Geometry') =>
-		# clear data, if exists
+		# Clear data, if exists
 		@positions = []
 		@indices = []
 		@faceNormals = []
 		@vertexNormals = []
 		@originalFileName = originalFileName
 
-		# convert point positions
+		# Convert point positions
 		for vertex in threeGeometry.vertices
 			@positions.push vertex.x
 			@positions.push vertex.y
 			@positions.push vertex.z
 
-		# convert polygons (indexed) and their normals
+		# Convert faces (indexed) and their normals
 		for face in threeGeometry.faces
 			@indices.push face.a
 			@indices.push face.b
@@ -218,7 +218,7 @@ class OptimizedModel
 			@faceNormals.push face.normal.x
 			@faceNormals.push face.normal.y
 			@faceNormals.push face.normal.z
-	
+
 	boundingBox: ->
 		if @_boundingBox
 			return @_boundingBox
@@ -234,13 +234,19 @@ class OptimizedModel
 			maxY = @positions[i + 1] if @positions[i + 1] > maxY
 			maxZ = @positions[i + 2] if @positions[i + 2] > maxZ
 
-		@_boundingBox = {
-			min: {x: minX, y: minY, z: minZ}
-			max: {x: maxX, y: maxY, z: maxZ}
-		}
+		@_boundingBox =
+			min:
+				x: minX
+				y: minY
+				z: minZ
+			max:
+				x: maxX
+				y: maxY
+				z: maxZ
+
 		return @_boundingBox
 
-	forEachPolygon: (callback) =>
+	forEachFace: (callback) =>
 		for i in [0..@indices.length - 1] by 3
 			p0 = {
 				x: @positions[@indices[i] * 3]

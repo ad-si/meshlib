@@ -2,7 +2,7 @@ OptimizedModel = require './OptimizedModel'
 
 # Takes an optimized model and looks for connected geometry
 # returns a list of optimized models if the original model
-# contains several geometries (-> connected polygons) that
+# contains several geometries (-> connected faces) that
 # have no connection between each other
 separateGeometry = (optimizedModel) ->
 	equivalenceClasses = createEquivalenceClasses optimizedModel
@@ -40,7 +40,7 @@ createModelFromEquivalenceClass = (equivalenceClass, optimizedModel) ->
 
 		return polyTranslationTable[currentId]
 
-	equivalenceClass.polygons.enumerate (pi) ->
+	equivalenceClass.faces.enumerate (pi) ->
 		p0 = optimizedModel.indices[pi * 3 + 0]
 		p1 = optimizedModel.indices[pi * 3 + 1]
 		p2 = optimizedModel.indices[pi * 3 + 2]
@@ -59,18 +59,18 @@ createModelFromEquivalenceClass = (equivalenceClass, optimizedModel) ->
 	return model
 
 # returns an array of equivalence classes. each equivalence class
-# represents several polygons that share points. if the model has
+# represents several faces that share points. if the model has
 # several equivalence classes, it contains several geometries
 # that are not connected to each other
 createEquivalenceClasses = (optimizedModel) ->
 	equivalenceClasses = []
 
-	for polygonIndex in [0..optimizedModel.indices.length - 1] by 3
+	for faceIndex in [0..optimizedModel.indices.length - 1] by 3
 		poly = {
-			index: polygonIndex / 3
-			p0: optimizedModel.indices[polygonIndex]
-			p1: optimizedModel.indices[polygonIndex + 1]
-			p2: optimizedModel.indices[polygonIndex + 2]
+			index: faceIndex / 3
+			p0: optimizedModel.indices[faceIndex]
+			p1: optimizedModel.indices[faceIndex + 1]
+			p2: optimizedModel.indices[faceIndex + 2]
 		}
 
 		connectedClasses = []
@@ -81,7 +81,7 @@ createEquivalenceClasses = (optimizedModel) ->
 				eq.points.push poly.p0
 				eq.points.push poly.p1
 				eq.points.push poly.p2
-				eq.polygons.push poly.index
+				eq.faces.push poly.index
 				connectedClasses.push eq
 
 		if connectedClasses.length == 0
@@ -90,16 +90,16 @@ createEquivalenceClasses = (optimizedModel) ->
 			# unconnected geometry
 			eq = {
 				points: new Hashmap()
-				polygons: new Hashmap()
+				faces: new Hashmap()
 			}
 			eq.points.push poly.p0
 			eq.points.push poly.p1
 			eq.points.push poly.p2
-			eq.polygons.push poly.index
+			eq.faces.push poly.index
 			equivalenceClasses.push eq
 
 		else if connectedClasses.length > 1
-			# this polygon belongs to more than one class. therefore,
+			# this face belongs to more than one class. therefore,
 			# all of these classes are equal. compact to one class
 			# (existing classes are emptied)
 			combined = compactClasses connectedClasses
@@ -113,21 +113,21 @@ createEquivalenceClasses = (optimizedModel) ->
 compactClasses = (equivalenceClasses) ->
 	newClass = {
 		points: new Hashmap()
-		polygons: new Hashmap()
+		faces: new Hashmap()
 	}
 
 	for eq in equivalenceClasses
-		# add points and polygons to new class. The hashmap
+		# add points and faces to new class. The hashmap
 		# automatically prevents inserting duplicate values
 		eq.points.enumerate (point) ->
 			newClass.points.push point
 
-		eq.polygons.enumerate (polygon) ->
-			newClass.polygons.push polygon
+		eq.faces.enumerate (face) ->
+			newClass.faces.push face
 
 		# clear old class
 		eq.points = new Hashmap()
-		eq.polygons = new Hashmap()
+		eq.faces = new Hashmap()
 
 	return newClass
 
@@ -141,15 +141,18 @@ class Hashmap
 		@length = 0
 		@_enumarray = []
 		@_existsarray = []
+
 	push: (number) =>
 		if not @_existsarray[number]
 			@length++
 			@_existsarray[number] = true
 			@_enumarray.push number
+
 	exists: (number) =>
 		if @_existsarray[number]?
 			return true
 		return false
+
 	enumerate: (callback) =>
 		for i in [0..@_enumarray.length - 1] by 1
 			callback @_enumarray[i]
