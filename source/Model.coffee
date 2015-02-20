@@ -1,6 +1,7 @@
 optimizeModel = require './optimizeModel'
 Vector = require './Vector'
 Face = require './Face'
+geometrySplitter = require './separateGeometry'
 
 NoFacesError = (message) ->
 	this.name = 'NoFacesError'
@@ -78,5 +79,8 @@ class Model
 			throw new NoFacesError
 
 		return @
+
+	getSubmodels: () =>
+		return geometrySplitter @mesh
 
 module.exports = Model

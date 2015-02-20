@@ -1,21 +1,5 @@
 OptimizedModel = require './OptimizedModel'
 
-# Takes an optimized model and looks for connected geometry
-# returns a list of optimized models if the original model
-# contains several geometries (-> connected faces) that
-# have no connection between each other
-separateGeometry = (optimizedModel) ->
-	equivalenceClasses = createEquivalenceClasses optimizedModel
-
-	if equivalenceClasses.length == 1
-		return [optimizedModel]
-
-	models = []
-	for eq in equivalenceClasses
-		models.push createModelFromEquivalenceClass eq, optimizedModel
-
-	return models
-
 # creates an standalone optimized model from an equivalence class and an
 # existing optimized model
 # TODO needs to be tested
@@ -27,7 +11,7 @@ createModelFromEquivalenceClass = (equivalenceClass, optimizedModel) ->
 
 	# inserts a point into the new model,
 	# adjust the id to prevent undefined position entries
-	insertPoint =  (currentId) ->
+	insertPoint = (currentId) ->
 		if not polyTranslationTable[currentId]?
 			polyTranslationTable[currentId] = nextPointIndex
 			nextPointIndex++
@@ -77,7 +61,7 @@ createEquivalenceClasses = (optimizedModel) ->
 
 		for eq in equivalenceClasses
 			if eq.points.exists(poly.p0) or
-			eq.points.exists(poly.p1) or eq.points.exists(poly.p2)
+			  eq.points.exists(poly.p1) or eq.points.exists(poly.p2)
 				eq.points.push poly.p0
 				eq.points.push poly.p1
 				eq.points.push poly.p2
@@ -132,8 +116,6 @@ compactClasses = (equivalenceClasses) ->
 	return newClass
 
 
-module.exports = separateGeometry
-
 # not really a true hashmap, but something that stores
 # numbers and can say whether it contains a certain number very efficiently
 class Hashmap
@@ -156,3 +138,21 @@ class Hashmap
 	enumerate: (callback) =>
 		for i in [0..@_enumarray.length - 1] by 1
 			callback @_enumarray[i]
+
+
+# Takes an optimized model and looks for connected geometry
+# returns a list of optimized models if the original model
+# contains several geometries (-> connected faces) that
+# have no connection between each other
+
+module.exports = (optimizedModel) ->
+	models = []
+	equivalenceClasses = createEquivalenceClasses optimizedModel
+
+	if equivalenceClasses.length is 1
+		models.push optimizedModel
+	else
+		for eq in equivalenceClasses
+			models.push createModelFromEquivalenceClass eq, optimizedModel
+
+	return models

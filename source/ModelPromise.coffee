@@ -56,6 +56,17 @@ class ModelPromise
 				fulfill @model
 		return @
 
+	getSubmodels: () =>
+		@ready = @ready.then =>
+			return new Promise (fulfill, reject) =>
+				try
+					models = @model.getSubmodels()
+				catch error
+					return reject error
+
+				fulfill models
+		return @ready
+
 	next: (onFulfilled, onRejected) =>
 		@done onFulfilled, onRejected
 		return @

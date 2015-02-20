@@ -74,8 +74,13 @@ describe 'Meshlib', ->
 		return expect(modelPromise).to.eventually.have.correctNormals
 
 
+	it.skip 'should extract individual geometries to submodels', () ->
+		jsonModel = loadYaml modelsMap['tetrahedrons'].filePath
 
+		modelPromise = meshlib jsonModel
+			.optimize()
+			.getSubmodels()
+			.then (models) -> models
 
-	it.skip 'should split individual geometries in STL file', () ->
-		@timeout('45s')
-		meshlib.separateGeometry(fromBinary)
+		return expect(modelPromise).to.eventually.be.an('array')
+			.and.to.have.length(2)
