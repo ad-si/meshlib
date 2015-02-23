@@ -43,7 +43,7 @@ class Model
 					return face
 
 				else if face.vertices.length is 2
-					face.addVertex new Vector 0,0,0
+					face.addVertex new Vector 0, 0, 0
 					return face
 
 				else if face.vertices.length is 1
@@ -57,12 +57,12 @@ class Model
 			throw new NoFacesError
 		return @
 
+
 	calculateNormals: () =>
 		newNormals = []
 
 		if @mesh.faces
 			@mesh.faces = @mesh.faces.map (face) ->
-
 				face = Face.fromVertexArray face.vertices
 
 				d1 = Vector.fromObject(face.vertices[1]).minus (
@@ -89,50 +89,43 @@ class Model
 	getSubmodels: () =>
 		return geometrySplitter @mesh
 
-	# Checks whether the model is 2-manifold, meaning that each edge is connected
-	# to exactly two faces. This also implies that the mesh is a closed body
-	# without holes
+
 	isTwoManifold: () ->
 		if @_isTwoManifold?
 			return @_isTwoManifold
 
-		edges = []
-		numEdges = []
+		edgesCountMap = {}
 
-		# adds the edge to the edges list. if it already exists in the list,
-		# the counter in numEdges is increased
-		addEdge = (a, b) ->
-			for i in [0..edges.length - 1] by 1
-				aeb = (edges[i].a == a and edges[i].b == b)
-				bea = (edges[i].a == b and edges[i].b == a)
-				if (aeb or bea)
-					numEdges[i]++
-					if numEdges[i] > 2
-						return false
+		# Count edge occurrences for all triangles
+		for index in [0...@mesh.faceVertex.indices.length] by 3
+			do (index) =>
+				x = @mesh.faceVertex.indices[index]
+				y = @mesh.faceVertex.indices[index + 1]
+				z = @mesh.faceVertex.indices[index + 2]
+
+				[
+					String(x).concat y
+					String(y).concat x
+
+					String(y).concat z
+					String(z).concat y
+
+					String(z).concat x
+					String(x).concat z
+				]
+				.forEach (edge) =>
+					if edgesCountMap[edge]
+						edgesCountMap[edge]++
 					else
-						return true
-			edges.push {a: a, b: b}
-			numEdges.push 1
+						edgesCountMap[edge] = 1
 
-		# add all edges for all triangles
-		for i in [0..@indices.length - 1] by 3
-			a = @indices[i]
-			b = @indices[i + 1]
-			c = @indices[i + 2]
-			r = addEdge a, b
-			r = addEdge(b, c) and r
-			r = addEdge(c, a) and r
-
-			if not r
+		# Check that each edge exists exactly twice
+		for edge, count of edgesCountMap
+			if count isnt 2
 				@_isTwoManifold = false
-				return @_isTwoManifold
+				return false
 
-		# check that each edge exists exactly twice
-		for num in numEdges
-			if num != 2
-				@_isTwoManifold = false
-				return @_isTwoManifold
 		@_isTwoManifold = true
-		return @_isTwoManifold
+		return true
 
 module.exports = Model
