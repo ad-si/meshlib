@@ -83,4 +83,50 @@ class Model
 	getSubmodels: () =>
 		return geometrySplitter @mesh
 
+	# Checks whether the model is 2-manifold, meaning that each edge is connected
+	# to exactly two faces. This also implies that the mesh is a closed body
+	# without holes
+	isTwoManifold: () ->
+		if @_isTwoManifold?
+			return @_isTwoManifold
+
+		edges = []
+		numEdges = []
+
+		# adds the edge to the edges list. if it already exists in the list,
+		# the counter in numEdges is increased
+		addEdge = (a, b) ->
+			for i in [0..edges.length - 1] by 1
+				aeb = (edges[i].a == a and edges[i].b == b)
+				bea = (edges[i].a == b and edges[i].b == a)
+				if (aeb or bea)
+					numEdges[i]++
+					if numEdges[i] > 2
+						return false
+					else
+						return true
+			edges.push {a: a, b: b}
+			numEdges.push 1
+
+		# add all edges for all triangles
+		for i in [0..@indices.length - 1] by 3
+			a = @indices[i]
+			b = @indices[i + 1]
+			c = @indices[i + 2]
+			r = addEdge a, b
+			r = addEdge(b, c) and r
+			r = addEdge(c, a) and r
+
+			if not r
+				@_isTwoManifold = false
+				return @_isTwoManifold
+
+		# check that each edge exists exactly twice
+		for num in numEdges
+			if num != 2
+				@_isTwoManifold = false
+				return @_isTwoManifold
+		@_isTwoManifold = true
+		return @_isTwoManifold
+
 module.exports = Model
