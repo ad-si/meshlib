@@ -4,27 +4,24 @@ Vector = require './Vector'
 
 
 module.exports = (faces, options = {}) ->
-
 	pointDistanceEpsilon = options.pointDistanceEpsilon || 0.0001
 
 	vertexnormals = []
 	facesNormals = []
-	index = [] # vert1 vert2 vert3
+	facesVerticesList = []
 
 	octreeRoot = new Octree(pointDistanceEpsilon)
 	biggestPointIndex = -1
 
 	for face in faces
 		# Add vertices if they don't exist, or get index of these vertices
-		indices = [-1,-1,-1]
-		for vertexIndex in [0..2]
-			vertex = new Vector face.vertices[vertexIndex]
-			newPointIndex = octreeRoot.add vertex,
-				new Vector(
-					face.normal.x,
-					face.normal.y,
-					face.normal.z
-				),
+		indices = [-1, -1, -1]
+
+		face.vertices.forEach (vertex, vertexIndex) =>
+
+			vertex = Vector.fromObject vertex
+
+			newPointIndex = octreeRoot.add vertex, face.normal,
 				biggestPointIndex
 
 			indices[vertexIndex] = newPointIndex
@@ -32,9 +29,8 @@ module.exports = (faces, options = {}) ->
 			if newPointIndex > biggestPointIndex
 				biggestPointIndex = newPointIndex
 
-		index.push indices[0]
-		index.push indices[1]
-		index.push indices[2]
+		facesVerticesList = facesVerticesList.concat indices
+
 		facesNormals.push face.normal.x
 		facesNormals.push face.normal.y
 		facesNormals.push face.normal.z
@@ -42,20 +38,20 @@ module.exports = (faces, options = {}) ->
 	# Get a list out of the octree
 	vertexPositions = new Array((biggestPointIndex + 1) * 3)
 	octreeRoot.forEach (node) ->
-		v = node.vec
+		vector = node.vec
 		i = node.index * 3
-		vertexPositions[i] = v.x
-		vertexPositions[i + 1] = v.y
-		vertexPositions[i + 2] = v.z
+		vertexPositions[i] = vector.x
+		vertexPositions[i + 1] = vector.y
+		vertexPositions[i + 2] = vector.z
 
 	# Average all vertex-normals
 	avgNormals = new Array((biggestPointIndex + 1) * 3)
 	octreeRoot.forEach (node) ->
 		normalList = node.normalList
 		i = node.index * 3
-		avg = new Vector(0,0,0)
+		avg = new Vector(0, 0, 0)
 		for normal in normalList
-			normal = normal.normalized()
+			normal = Vector.fromObject(normal).normalized()
 			avg = avg.add normal
 		avg = avg.normalized()
 		avgNormals[i] = avg.x
@@ -64,7 +60,7 @@ module.exports = (faces, options = {}) ->
 
 	return {
 		positions: vertexPositions
-		indices: index
+		indices: facesVerticesList
 		vertexNormals: avgNormals
 		faceNormals: facesNormals
 	}
