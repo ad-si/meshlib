@@ -23,11 +23,11 @@ class ModelPromise
 				fulfill @model
 		return @
 
-	optimize: =>
+	buildFaceVertexMesh: =>
 		@ready = @ready.then =>
 			return new Promise (fulfill, reject) =>
 				try
-					@model = @model.optimize()
+					@model = @model.buildFaceVertexMesh()
 				catch error
 					return reject error
 

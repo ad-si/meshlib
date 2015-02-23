@@ -3,24 +3,18 @@ Octree = require './Octree'
 Vector = require './Vector'
 
 
-module.exports = (faceVertexMesh, options) ->
+module.exports = (faces, options = {}) ->
 
-	options ?= {}
-
-	cleanse = options.cleanse || false
 	pointDistanceEpsilon = options.pointDistanceEpsilon || 0.0001
 
-	if cleanse
-		faceVertexMesh.cleanse()
-
 	vertexnormals = []
-	faceNormals = []
-	index = [] #vert1 vert2 vert3
+	facesNormals = []
+	index = [] # vert1 vert2 vert3
 
 	octreeRoot = new Octree(pointDistanceEpsilon)
 	biggestPointIndex = -1
 
-	for face in faceVertexMesh.faces
+	for face in faces
 		# Add vertices if they don't exist, or get index of these vertices
 		indices = [-1,-1,-1]
 		for vertexIndex in [0..2]
@@ -41,9 +35,9 @@ module.exports = (faceVertexMesh, options) ->
 		index.push indices[0]
 		index.push indices[1]
 		index.push indices[2]
-		faceNormals.push face.normal.x
-		faceNormals.push face.normal.y
-		faceNormals.push face.normal.z
+		facesNormals.push face.normal.x
+		facesNormals.push face.normal.y
+		facesNormals.push face.normal.z
 
 	# Get a list out of the octree
 	vertexPositions = new Array((biggestPointIndex + 1) * 3)
@@ -68,10 +62,9 @@ module.exports = (faceVertexMesh, options) ->
 		avgNormals[i + 1] = avg.y
 		avgNormals[i + 2] = avg.z
 
-	optimized = new OptimizedModel()
-	optimized.positions = vertexPositions
-	optimized.indices = index
-	optimized.vertexNormals = avgNormals
-	optimized.faceNormals = faceNormals
-
-	return optimized
+	return {
+		positions: vertexPositions
+		indices: index
+		vertexNormals: avgNormals
+		faceNormals: facesNormals
+	}

@@ -55,10 +55,10 @@ describe 'Meshlib', ->
 		jsonModel = loadYaml modelsMap['cube'].filePath
 
 		modelPromise = meshlib jsonModel
-			.optimize()
+			.buildFaceVertexMesh()
 			.done (model) -> model
 
-		return expect(modelPromise).to.eventually.be.optimized
+		return expect(modelPromise).to.eventually.have.faceVertexMesh
 
 
 	it 'should calculate face-normals', ->
@@ -78,7 +78,7 @@ describe 'Meshlib', ->
 		jsonModel = loadYaml modelsMap['tetrahedrons'].filePath
 
 		modelPromise = meshlib jsonModel
-			.optimize()
+			.buildFaceVertexMesh()
 			.getSubmodels()
 			.then (models) -> models
 

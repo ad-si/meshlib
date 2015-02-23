@@ -1,7 +1,7 @@
-optimizeModel = require './optimizeModel'
 Vector = require './Vector'
 Face = require './Face'
 geometrySplitter = require './separateGeometry'
+faceVertexMeshBuilder = require './faceVertexMeshBuilder'
 
 NoFacesError = (message) ->
 	this.name = 'NoFacesError'
@@ -12,16 +12,22 @@ NoFacesError.prototype = new Error
 # Abstracts the actual model from the external fluid api
 class Model
 	constructor: (@mesh, @options) ->
-		@mesh ?= {}
+		@mesh ?= {
+			faces: [],
+			faceVertex: {}
+		}
 		@options ?= {}
 
-	optimize: () =>
-		@mesh = optimizeModel @mesh
+
+	buildFaceVertexMesh: () =>
+		@mesh.faceVertex = faceVertexMeshBuilder @mesh.faces
 		return @
+
 
 	setFaces: (faces) =>
 		@mesh.faces = faces
 		return @
+
 
 	fixFaces: () =>
 		deletedFaces = []

@@ -12,25 +12,25 @@ module.exports = (chai, utils) ->
 			'expected #{this} to not be a Model'
 		)
 
-	chai.Assertion.addProperty 'optimized', () ->
+	chai.Assertion.addProperty 'faceVertexMesh', () ->
 
 		@assert(
-			@_obj.mesh.hasOwnProperty 'indices'
+			@_obj.mesh.faceVertex.hasOwnProperty 'indices'
 			'expected #{this} to have indices',
 			'expected #{this} to not have indices'
 		)
 		@assert(
-			@_obj.mesh.hasOwnProperty 'positions'
+			@_obj.mesh.faceVertex.hasOwnProperty 'positions'
 			'expected #{this} to have positions',
 			'expected #{this} to not have positions'
 		)
 		@assert(
-			@_obj.mesh.hasOwnProperty 'vertexNormals'
+			@_obj.mesh.faceVertex.hasOwnProperty 'vertexNormals'
 			'expected #{this} to have vertexNormals',
 			'expected #{this} to not have vertexNormals'
 		)
 		@assert(
-			@_obj.mesh.hasOwnProperty 'faceNormals'
+			@_obj.mesh.faceVertex.hasOwnProperty 'faceNormals'
 			'expected #{this} to have faceNormals',
 			'expected #{this} to not have faceNormals'
 		)
