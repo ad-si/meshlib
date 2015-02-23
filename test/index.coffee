@@ -22,7 +22,9 @@ generateMap = (collection) ->
 
 models = [
 	'cube'
+	'tetrahedron'
 	'tetrahedrons'
+	'missingFace'
 ].map (model) ->
 	return {
 		name: model
@@ -84,3 +86,25 @@ describe 'Meshlib', ->
 
 		return expect(modelPromise).to.eventually.be.an('array')
 			.and.to.have.length(2)
+
+
+	it 'should be two-manifold', () ->
+		jsonModel = loadYaml modelsMap['tetrahedron'].filePath
+
+		modelPromise = meshlib jsonModel
+			.buildFaceVertexMesh()
+			.isTwoManifold()
+			.then (isTwoManifold) -> isTwoManifold
+
+		return expect(modelPromise).to.eventually.be.true
+
+
+	it 'should not be two-manifold', () ->
+		jsonModel = loadYaml modelsMap['missingFace'].filePath
+
+		modelPromise = meshlib jsonModel
+			.buildFaceVertexMesh()
+			.isTwoManifold()
+			.then (isTwoManifold) -> isTwoManifold
+
+		return expect(modelPromise).to.eventually.be.false

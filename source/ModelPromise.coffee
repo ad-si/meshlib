@@ -67,6 +67,17 @@ class ModelPromise
 				fulfill models
 		return @ready
 
+	isTwoManifold: () =>
+		@ready = @ready.then =>
+			return new Promise (fulfill, reject) =>
+				try
+					isTwoManifold = @model.isTwoManifold()
+				catch error
+					return reject error
+
+				fulfill isTwoManifold
+		return @ready
+
 	next: (onFulfilled, onRejected) =>
 		@done onFulfilled, onRejected
 		return @
