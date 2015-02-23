@@ -1,37 +1,49 @@
+errors = {
+	FacetError: (message) ->
+		tmp = Error.apply(this, arguments)
+		tmp.name = @name = 'FacetError'
+
+		@stack = tmp.stack
+		@message = tmp.message or 'Previous facet was not completed!'
+
+	FileError: (message, calcDataLength, dataLength) ->
+		tmp = Error.apply(this, arguments)
+		tmp.name = @name = 'FileError'
+
+		@stack = tmp.stack
+		@message = tmp.message or "Calculated length of #{calcDataLength}
+					does not match specified file-size of #{dataLength}.
+					Triangles might be missing!"
+
+	NormalError: (message, calcDataLength, dataLength) ->
+		tmp = Error.apply(this, arguments)
+		tmp.name = @name = 'NormalError'
+
+		@stack = tmp.stack
+		@message = tmp.message or "Invalid normal definition:
+									(#{nx}, #{ny}, #{nz})"
+
+	VertexError: (message, calcDataLength, dataLength) ->
+		tmp = Error.apply(this, arguments)
+		tmp.name = @name = 'VertexError'
+
+		@stack = tmp.stack
+		@message = tmp.message or "Invalid vertex definition:
+									(#{nx}, #{ny}, #{nz})"
+}
+
+
 if global
 	scope = global
 
-else if typeof global is 'undefined' && window
+else if typeof global is 'undefined' and window
 	scope = window
 
-else
-	scope = {}
 
+for errorName, errorBody of errors
+	do () =>
+		scope[errorName] = errorBody
 
-FileError = (message, calcDataLength, dataLength) ->
-	this.name = 'FileError'
-	this.message = message or "Calculated length of #{calcDataLength}
-					does not match specified file-size of #{dataLength}.
-					Triangles might be missing!"
-FileError.prototype = new Error
-
-FacetError = (message) ->
-	this.name = 'FacetError'
-	this.message = message or 'Previous facet was not completed!'
-FacetError.prototype = new Error
-
-NormalError = (message) ->
-	this.name = 'NormalError'
-	this.message = message or "Invalid normal definition: (#{nx}, #{ny}, #{nz})"
-NormalError.prototype = new Error
-
-VertexError = (message) ->
-	this.name = 'VertexError'
-	this.message = message or "Invalid vertex definition: (#{nx}, #{ny}, #{nz})"
-VertexError.prototype = new Error
-
-
-scope.FileError = FileError
-scope.FacetError = FacetError
-scope.NormalError = NormalError
-scope.VertexError = VertexError
+		Inheritor = () -> {}
+		Inheritor.prototype = Error.prototype
+		scope[errorName].prototype = new Inheritor()
