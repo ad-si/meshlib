@@ -58,7 +58,11 @@ module.exports.ascii = (fileContent) ->
 						throw new VertexError 'Point definition without
 												an existing polygon!'
 						currentPoly = new Polygon()
-					currentPoly.addVertex new Vector(vx, vy, vz)
+
+					if currentPoly.vertices.length >= 3
+						throw new FacetError 'More than 3 vertices per facet!'
+					else
+						currentPoly.addVertex new Vector(vx, vy, vz)
 
 	return stl
 
