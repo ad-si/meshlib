@@ -1,6 +1,7 @@
 fs = require 'fs'
 path = require 'path'
 chai = require 'chai'
+yaml = require 'js-yaml'
 
 Model = require '../source/Model'
 meshlib = require '../source/index'
@@ -9,26 +10,30 @@ chai.use require './chaiHelper'
 chai.use require 'chai-as-promised'
 expect = chai.expect
 
+loadYaml = (path) ->
+	return yaml.safeLoad fs.readFileSync path
+
+generateMap = (collection) ->
+	return collection.reduce (previous, current, index) ->
+		previous[current.name] = models[index]
+		return previous
+	, {}
+
+
 models = [
-	'polytopes/triangle'
-	'polytopes/cube'
-	'gearwheel'
-	'geoSplit2'
-	'geoSplit4'
-	'geoSplit5'
-	'geoSplit7'
-	'bunny'
+	'cube'
+	'tetrahedron'
+	'tetrahedrons'
+	'missingFace'
 ].map (model) ->
 	return {
 		name: model
-		asciiPath: path.join __dirname, 'models', model + '.ascii.stl'
-		binaryPath: path.join __dirname, 'models', model + '.bin.stl'
+		filePath: path.join(
+			__dirname, 'models/', model + '.yaml'
+		)
 	}
 
-modelsMap = models.reduce (previous, current, index) ->
-	previous[current.name] = models[index]
-	return previous
-, {}
+modelsMap = generateMap models
 
 
 checkEquality = (dataFromAscii, dataFromBinary, arrayName) ->
@@ -38,79 +43,68 @@ checkEquality = (dataFromAscii, dataFromBinary, arrayName) ->
 	expect(fromAscii).to.deep.equal(fromBinary)
 
 
-describe.only 'Meshlib', ->
+describe 'Meshlib', ->
 	it 'should return a model object', ->
-		asciiStl = fs.readFileSync modelsMap['polytopes/triangle'].asciiPath
-		binaryStl = fs.readFileSync modelsMap['polytopes/triangle'].binaryPath
+		jsonModel = loadYaml modelsMap['cube'].filePath
 
-		modelPromise = meshlib asciiStl, {format: 'stl'}
-			.done (model) ->
-				return model
+		modelPromise = meshlib jsonModel
+			.done (model) -> model
 
 		return expect(modelPromise).to.eventually.be.a.model
 
-	it 'should be optimizable', ->
-		asciiStl = fs.readFileSync modelsMap.gearwheel.asciiPath
-		binaryStl = fs.readFileSync modelsMap.gearwheel.binaryPath
 
-		modelPromise = meshlib asciiStl, {format: 'stl'}
-			.optimize()
-			.done (model) ->
-				return model
+	it 'should create a face-vertex mesh', ->
+		jsonModel = loadYaml modelsMap['cube'].filePath
 
-		return expect(modelPromise).to.eventually.be.optimized
+		modelPromise = meshlib jsonModel
+			.buildFaceVertexMesh()
+			.done (model) -> model
 
-	it.skip 'should be optimizable', ->
-		modelPromise = meshlib(mediumStl, {format: 'stl'}).optimize()
-		return expect(modelPromise).to.eventually.be.optimized
+		return expect(modelPromise).to.eventually.have.faceVertexMesh
 
 
-describe 'Model Parsing', () ->
-	models.forEach (model) ->
-		describe model.name, () ->
+	it 'should calculate face-normals', ->
+		jsonModel = loadYaml modelsMap['cube'].filePath
 
-			fromAscii = null
-			fromBinary = null
+		jsonModel.faces.forEach (face) ->
+			delete face.normal
 
-			it 'should load and parse ASCII STL file', (done) ->
-				@timeout('8s')
+		modelPromise = meshlib jsonModel
+			.calculateNormals()
+			.done (model) -> model
 
-				asciiStlBuffer = fs.readFileSync model.asciiPath
-
-				meshlib.parse asciiStlBuffer, null, (error, dataFromAscii) ->
-					if error
-						throw error
-
-					else if not dataFromAscii
-						throw new Error 'Data is empty!'
-
-					else
-						fromAscii = dataFromAscii
-						done()
+		return expect(modelPromise).to.eventually.have.correctNormals
 
 
-			it 'should load and parse binary STL file', (done) ->
-				@timeout('8s')
+	it.skip 'should extract individual geometries to submodels', () ->
+		jsonModel = loadYaml modelsMap['tetrahedrons'].filePath
 
-				binaryStlBuffer = fs.readFileSync model.binaryPath
+		modelPromise = meshlib jsonModel
+			.buildFaceVertexMesh()
+			.getSubmodels()
+			.then (models) -> models
 
-				meshlib.parse binaryStlBuffer, null, (error, dataFromBinary) ->
-					if error
-						throw error
-					else if not dataFromBinary
-						throw new Error 'Data is empty!'
-					else
-						fromBinary = dataFromBinary
-						done()
+		return expect(modelPromise).to.eventually.be.an('array')
+			.and.to.have.length(2)
 
 
-			it 'ascii & binary version should yield the same model', () ->
-				for arrayName in ['positions', 'indices',
-					'vertexNormals', 'faceNormals']
-					it 'should yield the same model', () ->
-						checkEquality fromAscii, fromBinary, arrayName
+	it 'should be two-manifold', () ->
+		jsonModel = loadYaml modelsMap['tetrahedron'].filePath
+
+		modelPromise = meshlib jsonModel
+			.buildFaceVertexMesh()
+			.isTwoManifold()
+			.then (isTwoManifold) -> isTwoManifold
+
+		return expect(modelPromise).to.eventually.be.true
 
 
-			it 'should split individual geometries in STL file', () ->
-				@timeout('45s')
-				meshlib.separateGeometry(fromBinary)
+	it 'should not be two-manifold', () ->
+		jsonModel = loadYaml modelsMap['missingFace'].filePath
+
+		modelPromise = meshlib jsonModel
+			.buildFaceVertexMesh()
+			.isTwoManifold()
+			.then (isTwoManifold) -> isTwoManifold
+
+		return expect(modelPromise).to.eventually.be.false

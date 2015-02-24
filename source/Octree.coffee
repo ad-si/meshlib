@@ -3,7 +3,7 @@ class Octree
 		@index = -1
 		@vec = null
 		@normalList = null
-		@bxbybz = null #child that has a _b_igger x,y and z
+		@bxbybz = null # Child that has a _b_igger x,y and z
 		@bxbysz = null
 		@bxsybz = null
 		@bxsysz = null
@@ -13,7 +13,7 @@ class Octree
 		@sxbysz = null
 
 	forEach: (callback) ->
-		callback(@)
+		callback @
 		if @bxbybz?
 			@bxbybz.forEach callback
 		if @bxbysz?
@@ -31,63 +31,65 @@ class Octree
 		if @sxsysz?
 			@sxsysz.forEach callback
 
-	add: (point, normal, biggestUsedIndex = 0) ->
-		if @vec == null
-			#if the tree is not initialized, set the vector as first element
-			@vec = point
+	add: (vertex, normal, biggestUsedIndex = 0) ->
+		if not @vec?
+			# If the tree is not initialized, set the vector as first element
+			@vec = vertex
 			@normalList = []
 			@normalList.push normal
 			@index = biggestUsedIndex + 1
 			return @index
-		else if (point.euclideanDistanceTo @vec) < @distanceDelta
-			#if the points are near together, return own index
+
+		else if (vertex.euclideanDistanceTo @vec) < @distanceDelta
+			# If the points are near together, return own index
 			@normalList.push normal
 			return @index
+
 		else
-			#init the subnode this leaf belongs to
-			if point.x > @vec.x
-				#bx....
-				if point.y > @vec.y
-					#bxby..
-					if point.z > @vec.z
-						if (!(@bxbybz?))
+			# Init the subnode this leaf belongs to
+			if vertex.x > @vec.x
+				# bx____
+				if vertex.y > @vec.y
+					# bxby__
+					if vertex.z > @vec.z
+						if not @bxbybz?
 							@bxbybz = new Octree(@distanceDelta)
-						return @bxbybz.add point, normal, biggestUsedIndex
+						return @bxbybz.add vertex, normal, biggestUsedIndex
 					else
-						if (!(@bxbysz?))
+						if not @bxbysz?
 							@bxbysz = new Octree(@distanceDelta)
-						return @bxbysz.add point, normal, biggestUsedIndex
+						return @bxbysz.add vertex, normal, biggestUsedIndex
 				else
-					#bxsy..
-					if point.z > @vec.z
-						if (!(@bxsybz?))
+					# bxsy__
+					if vertex.z > @vec.z
+						if not @bxsybz?
 							@bxsybz = new Octree(@distanceDelta)
-						return @bxsybz.add point, normal, biggestUsedIndex
+						return @bxsybz.add vertex, normal, biggestUsedIndex
 					else
-						if (!(@bxsysz?))
+						if not @bxsysz?
 							@bxsysz = new Octree(@distanceDelta)
-						return @bxsysz.add point, normal, biggestUsedIndex
+						return @bxsysz.add vertex, normal, biggestUsedIndex
 			else
-				#sx....
-				if point.y > @vec.y
-					#sxby..
-					if point.z > @vec.z
-						if (!(@sxbybz?))
+				# sx____
+				if vertex.y > @vec.y
+					# sxby__
+					if vertex.z > @vec.z
+						if not @sxbybz?
 							@sxbybz = new Octree(@distanceDelta)
-						return @sxbybz.add point, normal, biggestUsedIndex
+						return @sxbybz.add vertex, normal, biggestUsedIndex
 					else
-						if (!(@sxbysz?))
+						if not @sxbysz?
 							@sxbysz = new Octree(@distanceDelta)
-						return @sxbysz.add point, normal, biggestUsedIndex
+						return @sxbysz.add vertex, normal, biggestUsedIndex
 				else
-					#sxsy..
-					if point.z > @vec.z
-						if (!(@sxsybz?))
+					# sxsy__
+					if vertex.z > @vec.z
+						if not @sxsybz?
 							@sxsybz = new Octree(@distanceDelta)
-						return @sxsybz.add point, normal, biggestUsedIndex
+						return @sxsybz.add vertex, normal, biggestUsedIndex
 					else
-						if (!(@sxsysz?))
+						if not @sxsysz?
 							@sxsysz = new Octree(@distanceDelta)
-						return @sxsysz.add point, normal, biggestUsedIndex
+						return @sxsysz.add vertex, normal, biggestUsedIndex
 
 module.exports = Octree

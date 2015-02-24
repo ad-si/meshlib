@@ -1,5 +1,3 @@
-Stl = require './Stl'
-optimizeModel = require './optimizeModel'
 Model = require './Model'
 
 
@@ -14,27 +12,71 @@ class ModelPromise
 			fulfill @model
 		return @
 
-	setPolygons: (polygons) =>
+	setFaces: (faces) =>
 		@ready = @ready.then =>
 			new Promise (fulfill, reject) =>
 				try
-					@model.setPolygons(polygons)
+					@model.setFaces(faces)
 				catch error
 					reject error
 
 				fulfill @model
 		return @
 
-	optimize: =>
+	buildFaceVertexMesh: =>
 		@ready = @ready.then =>
 			return new Promise (fulfill, reject) =>
 				try
-					@model = @model.optimize()
+					@model = @model.buildFaceVertexMesh()
 				catch error
 					return reject error
 
 				fulfill @model
 		return @
+
+	fixFaces: =>
+		@ready = @ready.then =>
+			return new Promise (fulfill, reject) =>
+				try
+					@model = @model.fixFaces()
+				catch error
+					return reject error
+
+				fulfill @model
+		return @
+
+	calculateNormals: =>
+		@ready = @ready.then =>
+			return new Promise (fulfill, reject) =>
+				try
+					@model = @model.calculateNormals()
+				catch error
+					return reject error
+
+				fulfill @model
+		return @
+
+	getSubmodels: () =>
+		@ready = @ready.then =>
+			return new Promise (fulfill, reject) =>
+				try
+					models = @model.getSubmodels()
+				catch error
+					return reject error
+
+				fulfill models
+		return @ready
+
+	isTwoManifold: () =>
+		@ready = @ready.then =>
+			return new Promise (fulfill, reject) =>
+				try
+					isTwoManifold = @model.isTwoManifold()
+				catch error
+					return reject error
+
+				fulfill isTwoManifold
+		return @ready
 
 	next: (onFulfilled, onRejected) =>
 		@done onFulfilled, onRejected

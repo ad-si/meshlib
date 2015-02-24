@@ -22,51 +22,6 @@ class OptimizedModel
 		@faceNormals = []
 		@originalFileName = 'Unknown file'
 
-	# Checks whether the model is 2-manifold, meaning that each edge is connected
-	# to exactly two faces. This also implies that the mesh is a closed body
-	# without holes
-	isTwoManifold: () ->
-		if @_isTwoManifold?
-			return @_isTwoManifold
-
-		edges = []
-		numEdges = []
-
-		# adds the edge to the edges list. if it already exists in the list,
-		# the counter in numEdges is increased
-		addEdge = (a, b) ->
-			for i in [0..edges.length - 1] by 1
-				aeb = (edges[i].a == a and edges[i].b == b)
-				bea = (edges[i].a == b and edges[i].b == a)
-				if (aeb or bea)
-					numEdges[i]++
-					if numEdges[i] > 2
-						return false
-					else
-						return true
-			edges.push {a: a, b: b}
-			numEdges.push 1
-
-		# add all edges for all triangles
-		for i in [0..@indices.length - 1] by 3
-			a = @indices[i]
-			b = @indices[i + 1]
-			c = @indices[i + 2]
-			r = addEdge a, b
-			r = addEdge(b, c) and r
-			r = addEdge(c, a) and r
-
-			if not r
-				@_isTwoManifold = false
-				return @_isTwoManifold
-
-		# check that each edge exists exactly twice
-		for num in numEdges
-			if num != 2
-				@_isTwoManifold = false
-				return @_isTwoManifold
-		@_isTwoManifold = true
-		return @_isTwoManifold
 
 	toBase64: () ->
 		posA = new Float32Array(@positions.length)
@@ -140,7 +95,7 @@ class OptimizedModel
 	# if bufferGeoemtry is set to true, a BufferGeometry using
 	# the vertex normals will be created
 	# else, a normal Geometry with face normals will be created
-	# (contains duplicate points, but provides better shading for sharp edges)
+	# (contains duplicate vertices, but provides better shading for sharp edges)
 	convertToThreeGeometry: (bufferGeometry = false) ->
 		if (bufferGeometry)
 			return @createBufferGeometry()
@@ -150,8 +105,8 @@ class OptimizedModel
 	# Creates a THREE.BufferGeometry using vertex normals
 	createBufferGeometry: ->
 		geometry = new THREE.BufferGeometry()
-		#officially, threejs supports normal array, but in fact,
-		#you have to use this lowlevel datatype to view something
+		# Officially, threejs supports normal array, but in fact,
+		# you have to use this lowlevel datatype to view something
 		parray = new Float32Array(@positions.length)
 		for i in [0..@positions.length - 1]
 			parray[i] = @positions[i]
@@ -168,14 +123,14 @@ class OptimizedModel
 		geometry.computeBoundingSphere()
 		return geometry
 
-	# uses a THREE.Geometry using face normals
+	# Uses a THREE.Geometry using face normals
 	createStandardGeometry: ->
 		geometry = new THREE.Geometry()
 
 		for vi in [0..@positions.length - 1] by 3
 			geometry.vertices.push new THREE.Vector3(
 				@positions[vi],
-				@positions[vi + 1], 
+				@positions[vi + 1],
 				@positions[vi + 2]
 				)
 
@@ -196,20 +151,20 @@ class OptimizedModel
 	# Imports from a THREE.Geometry
 	# Imports vertices (positions) and faces (indices), and face normals
 	fromThreeGeometry: (threeGeometry, originalFileName = 'Three.Geometry') =>
-		# clear data, if exists
+		# Clear data, if exists
 		@positions = []
 		@indices = []
 		@faceNormals = []
 		@vertexNormals = []
 		@originalFileName = originalFileName
 
-		# convert point positions
+		# Convert point positions
 		for vertex in threeGeometry.vertices
 			@positions.push vertex.x
 			@positions.push vertex.y
 			@positions.push vertex.z
 
-		# convert polygons (indexed) and their normals
+		# Convert faces (indexed) and their normals
 		for face in threeGeometry.faces
 			@indices.push face.a
 			@indices.push face.b
@@ -218,7 +173,7 @@ class OptimizedModel
 			@faceNormals.push face.normal.x
 			@faceNormals.push face.normal.y
 			@faceNormals.push face.normal.z
-	
+
 	boundingBox: ->
 		if @_boundingBox
 			return @_boundingBox
@@ -234,13 +189,19 @@ class OptimizedModel
 			maxY = @positions[i + 1] if @positions[i + 1] > maxY
 			maxZ = @positions[i + 2] if @positions[i + 2] > maxZ
 
-		@_boundingBox = {
-			min: {x: minX, y: minY, z: minZ}
-			max: {x: maxX, y: maxY, z: maxZ}
-		}
+		@_boundingBox =
+			min:
+				x: minX
+				y: minY
+				z: minZ
+			max:
+				x: maxX
+				y: maxY
+				z: maxZ
+
 		return @_boundingBox
 
-	forEachPolygon: (callback) =>
+	forEachFace: (callback) =>
 		for i in [0..@indices.length - 1] by 3
 			p0 = {
 				x: @positions[@indices[i] * 3]

@@ -160,7 +160,7 @@ logger.add winston.transports.File, {
 
 htmlPath = path.join reportDirectory, 'report.html'
 
-describe 'Performance', () ->
+describe.skip 'Performance', () ->
 
 	@timeout('1h')
 

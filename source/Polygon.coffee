@@ -1,14 +1,17 @@
 Vector = require './Vector'
 
 class Polygon
-	constructor: () ->
-		@points = []
+	constructor: (@vertices, @normal) ->
+		@vertices = []
 		@normal = new Vector(0, 0, 0)
+
+	@fromVertexArray: (array) ->
+		return new Polygon(array)
 
 	setNormal: (@normal) ->
 		return
 
-	addPoint: (point) ->
-		@points.push point
+	addVertex: (vertex) ->
+		@vertices.push vertex
 
 module.exports = Polygon
