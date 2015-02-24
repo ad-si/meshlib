@@ -4,7 +4,6 @@ require 'string.prototype.includes'
 textEncoding = require 'text-encoding'
 
 Vector = require '../../../source/Vector'
-optimizeModel = require '../../../source/optimizeModel'
 Polygon = require '../../../source/Polygon'
 converters = require '../../../source/converters'
 errors = require './errors'
