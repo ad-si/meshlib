@@ -16,26 +16,26 @@ stringToUint8Array = (str) ->
 
 class OptimizedModel
 	constructor: () ->
-		@positions = []
-		@indices = []
-		@vertexNormals = []
-		@faceNormals = []
+		@verticesCoordinates = []
+		@facesVerticesIndices = []
+		@verticesNormals = []
+		@facesNormals = []
 		@originalFileName = 'Unknown file'
 
 
 	toBase64: () ->
-		posA = new Float32Array(@positions.length)
-		for i in [0..@positions.length - 1]
-			posA[i] = @positions[i]
-		indA = new Int32Array(@indices.length)
-		for i in [0..@indices.length - 1]
-			indA[i] = @indices[i]
-		vnA = new Float32Array(@vertexNormals.length)
-		for i in [0..@vertexNormals.length - 1]
-			vnA[i] = @vertexNormals[i]
-		fnA = new Float32Array(@faceNormals.length)
-		for i in [0..@faceNormals.length - 1]
-			fnA[i] = @faceNormals[i]
+		posA = new Float32Array(@verticesCoordinates.length)
+		for i in [0..@verticesCoordinates.length - 1]
+			posA[i] = @verticesCoordinates[i]
+		indA = new Int32Array(@facesVerticesIndices.length)
+		for i in [0..@facesVerticesIndices.length - 1]
+			indA[i] = @facesVerticesIndices[i]
+		vnA = new Float32Array(@verticesNormals.length)
+		for i in [0..@verticesNormals.length - 1]
+			vnA[i] = @verticesNormals[i]
+		fnA = new Float32Array(@facesNormals.length)
+		for i in [0..@facesNormals.length - 1]
+			fnA[i] = @facesNormals[i]
 
 		posBase = @arrayBufferToBase64 posA.buffer
 		baseString = posBase
@@ -59,10 +59,10 @@ class OptimizedModel
 	fromBase64: (base64String) ->
 		strArray = base64String.split '|'
 
-		@positions = @base64ToFloat32Array strArray[0]
-		@indices = new @base64ToInt32Array strArray[1]
-		@vertexNormals = @base64ToFloat32Array strArray[2]
-		@faceNormals = @base64ToFloat32Array strArray[3]
+		@verticesCoordinates = @base64ToFloat32Array strArray[0]
+		@facesVerticesIndices = new @base64ToInt32Array strArray[1]
+		@verticesNormals = @base64ToFloat32Array strArray[2]
+		@facesNormals = @base64ToFloat32Array strArray[3]
 		@originalFileName = strArray[4]
 
 	base64ToFloat32Array: (b64) ->
@@ -107,15 +107,15 @@ class OptimizedModel
 		geometry = new THREE.BufferGeometry()
 		# Officially, threejs supports normal array, but in fact,
 		# you have to use this lowlevel datatype to view something
-		parray = new Float32Array(@positions.length)
-		for i in [0..@positions.length - 1]
-			parray[i] = @positions[i]
-		narray = new Float32Array(@vertexNormals.length)
-		for i in [0..@vertexNormals.length - 1]
-			narray[i] = @vertexNormals[i]
-		iarray = new Uint32Array(@indices.length)
-		for i in [0..@indices.length - 1]
-			iarray[i] = @indices[i]
+		parray = new Float32Array(@verticesCoordinates.length)
+		for i in [0..@verticesCoordinates.length - 1]
+			parray[i] = @verticesCoordinates[i]
+		narray = new Float32Array(@verticesNormals.length)
+		for i in [0..@verticesNormals.length - 1]
+			narray[i] = @verticesNormals[i]
+		iarray = new Uint32Array(@facesVerticesIndices.length)
+		for i in [0..@facesVerticesIndices.length - 1]
+			iarray[i] = @facesVerticesIndices[i]
 
 		geometry.addAttribute 'index', new THREE.BufferAttribute(iarray, 1)
 		geometry.addAttribute 'position', new THREE.BufferAttribute(parray, 3)
@@ -127,67 +127,66 @@ class OptimizedModel
 	createStandardGeometry: ->
 		geometry = new THREE.Geometry()
 
-		for vi in [0..@positions.length - 1] by 3
-			geometry.vertices.push new THREE.Vector3(
-				@positions[vi],
-				@positions[vi + 1],
-				@positions[vi + 2]
+		for vi in [0..@verticesCoordinates.length - 1] by 3
+			geometry.verticesCoordinates.push new THREE.Vector3(
+				@verticesCoordinates[vi],
+				@verticesCoordinates[vi + 1],
+				@verticesCoordinates[vi + 2]
 				)
 
-		for fi in [0..@indices.length - 1] by 3
+		for fi in [0..@facesVerticesIndices.length - 1] by 3
 			geometry.faces.push new THREE.Face3(
-				@indices[fi],
-				@indices[fi + 1],
-				@indices[fi + 2],
+				@facesVerticesIndices[fi],
+				@facesVerticesIndices[fi + 1],
+				@facesVerticesIndices[fi + 2],
 				new THREE.Vector3(
-					@faceNormals[fi],
-					@faceNormals[fi + 1],
-					@faceNormals[fi + 2]
+					@facesNormals[fi],
+					@facesNormals[fi + 1],
+					@facesNormals[fi + 2]
 					)
 				)
 
 		return geometry
 
 	# Imports from a THREE.Geometry
-	# Imports vertices (positions) and faces (indices), and face normals
+	# Imports faces, vertices and face normals
 	fromThreeGeometry: (threeGeometry, originalFileName = 'Three.Geometry') =>
 		# Clear data, if exists
-		@positions = []
-		@indices = []
-		@faceNormals = []
-		@vertexNormals = []
+		@verticesCoordinates = []
+		@facesVerticesIndices = []
+		@facesNormals = []
+		@verticesNormals = []
 		@originalFileName = originalFileName
 
-		# Convert point positions
-		for vertex in threeGeometry.vertices
-			@positions.push vertex.x
-			@positions.push vertex.y
-			@positions.push vertex.z
+		for vertex in threeGeometry.verticesCoordinates
+			@verticesCoordinates.push vertex.x
+			@verticesCoordinates.push vertex.y
+			@verticesCoordinates.push vertex.z
 
-		# Convert faces (indexed) and their normals
+		# Convert faces and their normals
 		for face in threeGeometry.faces
-			@indices.push face.a
-			@indices.push face.b
-			@indices.push face.c
+			@facesVerticesIndices.push face.a
+			@facesVerticesIndices.push face.b
+			@facesVerticesIndices.push face.c
 
-			@faceNormals.push face.normal.x
-			@faceNormals.push face.normal.y
-			@faceNormals.push face.normal.z
+			@facesNormals.push face.normal.x
+			@facesNormals.push face.normal.y
+			@facesNormals.push face.normal.z
 
 	boundingBox: ->
 		if @_boundingBox
 			return @_boundingBox
 
-		minX = maxX = @positions[0]
-		minY = maxY = @positions[1]
-		minZ = maxZ = @positions[2]
-		for i in [0..@positions.length - 1] by 3
-			minX = @positions[i]     if @positions[i] < minX
-			minY = @positions[i + 1] if @positions[i + 1] < minY
-			minZ = @positions[i + 2] if @positions[i + 2] < minZ
-			maxX = @positions[i]     if @positions[i] > maxX
-			maxY = @positions[i + 1] if @positions[i + 1] > maxY
-			maxZ = @positions[i + 2] if @positions[i + 2] > maxZ
+		minX = maxX = @verticesCoordinates[0]
+		minY = maxY = @verticesCoordinates[1]
+		minZ = maxZ = @verticesCoordinates[2]
+		for i in [0..@verticesCoordinates.length - 1] by 3
+			minX = @verticesCoordinates[i]     if @verticesCoordinates[i] < minX
+			minY = @verticesCoordinates[i + 1] if @verticesCoordinates[i + 1] < minY
+			minZ = @verticesCoordinates[i + 2] if @verticesCoordinates[i + 2] < minZ
+			maxX = @verticesCoordinates[i]     if @verticesCoordinates[i] > maxX
+			maxY = @verticesCoordinates[i + 1] if @verticesCoordinates[i + 1] > maxY
+			maxZ = @verticesCoordinates[i + 2] if @verticesCoordinates[i + 2] > maxZ
 
 		@_boundingBox =
 			min:
@@ -202,26 +201,26 @@ class OptimizedModel
 		return @_boundingBox
 
 	forEachFace: (callback) =>
-		for i in [0..@indices.length - 1] by 3
+		for i in [0..@facesVerticesIndices.length - 1] by 3
 			p0 = {
-				x: @positions[@indices[i] * 3]
-				y: @positions[@indices[i] * 3 + 1]
-				z: @positions[@indices[i] * 3 + 2]
+				x: @verticesCoordinates[@facesVerticesIndices[i] * 3]
+				y: @verticesCoordinates[@facesVerticesIndices[i] * 3 + 1]
+				z: @verticesCoordinates[@facesVerticesIndices[i] * 3 + 2]
 			}
 			p1 = {
-				x: @positions[@indices[i + 1] * 3]
-				y: @positions[@indices[i + 1] * 3 + 1]
-				z: @positions[@indices[i + 1] * 3 + 2]
+				x: @verticesCoordinates[@facesVerticesIndices[i + 1] * 3]
+				y: @verticesCoordinates[@facesVerticesIndices[i + 1] * 3 + 1]
+				z: @verticesCoordinates[@facesVerticesIndices[i + 1] * 3 + 2]
 			}
 			p2 = {
-				x: @positions[@indices[i + 2] * 3]
-				y: @positions[@indices[i + 2] * 3 + 1]
-				z: @positions[@indices[i + 2] * 3 + 2]
+				x: @verticesCoordinates[@facesVerticesIndices[i + 2] * 3]
+				y: @verticesCoordinates[@facesVerticesIndices[i + 2] * 3 + 1]
+				z: @verticesCoordinates[@facesVerticesIndices[i + 2] * 3 + 2]
 			}
 			n = {
-				x: @faceNormals[i]
-				y: @faceNormals[i + 1]
-				z: @faceNormals[i + 2]
+				x: @facesNormals[i]
+				y: @facesNormals[i + 1]
+				z: @facesNormals[i + 2]
 			}
 
 			callback p0, p1, p2, n

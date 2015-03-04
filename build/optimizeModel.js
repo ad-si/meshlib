@@ -68,10 +68,10 @@
       return avgNormals[i + 2] = avg.z;
     });
     optimized = new OptimizedModel();
-    optimized.positions = vertexPositions;
+    optimized.vertices = vertexPositions;
     optimized.indices = index;
-    optimized.vertexNormals = avgNormals;
-    optimized.faceNormals = faceNormals;
+    optimized.verticesNormals = avgNormals;
+    optimized.facesNormals = faceNormals;
     return optimized;
   };
 

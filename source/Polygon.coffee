@@ -2,7 +2,7 @@ Vector = require './Vector'
 
 class Polygon
 	constructor: (@vertices, @normal) ->
-		@vertices = []
+		@verticesCoordinates = []
 		@normal = new Vector(0, 0, 0)
 
 	@fromVertexArray: (array) ->
@@ -12,6 +12,6 @@ class Polygon
 		return
 
 	addVertex: (vertex) ->
-		@vertices.push vertex
+		@verticesCoordinates.push vertex
 
 module.exports = Polygon

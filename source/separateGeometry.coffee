@@ -15,30 +15,30 @@ createModelFromEquivalenceClass = (equivalenceClass, optimizedModel) ->
 		if not polyTranslationTable[currentId]?
 			polyTranslationTable[currentId] = nextPointIndex
 			nextPointIndex++
-			model.positions.push optimizedModel.positions[currentId * 3 + 0]
-			model.positions.push optimizedModel.positions[currentId * 3 + 1]
-			model.positions.push optimizedModel.positions[currentId * 3 + 2]
-			model.vertexNormals.push optimizedModel.vertexNormals[currentId * 3 + 0]
-			model.vertexNormals.push optimizedModel.vertexNormals[currentId * 3 + 1]
-			model.vertexNormals.push optimizedModel.vertexNormals[currentId * 3 + 2]
+			model.verticesCoordinates.push optimizedModel.verticesCoordinates[currentId * 3 + 0]
+			model.verticesCoordinates.push optimizedModel.verticesCoordinates[currentId * 3 + 1]
+			model.verticesCoordinates.push optimizedModel.verticesCoordinates[currentId * 3 + 2]
+			model.verticesNormals.push optimizedModel.verticesNormals[currentId * 3 + 0]
+			model.verticesNormals.push optimizedModel.verticesNormals[currentId * 3 + 1]
+			model.verticesNormals.push optimizedModel.verticesNormals[currentId * 3 + 2]
 
 		return polyTranslationTable[currentId]
 
 	equivalenceClass.faces.enumerate (pi) ->
-		p0 = optimizedModel.indices[pi * 3 + 0]
-		p1 = optimizedModel.indices[pi * 3 + 1]
-		p2 = optimizedModel.indices[pi * 3 + 2]
+		p0 = optimizedModel.facesVerticesIndices[pi * 3 + 0]
+		p1 = optimizedModel.facesVerticesIndices[pi * 3 + 1]
+		p2 = optimizedModel.facesVerticesIndices[pi * 3 + 2]
 
 		p0n = insertPoint p0
 		p1n = insertPoint p1
 		p2n = insertPoint p2
 
-		model.indices.push p0n
-		model.indices.push p1n
-		model.indices.push p2n
-		model.faceNormals.push optimizedModel.faceNormals[pi * 3 + 0]
-		model.faceNormals.push optimizedModel.faceNormals[pi * 3 + 1]
-		model.faceNormals.push optimizedModel.faceNormals[pi * 3 + 2]
+		model.facesVerticesIndices.push p0n
+		model.facesVerticesIndices.push p1n
+		model.facesVerticesIndices.push p2n
+		model.facesNormals.push optimizedModel.facesNormals[pi * 3 + 0]
+		model.facesNormals.push optimizedModel.facesNormals[pi * 3 + 1]
+		model.facesNormals.push optimizedModel.facesNormals[pi * 3 + 2]
 
 	return model
 
@@ -49,12 +49,12 @@ createModelFromEquivalenceClass = (equivalenceClass, optimizedModel) ->
 createEquivalenceClasses = (optimizedModel) ->
 	equivalenceClasses = []
 
-	for faceIndex in [0..optimizedModel.indices.length - 1] by 3
+	for faceIndex in [0..optimizedModel.facesVerticesIndices.length - 1] by 3
 		poly = {
 			index: faceIndex / 3
-			p0: optimizedModel.indices[faceIndex]
-			p1: optimizedModel.indices[faceIndex + 1]
-			p2: optimizedModel.indices[faceIndex + 2]
+			p0: optimizedModel.facesVerticesIndices[faceIndex]
+			p1: optimizedModel.facesVerticesIndices[faceIndex + 1]
+			p2: optimizedModel.facesVerticesIndices[faceIndex + 2]
 		}
 
 		connectedClasses = []

@@ -9,6 +9,6 @@ class Face
 		return new Face array
 
 	addVertex: (vertex) ->
-		@vertices.push vertex
+		@verticesCoordinates.push vertex
 
 module.exports = Face

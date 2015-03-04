@@ -97,11 +97,11 @@ class Model
 		edgesCountMap = {}
 
 		# Count edge occurrences for all triangles
-		for index in [0...@mesh.faceVertex.indices.length] by 3
+		for index in [0...@mesh.faceVertex.facesVerticesIndices.length] by 3
 			do (index) =>
-				x = @mesh.faceVertex.indices[index]
-				y = @mesh.faceVertex.indices[index + 1]
-				z = @mesh.faceVertex.indices[index + 2]
+				x = @mesh.faceVertex.facesVerticesIndices[index]
+				y = @mesh.faceVertex.facesVerticesIndices[index + 1]
+				z = @mesh.faceVertex.facesVerticesIndices[index + 2]
 
 				[
 					String(x).concat y

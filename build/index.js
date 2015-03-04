@@ -74,7 +74,7 @@
   };
 
   meshlib = function(model, options) {
-    if ((model.positions == null) || (model.indices == null) || (model.vertexNormals == null) || (model.faceNormals == null)) {
+    if ((model.verticesCoordinates == null) || (model.facesVerticesIndices == null) || (model.verticesNormals == null) || (model.facesNormals == null)) {
       model = parseBuffer(model, options);
     }
     return new Model(model, options);

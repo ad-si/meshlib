@@ -15,22 +15,22 @@ module.exports = (chai, utils) ->
 	chai.Assertion.addProperty 'faceVertexMesh', () ->
 
 		@assert(
-			@_obj.mesh.faceVertex.hasOwnProperty 'indices'
-			'expected #{this} to have indices',
-			'expected #{this} to not have indices'
+			@_obj.mesh.faceVertex.hasOwnProperty 'facesVerticesIndices'
+			'expected #{this} to have facesVerticesIndices',
+			'expected #{this} to not have facesVerticesIndices'
 		)
 		@assert(
-			@_obj.mesh.faceVertex.hasOwnProperty 'positions'
-			'expected #{this} to have positions',
-			'expected #{this} to not have positions'
+			@_obj.mesh.faceVertex.hasOwnProperty 'verticesCoordinates'
+			'expected #{this} to have verticesCoordinates',
+			'expected #{this} to not have verticesCoordinates'
 		)
 		@assert(
-			@_obj.mesh.faceVertex.hasOwnProperty 'vertexNormals'
+			@_obj.mesh.faceVertex.hasOwnProperty 'verticesNormals'
 			'expected #{this} to have vertexNormals',
 			'expected #{this} to not have vertexNormals'
 		)
 		@assert(
-			@_obj.mesh.faceVertex.hasOwnProperty 'faceNormals'
+			@_obj.mesh.faceVertex.hasOwnProperty 'facesNormals'
 			'expected #{this} to have faceNormals',
 			'expected #{this} to not have faceNormals'
 		)
@@ -61,8 +61,8 @@ module.exports = (chai, utils) ->
 
 	chai.Assertion.addMethod 'equalFace', (face) ->
 
-		@_obj.vertices.every (vertex, vertexIndex) =>
-			chai.expect(vertex).to.equalVector(face.vertices[vertexIndex])
+		@_obj.verticesCoordinates.every (vertex, vertexIndex) =>
+			chai.expect(vertex).to.equalVector(face.verticesCoordinates[vertexIndex])
 
 		chai.expect(@_obj.normal).to.equalVector(face.normal)
 

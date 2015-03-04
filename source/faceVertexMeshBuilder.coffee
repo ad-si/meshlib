@@ -6,9 +6,9 @@ Vector = require './Vector'
 module.exports = (faces, options = {}) ->
 	pointDistanceEpsilon = options.pointDistanceEpsilon || 0.0001
 
-	vertexnormals = []
+	verticesNormals = []
 	facesNormals = []
-	facesVerticesList = []
+	facesVerticesIndices = []
 
 	octreeRoot = new Octree(pointDistanceEpsilon)
 	biggestPointIndex = -1
@@ -29,7 +29,7 @@ module.exports = (faces, options = {}) ->
 			if newPointIndex > biggestPointIndex
 				biggestPointIndex = newPointIndex
 
-		facesVerticesList = facesVerticesList.concat indices
+		facesVerticesIndices = facesVerticesIndices.concat indices
 
 		facesNormals.push face.normal.x
 		facesNormals.push face.normal.y
@@ -59,8 +59,8 @@ module.exports = (faces, options = {}) ->
 		avgNormals[i + 2] = avg.z
 
 	return {
-		positions: vertexPositions
-		indices: facesVerticesList
-		vertexNormals: avgNormals
-		faceNormals: facesNormals
+		verticesCoordinates: vertexPositions
+		facesVerticesIndices: facesVerticesIndices
+		verticesNormals: avgNormals
+		facesNormals: facesNormals
 	}

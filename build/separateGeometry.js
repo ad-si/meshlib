@@ -28,29 +28,29 @@
       if (polyTranslationTable[currentId] == null) {
         polyTranslationTable[currentId] = nextPointIndex;
         nextPointIndex++;
-        model.positions.push(optimizedModel.positions[currentId * 3 + 0]);
-        model.positions.push(optimizedModel.positions[currentId * 3 + 1]);
-        model.positions.push(optimizedModel.positions[currentId * 3 + 2]);
-        model.vertexNormals.push(optimizedModel.vertexNormals[currentId * 3 + 0]);
-        model.vertexNormals.push(optimizedModel.vertexNormals[currentId * 3 + 1]);
-        model.vertexNormals.push(optimizedModel.vertexNormals[currentId * 3 + 2]);
+        model.vertices.push(optimizedModel.verticesCoordinates[currentId * 3 + 0]);
+        model.vertices.push(optimizedModel.verticesCoordinates[currentId * 3 + 1]);
+        model.vertices.push(optimizedModel.verticesCoordinates[currentId * 3 + 2]);
+        model.verticesNormals.push(optimizedModel.verticesNormals[currentId * 3 + 0]);
+        model.verticesNormals.push(optimizedModel.verticesNormals[currentId * 3 + 1]);
+        model.verticesNormals.push(optimizedModel.verticesNormals[currentId * 3 + 2]);
       }
       return polyTranslationTable[currentId];
     };
     equivalenceClass.polygons.enumerate(function(pi) {
       var p0, p0n, p1, p1n, p2, p2n;
-      p0 = optimizedModel.indices[pi * 3 + 0];
-      p1 = optimizedModel.indices[pi * 3 + 1];
-      p2 = optimizedModel.indices[pi * 3 + 2];
+      p0 = optimizedModel.facesVerticesIndices[pi * 3 + 0];
+      p1 = optimizedModel.facesVerticesIndices[pi * 3 + 1];
+      p2 = optimizedModel.facesVerticesIndices[pi * 3 + 2];
       p0n = insertPoint(p0);
       p1n = insertPoint(p1);
       p2n = insertPoint(p2);
       model.indices.push(p0n);
       model.indices.push(p1n);
       model.indices.push(p2n);
-      model.faceNormals.push(optimizedModel.faceNormals[pi * 3 + 0]);
-      model.faceNormals.push(optimizedModel.faceNormals[pi * 3 + 1]);
-      return model.faceNormals.push(optimizedModel.faceNormals[pi * 3 + 2]);
+      model.facesNormals.push(optimizedModel.facesNormals[pi * 3 + 0]);
+      model.facesNormals.push(optimizedModel.facesNormals[pi * 3 + 1]);
+      return model.facesNormals.push(optimizedModel.facesNormals[pi * 3 + 2]);
     });
     return model;
   };
@@ -58,12 +58,12 @@
   createEquivalenceClasses = function(optimizedModel) {
     var combined, connectedClasses, eq, equivalenceClasses, poly, polygonIndex, _i, _j, _len, _ref;
     equivalenceClasses = [];
-    for (polygonIndex = _i = 0, _ref = optimizedModel.indices.length - 1; _i <= _ref; polygonIndex = _i += 3) {
+    for (polygonIndex = _i = 0, _ref = optimizedModel.facesVerticesIndices.length - 1; _i <= _ref; polygonIndex = _i += 3) {
       poly = {
         index: polygonIndex / 3,
-        p0: optimizedModel.indices[polygonIndex],
-        p1: optimizedModel.indices[polygonIndex + 1],
-        p2: optimizedModel.indices[polygonIndex + 2]
+        p0: optimizedModel.facesVerticesIndices[polygonIndex],
+        p1: optimizedModel.facesVerticesIndices[polygonIndex + 1],
+        p2: optimizedModel.facesVerticesIndices[polygonIndex + 2]
       };
       connectedClasses = [];
       for (_j = 0, _len = equivalenceClasses.length; _j < _len; _j++) {

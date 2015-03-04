@@ -8,7 +8,7 @@
 
   toAsciiStl = function(model) {
     var faceNormals, i, indices, originalFileName, positions, stl, stringifyFaceNormal, stringifyVector, _i, _ref;
-    faceNormals = model.faceNormals, indices = model.indices, positions = model.positions, originalFileName = model.originalFileName;
+    faceNormals = model.facesNormals, indices = model.facesVerticesIndices, positions = model.verticesCoordinates, originalFileName = model.originalFileName;
     stringifyFaceNormal = function(i) {
       return faceNormals[i] + ' ' + faceNormals[i + 1] + ' ' + faceNormals[i + 2];
     };
@@ -27,7 +27,7 @@
 
   toBinaryStl = function(model) {
     var a, attributeByteCountLength, buffer, bufferLength, contentLength, dataView, faceNormals, facetLength, facetsCounterLength, headerLength, i, indices, le, offset, positions, vectorLength, _i, _j, _ref;
-    faceNormals = model.faceNormals, indices = model.indices, positions = model.positions;
+    faceNormals = model.facesNormals, indices = model.facesVerticesIndices, positions = model.verticesCoordinates;
     headerLength = 80;
     facetsCounterLength = 4;
     vectorLength = 12;

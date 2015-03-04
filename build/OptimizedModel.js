@@ -23,10 +23,10 @@
     function OptimizedModel() {
       this.forEachPolygon = __bind(this.forEachPolygon, this);
       this.fromThreeGeometry = __bind(this.fromThreeGeometry, this);
-      this.positions = [];
+      this.vertices = [];
       this.indices = [];
-      this.vertexNormals = [];
-      this.faceNormals = [];
+      this.verticesNormals = [];
+      this.facesNormals = [];
       this.originalFileName = 'Unknown file';
     }
 
@@ -82,21 +82,21 @@
 
     OptimizedModel.prototype.toBase64 = function() {
       var baseString, fnA, fnBase, i, indA, indBase, posA, posBase, vnA, vnBase, _i, _j, _k, _l, _ref, _ref1, _ref2, _ref3;
-      posA = new Float32Array(this.positions.length);
-      for (i = _i = 0, _ref = this.positions.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
-        posA[i] = this.positions[i];
+      posA = new Float32Array(this.vertices.length);
+      for (i = _i = 0, _ref = this.vertices.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
+        posA[i] = this.vertices[i];
       }
       indA = new Int32Array(this.indices.length);
       for (i = _j = 0, _ref1 = this.indices.length - 1; 0 <= _ref1 ? _j <= _ref1 : _j >= _ref1; i = 0 <= _ref1 ? ++_j : --_j) {
         indA[i] = this.indices[i];
       }
-      vnA = new Float32Array(this.vertexNormals.length);
-      for (i = _k = 0, _ref2 = this.vertexNormals.length - 1; 0 <= _ref2 ? _k <= _ref2 : _k >= _ref2; i = 0 <= _ref2 ? ++_k : --_k) {
-        vnA[i] = this.vertexNormals[i];
+      vnA = new Float32Array(this.verticesNormals.length);
+      for (i = _k = 0, _ref2 = this.verticesNormals.length - 1; 0 <= _ref2 ? _k <= _ref2 : _k >= _ref2; i = 0 <= _ref2 ? ++_k : --_k) {
+        vnA[i] = this.verticesNormals[i];
       }
-      fnA = new Float32Array(this.faceNormals.length);
-      for (i = _l = 0, _ref3 = this.faceNormals.length - 1; 0 <= _ref3 ? _l <= _ref3 : _l >= _ref3; i = 0 <= _ref3 ? ++_l : --_l) {
-        fnA[i] = this.faceNormals[i];
+      fnA = new Float32Array(this.facesNormals.length);
+      for (i = _l = 0, _ref3 = this.facesNormals.length - 1; 0 <= _ref3 ? _l <= _ref3 : _l >= _ref3; i = 0 <= _ref3 ? ++_l : --_l) {
+        fnA[i] = this.facesNormals[i];
       }
       posBase = this.arrayBufferToBase64(posA.buffer);
       baseString = posBase;
@@ -116,10 +116,10 @@
     OptimizedModel.prototype.fromBase64 = function(base64String) {
       var strArray;
       strArray = base64String.split('|');
-      this.positions = this.base64ToFloat32Array(strArray[0]);
+      this.vertices = this.base64ToFloat32Array(strArray[0]);
       this.indices = new this.base64ToInt32Array(strArray[1]);
-      this.vertexNormals = this.base64ToFloat32Array(strArray[2]);
-      this.faceNormals = this.base64ToFloat32Array(strArray[3]);
+      this.verticesNormals = this.base64ToFloat32Array(strArray[2]);
+      this.facesNormals = this.base64ToFloat32Array(strArray[3]);
       return this.originalFileName = strArray[4];
     };
 
@@ -172,13 +172,13 @@
     OptimizedModel.prototype.createBufferGeometry = function() {
       var geometry, i, iarray, narray, parray, _i, _j, _k, _ref, _ref1, _ref2;
       geometry = new THREE.BufferGeometry();
-      parray = new Float32Array(this.positions.length);
-      for (i = _i = 0, _ref = this.positions.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
-        parray[i] = this.positions[i];
+      parray = new Float32Array(this.vertices.length);
+      for (i = _i = 0, _ref = this.vertices.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
+        parray[i] = this.vertices[i];
       }
-      narray = new Float32Array(this.vertexNormals.length);
-      for (i = _j = 0, _ref1 = this.vertexNormals.length - 1; 0 <= _ref1 ? _j <= _ref1 : _j >= _ref1; i = 0 <= _ref1 ? ++_j : --_j) {
-        narray[i] = this.vertexNormals[i];
+      narray = new Float32Array(this.verticesNormals.length);
+      for (i = _j = 0, _ref1 = this.verticesNormals.length - 1; 0 <= _ref1 ? _j <= _ref1 : _j >= _ref1; i = 0 <= _ref1 ? ++_j : --_j) {
+        narray[i] = this.verticesNormals[i];
       }
       iarray = new Uint32Array(this.indices.length);
       for (i = _k = 0, _ref2 = this.indices.length - 1; 0 <= _ref2 ? _k <= _ref2 : _k >= _ref2; i = 0 <= _ref2 ? ++_k : --_k) {
@@ -194,11 +194,11 @@
     OptimizedModel.prototype.createStandardGeometry = function() {
       var fi, geometry, vi, _i, _j, _ref, _ref1;
       geometry = new THREE.Geometry();
-      for (vi = _i = 0, _ref = this.positions.length - 1; _i <= _ref; vi = _i += 3) {
-        geometry.vertices.push(new THREE.Vector3(this.positions[vi], this.positions[vi + 1], this.positions[vi + 2]));
+      for (vi = _i = 0, _ref = this.vertices.length - 1; _i <= _ref; vi = _i += 3) {
+        geometry.vertices.push(new THREE.Vector3(this.vertices[vi], this.vertices[vi + 1], this.vertices[vi + 2]));
       }
       for (fi = _j = 0, _ref1 = this.indices.length - 1; _j <= _ref1; fi = _j += 3) {
-        geometry.faces.push(new THREE.Face3(this.indices[fi], this.indices[fi + 1], this.indices[fi + 2], new THREE.Vector3(this.faceNormals[fi], this.faceNormals[fi + 1], this.faceNormals[fi + 2])));
+        geometry.faces.push(new THREE.Face3(this.indices[fi], this.indices[fi + 1], this.indices[fi + 2], new THREE.Vector3(this.facesNormals[fi], this.facesNormals[fi + 1], this.facesNormals[fi + 2])));
       }
       return geometry;
     };
@@ -208,17 +208,17 @@
       if (originalFileName == null) {
         originalFileName = 'Three.Geometry';
       }
-      this.positions = [];
+      this.vertices = [];
       this.indices = [];
-      this.faceNormals = [];
-      this.vertexNormals = [];
+      this.facesNormals = [];
+      this.verticesNormals = [];
       this.originalFileName = originalFileName;
-      _ref = threeGeometry.vertices;
+      _ref = threeGeometry.verticesCoordinates;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         vertex = _ref[_i];
-        this.positions.push(vertex.x);
-        this.positions.push(vertex.y);
-        this.positions.push(vertex.z);
+        this.vertices.push(vertex.x);
+        this.vertices.push(vertex.y);
+        this.vertices.push(vertex.z);
       }
       _ref1 = threeGeometry.faces;
       _results = [];
@@ -227,9 +227,9 @@
         this.indices.push(face.a);
         this.indices.push(face.b);
         this.indices.push(face.c);
-        this.faceNormals.push(face.normal.x);
-        this.faceNormals.push(face.normal.y);
-        _results.push(this.faceNormals.push(face.normal.z));
+        this.facesNormals.push(face.normal.x);
+        this.facesNormals.push(face.normal.y);
+        _results.push(this.facesNormals.push(face.normal.z));
       }
       return _results;
     };
@@ -239,27 +239,27 @@
       if (this._boundingBox) {
         return this._boundingBox;
       }
-      minX = maxX = this.positions[0];
-      minY = maxY = this.positions[1];
-      minZ = maxZ = this.positions[2];
-      for (i = _i = 0, _ref = this.positions.length - 1; _i <= _ref; i = _i += 3) {
-        if (this.positions[i] < minX) {
-          minX = this.positions[i];
+      minX = maxX = this.vertices[0];
+      minY = maxY = this.vertices[1];
+      minZ = maxZ = this.vertices[2];
+      for (i = _i = 0, _ref = this.vertices.length - 1; _i <= _ref; i = _i += 3) {
+        if (this.vertices[i] < minX) {
+          minX = this.vertices[i];
         }
-        if (this.positions[i + 1] < minY) {
-          minY = this.positions[i + 1];
+        if (this.vertices[i + 1] < minY) {
+          minY = this.vertices[i + 1];
         }
-        if (this.positions[i + 2] < minZ) {
-          minZ = this.positions[i + 2];
+        if (this.vertices[i + 2] < minZ) {
+          minZ = this.vertices[i + 2];
         }
-        if (this.positions[i] > maxX) {
-          maxX = this.positions[i];
+        if (this.vertices[i] > maxX) {
+          maxX = this.vertices[i];
         }
-        if (this.positions[i + 1] > maxY) {
-          maxY = this.positions[i + 1];
+        if (this.vertices[i + 1] > maxY) {
+          maxY = this.vertices[i + 1];
         }
-        if (this.positions[i + 2] > maxZ) {
-          maxZ = this.positions[i + 2];
+        if (this.vertices[i + 2] > maxZ) {
+          maxZ = this.vertices[i + 2];
         }
       }
       this._boundingBox = {
@@ -282,24 +282,24 @@
       _results = [];
       for (i = _i = 0, _ref = this.indices.length - 1; _i <= _ref; i = _i += 3) {
         p0 = {
-          x: this.positions[this.indices[i] * 3],
-          y: this.positions[this.indices[i] * 3 + 1],
-          z: this.positions[this.indices[i] * 3 + 2]
+          x: this.vertices[this.indices[i] * 3],
+          y: this.vertices[this.indices[i] * 3 + 1],
+          z: this.vertices[this.indices[i] * 3 + 2]
         };
         p1 = {
-          x: this.positions[this.indices[i + 1] * 3],
-          y: this.positions[this.indices[i + 1] * 3 + 1],
-          z: this.positions[this.indices[i + 1] * 3 + 2]
+          x: this.vertices[this.indices[i + 1] * 3],
+          y: this.vertices[this.indices[i + 1] * 3 + 1],
+          z: this.vertices[this.indices[i + 1] * 3 + 2]
         };
         p2 = {
-          x: this.positions[this.indices[i + 2] * 3],
-          y: this.positions[this.indices[i + 2] * 3 + 1],
-          z: this.positions[this.indices[i + 2] * 3 + 2]
+          x: this.vertices[this.indices[i + 2] * 3],
+          y: this.vertices[this.indices[i + 2] * 3 + 1],
+          z: this.vertices[this.indices[i + 2] * 3 + 2]
         };
         n = {
-          x: this.faceNormals[i],
-          y: this.faceNormals[i + 1],
-          z: this.faceNormals[i + 2]
+          x: this.facesNormals[i],
+          y: this.facesNormals[i + 1],
+          z: this.facesNormals[i + 2]
         };
         _results.push(callback(p0, p1, p2, n));
       }
