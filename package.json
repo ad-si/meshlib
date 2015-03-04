@@ -9,7 +9,8 @@
   },
   "scripts": {
     "test": "./node_modules/.bin/mocha --compilers coffee:coffee-script/register",
-    "performanceTest": "coffee ./test/performance.coffee"
+    "testPerformance": "coffee ./test/performance.coffee",
+    "checkStyle": "./node_modules/.bin/coffeelint ."
   },
   "bin": "./bin/cli.js",
   "keywords": [
@@ -59,6 +60,8 @@
   "devDependencies": {
     "chai": "^2.0.0",
     "chai-as-promised": "^4.2.0",
+    "coffeelint": "^1.9.2",
+    "coffeelint-newline-at-eof": "^0.4.1",
     "express": "^4.11.1",
     "git-rev": "^0.2.1",
     "jade": "^1.9.2",
