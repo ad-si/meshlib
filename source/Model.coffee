@@ -113,7 +113,7 @@ class Model
 					String(z).concat x
 					String(x).concat z
 				]
-				.forEach (edge) =>
+				.forEach (edge) ->
 					if edgesCountMap[edge]
 						edgesCountMap[edge]++
 					else

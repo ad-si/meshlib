@@ -61,7 +61,7 @@ module.exports = (chai, utils) ->
 
 	chai.Assertion.addMethod 'equalFace', (face) ->
 
-		@_obj.verticesCoordinates.every (vertex, vertexIndex) =>
+		@_obj.verticesCoordinates.every (vertex, vertexIndex) ->
 			chai.expect(vertex).to.equalVector(face.verticesCoordinates[vertexIndex])
 
 		chai.expect(@_obj.normal).to.equalVector(face.normal)
@@ -69,7 +69,7 @@ module.exports = (chai, utils) ->
 
 	chai.Assertion.addMethod 'equalFaces', (faces) ->
 
-		@_obj.forEach (face, faceIndex) =>
+		@_obj.forEach (face, faceIndex) ->
 			chai.expect(face).to.equalFace(faces[faceIndex])
 
 

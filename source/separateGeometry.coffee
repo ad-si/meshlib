@@ -15,17 +15,29 @@ createModelFromEquivalenceClass = (equivalenceClass, optimizedModel) ->
 		if not polyTranslationTable[currentId]?
 			polyTranslationTable[currentId] = nextPointIndex
 			nextPointIndex++
-			model.verticesCoordinates.push optimizedModel.verticesCoordinates[currentId * 3 + 0]
-			model.verticesCoordinates.push optimizedModel.verticesCoordinates[currentId * 3 + 1]
-			model.verticesCoordinates.push optimizedModel.verticesCoordinates[currentId * 3 + 2]
-			model.verticesNormals.push optimizedModel.verticesNormals[currentId * 3 + 0]
-			model.verticesNormals.push optimizedModel.verticesNormals[currentId * 3 + 1]
-			model.verticesNormals.push optimizedModel.verticesNormals[currentId * 3 + 2]
+			model.verticesCoordinates.push(
+				optimizedModel.verticesCoordinates[currentId * 3]
+			)
+			model.verticesCoordinates.push(
+				optimizedModel.verticesCoordinates[currentId * 3 + 1]
+			)
+			model.verticesCoordinates.push(
+				optimizedModel.verticesCoordinates[currentId * 3 + 2]
+			)
+			model.verticesNormals.push(
+				optimizedModel.verticesNormals[currentId * 3]
+			)
+			model.verticesNormals.push(
+				optimizedModel.verticesNormals[currentId * 3 + 1]
+			)
+			model.verticesNormals.push(
+				optimizedModel.verticesNormals[currentId * 3 + 2]
+			)
 
 		return polyTranslationTable[currentId]
 
 	equivalenceClass.faces.enumerate (pi) ->
-		p0 = optimizedModel.facesVerticesIndices[pi * 3 + 0]
+		p0 = optimizedModel.facesVerticesIndices[pi * 3]
 		p1 = optimizedModel.facesVerticesIndices[pi * 3 + 1]
 		p2 = optimizedModel.facesVerticesIndices[pi * 3 + 2]
 
@@ -36,7 +48,7 @@ createModelFromEquivalenceClass = (equivalenceClass, optimizedModel) ->
 		model.facesVerticesIndices.push p0n
 		model.facesVerticesIndices.push p1n
 		model.facesVerticesIndices.push p2n
-		model.facesNormals.push optimizedModel.facesNormals[pi * 3 + 0]
+		model.facesNormals.push optimizedModel.facesNormals[pi * 3]
 		model.facesNormals.push optimizedModel.facesNormals[pi * 3 + 1]
 		model.facesNormals.push optimizedModel.facesNormals[pi * 3 + 2]
 

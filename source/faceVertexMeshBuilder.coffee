@@ -17,7 +17,7 @@ module.exports = (faces, options = {}) ->
 		# Add vertices if they don't exist, or get index of these vertices
 		indices = [-1, -1, -1]
 
-		face.vertices.forEach (vertex, vertexIndex) =>
+		face.vertices.forEach (vertex, vertexIndex) ->
 
 			vertex = Vector.fromObject vertex
 
