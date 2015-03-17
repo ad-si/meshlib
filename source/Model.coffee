@@ -3,12 +3,7 @@ Face = require './primitives/Face'
 geometrySplitter = require './helpers/separateGeometry'
 buildFaceVertexMesh = require './helpers/buildFaceVertexMesh'
 testTwoManifoldness = require './helpers/testTwoManifoldness'
-
-NoFacesError = (message) ->
-	this.name = 'NoFacesError'
-	this.message = message or
-		'No faces available. Make sure to generate them first.'
-NoFacesError.prototype = new Error
+NoFacesError = require './errors/NoFacesError'
 
 # Abstracts the actual model from the external fluid api
 class Model
