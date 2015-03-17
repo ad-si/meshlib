@@ -1,7 +1,4 @@
-OptimizedModel = require './../OptimizedModel'
-Octree = require './../primitives/Octree'
 Vector = require './../primitives/Vector'
-
 OctreeHelper = require './OctreeHelper'
 
 
