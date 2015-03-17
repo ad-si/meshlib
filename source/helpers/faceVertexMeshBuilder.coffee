@@ -1,6 +1,6 @@
-OptimizedModel = require './OptimizedModel'
-Octree = require './Octree'
-Vector = require './Vector'
+OptimizedModel = require './../OptimizedModel'
+Octree = require './../primitives/Octree'
+Vector = require './../primitives/Vector'
 
 
 module.exports = (faces, options = {}) ->

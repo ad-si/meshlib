@@ -1,7 +1,7 @@
-Vector = require './Vector'
-Face = require './Face'
-geometrySplitter = require './separateGeometry'
-faceVertexMeshBuilder = require './faceVertexMeshBuilder'
+Vector = require './primitives/Vector'
+Face = require './primitives/Face'
+geometrySplitter = require './helpers/separateGeometry'
+faceVertexMeshBuilder = require './helpers/faceVertexMeshBuilder'
 
 NoFacesError = (message) ->
 	this.name = 'NoFacesError'

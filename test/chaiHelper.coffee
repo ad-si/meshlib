@@ -1,5 +1,5 @@
 Model = require '../source/Model'
-Vector = require '../source/Vector'
+Vector = require '../source/primitives/Vector'
 
 maxCoordinateDelta = 0.00001
 
