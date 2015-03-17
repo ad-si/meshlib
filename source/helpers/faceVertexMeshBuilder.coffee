@@ -16,9 +16,10 @@ module.exports = (faces, options = {}) ->
 	for face in faces
 		indices = [-1, -1, -1]
 
-		face.vertices.forEach (vertex, i) ->
+		face.vertices.every (vertex, i) ->
 			index = octree.add vertex, face.normal
 			indices[i] = index
+			return i < 2
 		faceVertexIndices = faceVertexIndices.concat indices
 
 		faceNormals.push face.normal.x
