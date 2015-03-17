@@ -2,6 +2,7 @@ Vector = require './primitives/Vector'
 Face = require './primitives/Face'
 geometrySplitter = require './helpers/separateGeometry'
 faceVertexMeshBuilder = require './helpers/faceVertexMeshBuilder'
+testTwoManifoldness = require './helpers/testTwoManifoldness'
 
 NoFacesError = (message) ->
 	this.name = 'NoFacesError'
@@ -91,41 +92,7 @@ class Model
 
 
 	isTwoManifold: () ->
-		if @_isTwoManifold?
-			return @_isTwoManifold
-
-		edgesCountMap = {}
-
-		# Count edge occurrences for all triangles
-		for index in [0...@mesh.faceVertex.facesVerticesIndices.length] by 3
-			do (index) =>
-				x = @mesh.faceVertex.facesVerticesIndices[index]
-				y = @mesh.faceVertex.facesVerticesIndices[index + 1]
-				z = @mesh.faceVertex.facesVerticesIndices[index + 2]
-
-				[
-					String(x).concat y
-					String(y).concat x
-
-					String(y).concat z
-					String(z).concat y
-
-					String(z).concat x
-					String(x).concat z
-				]
-				.forEach (edge) ->
-					if edgesCountMap[edge]
-						edgesCountMap[edge]++
-					else
-						edgesCountMap[edge] = 1
-
-		# Check that each edge exists exactly twice
-		for edge, count of edgesCountMap
-			if count isnt 2
-				@_isTwoManifold = false
-				return false
-
-		@_isTwoManifold = true
-		return true
+		@_isTwoManifold ?= testTwoManifoldness @mesh.faceVertex
+		return @_isTwoManifold
 
 module.exports = Model
