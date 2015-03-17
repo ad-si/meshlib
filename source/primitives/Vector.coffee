@@ -8,18 +8,11 @@ class Vector
 	@fromArray: (array) ->
 		return new Vector array[0], array[1], array[2]
 
-	minus: (vec) ->
-		return new Vector @x - vec.x, @y - vec.y, @z - vec.z
-
 	add: (vec) ->
 		return new Vector @x + vec.x, @y + vec.y, @z + vec.z
 
-	crossProduct: (vec) ->
-		return new Vector(
-			@y * vec.z - @z * vec.y
-			@z * vec.x - @x * vec.z
-			@x * vec.y - @y * vec.x
-		)
+	minus: (vec) ->
+		return new Vector @x - vec.x, @y - vec.y, @z - vec.z
 
 	length: () ->
 		return Math.sqrt @x * @x + @y * @y + @z * @z
@@ -27,10 +20,17 @@ class Vector
 	euclideanDistanceTo: (vec) ->
 		return @minus(vec).length()
 
-	multiplyScalar: (scalar) ->
+	scale: (scalar) ->
 		return new Vector @x * scalar, @y * scalar, @z * scalar
 
 	normalized: () ->
-		return @multiplyScalar 1.0 / @length()
+		return @scale 1.0 / @length()
+
+	crossProduct: (vec) ->
+		return new Vector(
+			@y * vec.z - @z * vec.y
+			@z * vec.x - @x * vec.z
+			@x * vec.y - @y * vec.x
+		)
 
 module.exports = Vector
