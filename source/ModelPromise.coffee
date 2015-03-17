@@ -3,80 +3,27 @@ Model = require './Model'
 
 class ModelPromise
 	constructor: (mesh, options) ->
-		@ready = new Promise (fulfill, reject) =>
-			try
-				@model = new Model mesh, options
-			catch error
-				reject error
-
-			fulfill @model
+		@ready = Promise.resolve().then =>
+			@model = new Model mesh, options
 		return @
 
 	setFaces: (faces) =>
-		@ready = @ready.then =>
-			new Promise (fulfill, reject) =>
-				try
-					@model.setFaces(faces)
-				catch error
-					reject error
-
-				fulfill @model
-		return @
+		return @next => @model.setFaces faces
 
 	buildFaceVertexMesh: =>
-		@ready = @ready.then =>
-			return new Promise (fulfill, reject) =>
-				try
-					@model = @model.buildFaceVertexMesh()
-				catch error
-					return reject error
-
-				fulfill @model
-		return @
+		return @next => @model.buildFaceVertexMesh()
 
 	fixFaces: =>
-		@ready = @ready.then =>
-			return new Promise (fulfill, reject) =>
-				try
-					@model = @model.fixFaces()
-				catch error
-					return reject error
-
-				fulfill @model
-		return @
+		return @next => @model.fixFaces()
 
 	calculateNormals: =>
-		@ready = @ready.then =>
-			return new Promise (fulfill, reject) =>
-				try
-					@model = @model.calculateNormals()
-				catch error
-					return reject error
+		return @next => @model.calculateNormals()
 
-				fulfill @model
-		return @
+	getSubmodels: =>
+		return @done => @model.getSubmodels()
 
-	getSubmodels: () =>
-		@ready = @ready.then =>
-			return new Promise (fulfill, reject) =>
-				try
-					models = @model.getSubmodels()
-				catch error
-					return reject error
-
-				fulfill models
-		return @ready
-
-	isTwoManifold: () =>
-		@ready = @ready.then =>
-			return new Promise (fulfill, reject) =>
-				try
-					isTwoManifold = @model.isTwoManifold()
-				catch error
-					return reject error
-
-				fulfill isTwoManifold
-		return @ready
+	isTwoManifold: =>
+		return @done => @model.isTwoManifold()
 
 	next: (onFulfilled, onRejected) =>
 		@done onFulfilled, onRejected
