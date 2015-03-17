@@ -21,74 +21,24 @@
 
   OptimizedModel = (function() {
     function OptimizedModel() {
-      this.forEachPolygon = __bind(this.forEachPolygon, this);
+      this.forEachFace = __bind(this.forEachFace, this);
       this.fromThreeGeometry = __bind(this.fromThreeGeometry, this);
-      this.vertices = [];
-      this.indices = [];
+      this.verticesCoordinates = [];
+      this.facesVerticesIndices = [];
       this.verticesNormals = [];
       this.facesNormals = [];
       this.originalFileName = 'Unknown file';
     }
 
-    OptimizedModel.prototype.isTwoManifold = function() {
-      var a, addEdge, b, c, edges, i, num, numEdges, r, _i, _j, _len, _ref;
-      if (this._isTwoManifold != null) {
-        return this._isTwoManifold;
-      }
-      edges = [];
-      numEdges = [];
-      addEdge = function(a, b) {
-        var aeb, bea, i, _i, _ref;
-        for (i = _i = 0, _ref = edges.length - 1; _i <= _ref; i = _i += 1) {
-          aeb = edges[i].a === a && edges[i].b === b;
-          bea = edges[i].a === b && edges[i].b === a;
-          if (aeb || bea) {
-            numEdges[i]++;
-            if (numEdges[i] > 2) {
-              return false;
-            } else {
-              return true;
-            }
-          }
-        }
-        edges.push({
-          a: a,
-          b: b
-        });
-        return numEdges.push(1);
-      };
-      for (i = _i = 0, _ref = this.indices.length - 1; _i <= _ref; i = _i += 3) {
-        a = this.indices[i];
-        b = this.indices[i + 1];
-        c = this.indices[i + 2];
-        r = addEdge(a, b);
-        r = addEdge(b, c) && r;
-        r = addEdge(c, a) && r;
-        if (!r) {
-          this._isTwoManifold = false;
-          return this._isTwoManifold;
-        }
-      }
-      for (_j = 0, _len = numEdges.length; _j < _len; _j++) {
-        num = numEdges[_j];
-        if (num !== 2) {
-          this._isTwoManifold = false;
-          return this._isTwoManifold;
-        }
-      }
-      this._isTwoManifold = true;
-      return this._isTwoManifold;
-    };
-
     OptimizedModel.prototype.toBase64 = function() {
       var baseString, fnA, fnBase, i, indA, indBase, posA, posBase, vnA, vnBase, _i, _j, _k, _l, _ref, _ref1, _ref2, _ref3;
-      posA = new Float32Array(this.vertices.length);
-      for (i = _i = 0, _ref = this.vertices.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
-        posA[i] = this.vertices[i];
+      posA = new Float32Array(this.verticesCoordinates.length);
+      for (i = _i = 0, _ref = this.verticesCoordinates.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
+        posA[i] = this.verticesCoordinates[i];
       }
-      indA = new Int32Array(this.indices.length);
-      for (i = _j = 0, _ref1 = this.indices.length - 1; 0 <= _ref1 ? _j <= _ref1 : _j >= _ref1; i = 0 <= _ref1 ? ++_j : --_j) {
-        indA[i] = this.indices[i];
+      indA = new Int32Array(this.facesVerticesIndices.length);
+      for (i = _j = 0, _ref1 = this.facesVerticesIndices.length - 1; 0 <= _ref1 ? _j <= _ref1 : _j >= _ref1; i = 0 <= _ref1 ? ++_j : --_j) {
+        indA[i] = this.facesVerticesIndices[i];
       }
       vnA = new Float32Array(this.verticesNormals.length);
       for (i = _k = 0, _ref2 = this.verticesNormals.length - 1; 0 <= _ref2 ? _k <= _ref2 : _k >= _ref2; i = 0 <= _ref2 ? ++_k : --_k) {
@@ -116,8 +66,8 @@
     OptimizedModel.prototype.fromBase64 = function(base64String) {
       var strArray;
       strArray = base64String.split('|');
-      this.vertices = this.base64ToFloat32Array(strArray[0]);
-      this.indices = new this.base64ToInt32Array(strArray[1]);
+      this.verticesCoordinates = this.base64ToFloat32Array(strArray[0]);
+      this.facesVerticesIndices = new this.base64ToInt32Array(strArray[1]);
       this.verticesNormals = this.base64ToFloat32Array(strArray[2]);
       this.facesNormals = this.base64ToFloat32Array(strArray[3]);
       return this.originalFileName = strArray[4];
@@ -172,17 +122,17 @@
     OptimizedModel.prototype.createBufferGeometry = function() {
       var geometry, i, iarray, narray, parray, _i, _j, _k, _ref, _ref1, _ref2;
       geometry = new THREE.BufferGeometry();
-      parray = new Float32Array(this.vertices.length);
-      for (i = _i = 0, _ref = this.vertices.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
-        parray[i] = this.vertices[i];
+      parray = new Float32Array(this.verticesCoordinates.length);
+      for (i = _i = 0, _ref = this.verticesCoordinates.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
+        parray[i] = this.verticesCoordinates[i];
       }
       narray = new Float32Array(this.verticesNormals.length);
       for (i = _j = 0, _ref1 = this.verticesNormals.length - 1; 0 <= _ref1 ? _j <= _ref1 : _j >= _ref1; i = 0 <= _ref1 ? ++_j : --_j) {
         narray[i] = this.verticesNormals[i];
       }
-      iarray = new Uint32Array(this.indices.length);
-      for (i = _k = 0, _ref2 = this.indices.length - 1; 0 <= _ref2 ? _k <= _ref2 : _k >= _ref2; i = 0 <= _ref2 ? ++_k : --_k) {
-        iarray[i] = this.indices[i];
+      iarray = new Uint32Array(this.facesVerticesIndices.length);
+      for (i = _k = 0, _ref2 = this.facesVerticesIndices.length - 1; 0 <= _ref2 ? _k <= _ref2 : _k >= _ref2; i = 0 <= _ref2 ? ++_k : --_k) {
+        iarray[i] = this.facesVerticesIndices[i];
       }
       geometry.addAttribute('index', new THREE.BufferAttribute(iarray, 1));
       geometry.addAttribute('position', new THREE.BufferAttribute(parray, 3));
@@ -194,11 +144,11 @@
     OptimizedModel.prototype.createStandardGeometry = function() {
       var fi, geometry, vi, _i, _j, _ref, _ref1;
       geometry = new THREE.Geometry();
-      for (vi = _i = 0, _ref = this.vertices.length - 1; _i <= _ref; vi = _i += 3) {
-        geometry.vertices.push(new THREE.Vector3(this.vertices[vi], this.vertices[vi + 1], this.vertices[vi + 2]));
+      for (vi = _i = 0, _ref = this.verticesCoordinates.length - 1; _i <= _ref; vi = _i += 3) {
+        geometry.verticesCoordinates.push(new THREE.Vector3(this.verticesCoordinates[vi], this.verticesCoordinates[vi + 1], this.verticesCoordinates[vi + 2]));
       }
-      for (fi = _j = 0, _ref1 = this.indices.length - 1; _j <= _ref1; fi = _j += 3) {
-        geometry.faces.push(new THREE.Face3(this.indices[fi], this.indices[fi + 1], this.indices[fi + 2], new THREE.Vector3(this.facesNormals[fi], this.facesNormals[fi + 1], this.facesNormals[fi + 2])));
+      for (fi = _j = 0, _ref1 = this.facesVerticesIndices.length - 1; _j <= _ref1; fi = _j += 3) {
+        geometry.faces.push(new THREE.Face3(this.facesVerticesIndices[fi], this.facesVerticesIndices[fi + 1], this.facesVerticesIndices[fi + 2], new THREE.Vector3(this.facesNormals[fi], this.facesNormals[fi + 1], this.facesNormals[fi + 2])));
       }
       return geometry;
     };
@@ -208,25 +158,25 @@
       if (originalFileName == null) {
         originalFileName = 'Three.Geometry';
       }
-      this.vertices = [];
-      this.indices = [];
+      this.verticesCoordinates = [];
+      this.facesVerticesIndices = [];
       this.facesNormals = [];
       this.verticesNormals = [];
       this.originalFileName = originalFileName;
       _ref = threeGeometry.verticesCoordinates;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         vertex = _ref[_i];
-        this.vertices.push(vertex.x);
-        this.vertices.push(vertex.y);
-        this.vertices.push(vertex.z);
+        this.verticesCoordinates.push(vertex.x);
+        this.verticesCoordinates.push(vertex.y);
+        this.verticesCoordinates.push(vertex.z);
       }
       _ref1 = threeGeometry.faces;
       _results = [];
       for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
         face = _ref1[_j];
-        this.indices.push(face.a);
-        this.indices.push(face.b);
-        this.indices.push(face.c);
+        this.facesVerticesIndices.push(face.a);
+        this.facesVerticesIndices.push(face.b);
+        this.facesVerticesIndices.push(face.c);
         this.facesNormals.push(face.normal.x);
         this.facesNormals.push(face.normal.y);
         _results.push(this.facesNormals.push(face.normal.z));
@@ -239,27 +189,27 @@
       if (this._boundingBox) {
         return this._boundingBox;
       }
-      minX = maxX = this.vertices[0];
-      minY = maxY = this.vertices[1];
-      minZ = maxZ = this.vertices[2];
-      for (i = _i = 0, _ref = this.vertices.length - 1; _i <= _ref; i = _i += 3) {
-        if (this.vertices[i] < minX) {
-          minX = this.vertices[i];
+      minX = maxX = this.verticesCoordinates[0];
+      minY = maxY = this.verticesCoordinates[1];
+      minZ = maxZ = this.verticesCoordinates[2];
+      for (i = _i = 0, _ref = this.verticesCoordinates.length - 1; _i <= _ref; i = _i += 3) {
+        if (this.verticesCoordinates[i] < minX) {
+          minX = this.verticesCoordinates[i];
         }
-        if (this.vertices[i + 1] < minY) {
-          minY = this.vertices[i + 1];
+        if (this.verticesCoordinates[i + 1] < minY) {
+          minY = this.verticesCoordinates[i + 1];
         }
-        if (this.vertices[i + 2] < minZ) {
-          minZ = this.vertices[i + 2];
+        if (this.verticesCoordinates[i + 2] < minZ) {
+          minZ = this.verticesCoordinates[i + 2];
         }
-        if (this.vertices[i] > maxX) {
-          maxX = this.vertices[i];
+        if (this.verticesCoordinates[i] > maxX) {
+          maxX = this.verticesCoordinates[i];
         }
-        if (this.vertices[i + 1] > maxY) {
-          maxY = this.vertices[i + 1];
+        if (this.verticesCoordinates[i + 1] > maxY) {
+          maxY = this.verticesCoordinates[i + 1];
         }
-        if (this.vertices[i + 2] > maxZ) {
-          maxZ = this.vertices[i + 2];
+        if (this.verticesCoordinates[i + 2] > maxZ) {
+          maxZ = this.verticesCoordinates[i + 2];
         }
       }
       this._boundingBox = {
@@ -277,24 +227,24 @@
       return this._boundingBox;
     };
 
-    OptimizedModel.prototype.forEachPolygon = function(callback) {
+    OptimizedModel.prototype.forEachFace = function(callback) {
       var i, n, p0, p1, p2, _i, _ref, _results;
       _results = [];
-      for (i = _i = 0, _ref = this.indices.length - 1; _i <= _ref; i = _i += 3) {
+      for (i = _i = 0, _ref = this.facesVerticesIndices.length - 1; _i <= _ref; i = _i += 3) {
         p0 = {
-          x: this.vertices[this.indices[i] * 3],
-          y: this.vertices[this.indices[i] * 3 + 1],
-          z: this.vertices[this.indices[i] * 3 + 2]
+          x: this.verticesCoordinates[this.facesVerticesIndices[i] * 3],
+          y: this.verticesCoordinates[this.facesVerticesIndices[i] * 3 + 1],
+          z: this.verticesCoordinates[this.facesVerticesIndices[i] * 3 + 2]
         };
         p1 = {
-          x: this.vertices[this.indices[i + 1] * 3],
-          y: this.vertices[this.indices[i + 1] * 3 + 1],
-          z: this.vertices[this.indices[i + 1] * 3 + 2]
+          x: this.verticesCoordinates[this.facesVerticesIndices[i + 1] * 3],
+          y: this.verticesCoordinates[this.facesVerticesIndices[i + 1] * 3 + 1],
+          z: this.verticesCoordinates[this.facesVerticesIndices[i + 1] * 3 + 2]
         };
         p2 = {
-          x: this.vertices[this.indices[i + 2] * 3],
-          y: this.vertices[this.indices[i + 2] * 3 + 1],
-          z: this.vertices[this.indices[i + 2] * 3 + 2]
+          x: this.verticesCoordinates[this.facesVerticesIndices[i + 2] * 3],
+          y: this.verticesCoordinates[this.facesVerticesIndices[i + 2] * 3 + 1],
+          z: this.verticesCoordinates[this.facesVerticesIndices[i + 2] * 3 + 2]
         };
         n = {
           x: this.facesNormals[i],
