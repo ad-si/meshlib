@@ -1,7 +1,7 @@
 Vector = require './primitives/Vector'
 Face = require './primitives/Face'
 geometrySplitter = require './helpers/separateGeometry'
-faceVertexMeshBuilder = require './helpers/faceVertexMeshBuilder'
+buildFaceVertexMesh = require './helpers/buildFaceVertexMesh'
 testTwoManifoldness = require './helpers/testTwoManifoldness'
 
 NoFacesError = (message) ->
@@ -21,7 +21,7 @@ class Model
 
 
 	buildFaceVertexMesh: () =>
-		@mesh.faceVertex = faceVertexMeshBuilder @mesh.faces
+		@mesh.faceVertex = buildFaceVertexMesh @mesh.faces
 		return @
 
 
