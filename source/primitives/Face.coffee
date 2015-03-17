@@ -1,5 +1,4 @@
 Vector = require './Vector'
-Polygon = require './Polygon'
 
 class Face
 	constructor: (@vertices = [], @normal = null) ->
