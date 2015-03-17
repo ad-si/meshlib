@@ -39,8 +39,7 @@ class Octree
 		@vec = vertex
 		@normalList = []
 		@normalList.push normal
-		@index = biggestUsedIndex + 1
-		return @index
+		return @index = biggestUsedIndex + 1
 
 	_joinVertex: (vertex, normal) ->
 		@normalList.push normal
