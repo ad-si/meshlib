@@ -1,5 +1,3 @@
-Vector = require './Vector'
-
 class Face
 	constructor: (@vertices = [], @normal = null) ->
 		return
