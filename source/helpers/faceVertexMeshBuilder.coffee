@@ -8,31 +8,29 @@ OctreeHelper = require './OctreeHelper'
 module.exports = (faces, options = {}) ->
 	pointDistanceEpsilon = options.pointDistanceEpsilon || 0.0001
 
-	facesNormals = []
-	facesVerticesIndices = []
+	faceNormals = []
+	faceVertexIndices = []
 
-	octreeRoot = new OctreeHelper pointDistanceEpsilon
+	octree = new OctreeHelper pointDistanceEpsilon
 
 	for face in faces
-		# Add vertices if they don't exist, or get index of these vertices
 		indices = [-1, -1, -1]
 
-		face.vertices.forEach (vertex, vertexIndex) ->
-			index = octreeRoot.add vertex, face.normal
-			indices[vertexIndex] = index
-		facesVerticesIndices = facesVerticesIndices.concat indices
+		face.vertices.forEach (vertex, i) ->
+			index = octree.add vertex, face.normal
+			indices[i] = index
+		faceVertexIndices = faceVertexIndices.concat indices
 
-		facesNormals.push face.normal.x
-		facesNormals.push face.normal.y
-		facesNormals.push face.normal.z
+		faceNormals.push face.normal.x
+		faceNormals.push face.normal.y
+		faceNormals.push face.normal.z
 
-	# Get a list out of the octree
-	vertexCoordinates = octreeRoot.getVertexCoordinateList()
-	vertexNormals = octreeRoot.getAveragedNormalList()
+	vertexCoordinates = octree.getVertexCoordinateList()
+	vertexNormals = octree.getAveragedNormalList()
 
 	return {
 		verticesCoordinates: vertexCoordinates
-		facesVerticesIndices: facesVerticesIndices
+		facesVerticesIndices: faceVertexIndices
 		verticesNormals: vertexNormals
-		facesNormals: facesNormals
+		facesNormals: faceNormals
 	}
