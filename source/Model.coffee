@@ -1,13 +1,9 @@
-Vector = require './Vector'
-Face = require './Face'
-geometrySplitter = require './separateGeometry'
-faceVertexMeshBuilder = require './faceVertexMeshBuilder'
-
-NoFacesError = (message) ->
-	this.name = 'NoFacesError'
-	this.message = message or
-		'No faces available. Make sure to generate them first.'
-NoFacesError.prototype = new Error
+Vector = require './primitives/Vector'
+Face = require './primitives/Face'
+geometrySplitter = require './helpers/separateGeometry'
+buildFaceVertexMesh = require './helpers/buildFaceVertexMesh'
+testTwoManifoldness = require './helpers/testTwoManifoldness'
+NoFacesError = require './errors/NoFacesError'
 
 # Abstracts the actual model from the external fluid api
 class Model
@@ -20,7 +16,7 @@ class Model
 
 
 	buildFaceVertexMesh: () =>
-		@mesh.faceVertex = faceVertexMeshBuilder @mesh.faces
+		@mesh.faceVertex = buildFaceVertexMesh @mesh.faces
 		return @
 
 
@@ -91,41 +87,7 @@ class Model
 
 
 	isTwoManifold: () ->
-		if @_isTwoManifold?
-			return @_isTwoManifold
-
-		edgesCountMap = {}
-
-		# Count edge occurrences for all triangles
-		for index in [0...@mesh.faceVertex.facesVerticesIndices.length] by 3
-			do (index) =>
-				x = @mesh.faceVertex.facesVerticesIndices[index]
-				y = @mesh.faceVertex.facesVerticesIndices[index + 1]
-				z = @mesh.faceVertex.facesVerticesIndices[index + 2]
-
-				[
-					String(x).concat y
-					String(y).concat x
-
-					String(y).concat z
-					String(z).concat y
-
-					String(z).concat x
-					String(x).concat z
-				]
-				.forEach (edge) ->
-					if edgesCountMap[edge]
-						edgesCountMap[edge]++
-					else
-						edgesCountMap[edge] = 1
-
-		# Check that each edge exists exactly twice
-		for edge, count of edgesCountMap
-			if count isnt 2
-				@_isTwoManifold = false
-				return false
-
-		@_isTwoManifold = true
-		return true
+		@_isTwoManifold ?= testTwoManifoldness @mesh.faceVertex
+		return @_isTwoManifold
 
 module.exports = Model
