@@ -3,6 +3,7 @@ Face = require './primitives/Face'
 geometrySplitter = require './helpers/separateGeometry'
 buildFaceVertexMesh = require './helpers/buildFaceVertexMesh'
 testTwoManifoldness = require './helpers/testTwoManifoldness'
+calculateBoundingBox = require './helpers/calculateBoundingBox'
 NoFacesError = require './errors/NoFacesError'
 
 # Abstracts the actual model from the external fluid api
@@ -89,5 +90,12 @@ class Model
 	isTwoManifold: () ->
 		@_isTwoManifold ?= testTwoManifoldness @mesh.faceVertex
 		return @_isTwoManifold
+
+
+	getBoundingBox: ->
+		if not @_boundingBox
+			@_boundingBox = calculateBoundingBox @mesh.faceVertex
+		return @_boundingBox
+
 
 module.exports = Model

@@ -25,6 +25,9 @@ class ModelPromise
 	isTwoManifold: =>
 		return @done => @model.isTwoManifold()
 
+	getBoundingBox: =>
+		return @done => @model.getBoundingBox()
+
 	next: (onFulfilled, onRejected) =>
 		@done onFulfilled, onRejected
 		return @
