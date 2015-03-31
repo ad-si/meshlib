@@ -4,7 +4,7 @@ Octree = require '../primitives/Octree'
 class OctreeHelper
 	constructor: (@joinDistanceEpsilon) ->
 		@tree = new Octree @joinDistanceEpsilon
-		@lastIndex = 0
+		@lastIndex = -1
 
 	add: (vertex, normal) ->
 		vertex = Vector.fromObject vertex
@@ -21,6 +21,7 @@ class OctreeHelper
 			vertexList[i] = node.vec.x
 			vertexList[i + 1] = node.vec.y
 			vertexList[i + 2] = node.vec.z
+		return vertexList
 
 	getAveragedNormalList: ->
 		averagedNormalList = new Array (@lastIndex + 1) * 3
