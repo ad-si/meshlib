@@ -16,7 +16,7 @@ class Model
 		@options ?= {}
 
 
-	buildFaceVertexMesh: () =>
+	buildFaceVertexMesh: =>
 		@mesh.faceVertex = buildFaceVertexMesh @mesh.faces
 		return @
 
@@ -26,7 +26,7 @@ class Model
 		return @
 
 
-	fixFaces: () =>
+	fixFaces: =>
 		deletedFaces = []
 
 		if @mesh.faces
@@ -55,7 +55,7 @@ class Model
 		return @
 
 
-	calculateNormals: () =>
+	calculateNormals: =>
 		newNormals = []
 
 		if @mesh.faces
@@ -83,11 +83,11 @@ class Model
 
 		return @
 
-	getSubmodels: () =>
+	getSubmodels: =>
 		return geometrySplitter @mesh
 
 
-	isTwoManifold: () ->
+	isTwoManifold: ->
 		@_isTwoManifold ?= testTwoManifoldness @mesh.faceVertex
 		return @_isTwoManifold
 
