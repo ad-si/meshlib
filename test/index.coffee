@@ -103,8 +103,40 @@ describe 'Meshlib', ->
 		jsonModel = loadYaml modelsMap['missingFace'].filePath
 
 		modelPromise = meshlib jsonModel
-			.buildFaceVertexMesh()
-			.isTwoManifold()
-			.then (isTwoManifold) -> isTwoManifold
+		.buildFaceVertexMesh()
+		.isTwoManifold()
+		.then (isTwoManifold) -> isTwoManifold
 
 		return expect(modelPromise).to.eventually.be.false
+
+
+	describe 'calculateBoundingBox', ->
+
+		it 'calculates the bounding box of a tetrahedron', () ->
+
+			jsonTetrahedron = loadYaml modelsMap['tetrahedron'].filePath
+
+			modelPromise = meshlib jsonTetrahedron
+			.buildFaceVertexMesh()
+			.getBoundingBox()
+			.then (boundingBox) -> boundingBox
+
+			return expect(modelPromise).to.eventually.deep.equal({
+					min: { x: 0, y: 0, z: 0 },
+					max: { x: 1, y: 1, z: 1 }
+				})
+
+
+		it 'calculates the bounding box of a cube', () ->
+
+			jsonCube = loadYaml modelsMap['cube'].filePath
+
+			modelPromise = meshlib jsonCube
+			.buildFaceVertexMesh()
+			.getBoundingBox()
+			.then (boundingBox) -> boundingBox
+
+			return expect(modelPromise).to.eventually.deep.equal({
+				min: {x: -1, y: -1, z: -1},
+				max: { x: 1, y: 1, z: 1 }
+			})
