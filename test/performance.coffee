@@ -11,7 +11,7 @@ mkdirp = require 'mkdirp'
 readdirp = require 'readdirp'
 winston = require 'winston'
 
-meshlib = require '../index'
+meshlib = require '../source/index'
 reportGenerator = require './reportGenerator'
 #LegoPipeline = require '../src/plugins/newBrickator/LegoPipeline'
 
