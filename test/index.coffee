@@ -76,7 +76,7 @@ describe 'Meshlib', ->
 		return expect(modelPromise).to.eventually.have.correctNormals
 
 
-	it.skip 'should extract individual geometries to submodels', () ->
+	it.skip 'should extract individual geometries to submodels', ->
 		jsonModel = loadYaml modelsMap['tetrahedrons'].filePath
 
 		modelPromise = meshlib jsonModel
@@ -88,7 +88,7 @@ describe 'Meshlib', ->
 		.and.to.have.length(2)
 
 
-	it 'should be two-manifold', () ->
+	it 'should be two-manifold', ->
 		jsonModel = loadYaml modelsMap['tetrahedron'].filePath
 
 		modelPromise = meshlib jsonModel
@@ -99,7 +99,7 @@ describe 'Meshlib', ->
 		return expect(modelPromise).to.eventually.be.true
 
 
-	it 'should not be two-manifold', () ->
+	it 'should not be two-manifold', ->
 		jsonModel = loadYaml modelsMap['missingFace'].filePath
 
 		modelPromise = meshlib jsonModel
@@ -111,7 +111,7 @@ describe 'Meshlib', ->
 
 
 	describe 'calculateBoundingBox', ->
-		it 'calculates the bounding box of a tetrahedron', () ->
+		it 'calculates the bounding box of a tetrahedron', ->
 			jsonTetrahedron = loadYaml modelsMap['tetrahedron'].filePath
 
 			modelPromise = meshlib jsonTetrahedron
@@ -125,13 +125,12 @@ describe 'Meshlib', ->
 			})
 
 
-		it 'calculates the bounding box of a cube', () ->
+		it 'calculates the bounding box of a cube', ->
 			jsonCube = loadYaml modelsMap['cube'].filePath
 
 			modelPromise = meshlib jsonCube
 			.buildFaceVertexMesh()
 			.getBoundingBox()
-			.then (boundingBox) -> boundingBox
 
 			return expect(modelPromise).to.eventually.deep.equal({
 				min: {x: -1, y: -1, z: -1},
@@ -139,7 +138,7 @@ describe 'Meshlib', ->
 			})
 
 
-	it 'iterates over all faces in the face-vertex-mesh', () ->
+	it 'iterates over all faces in the face-vertex-mesh', ->
 		jsonTetrahedron = loadYaml modelsMap['tetrahedron'].filePath,
 			vertices = []
 
