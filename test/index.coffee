@@ -44,7 +44,7 @@ checkEquality = (dataFromAscii, dataFromBinary, arrayName) ->
 
 
 describe 'Meshlib', ->
-	it 'should return a model object', ->
+	it 'returns a model object', ->
 		jsonModel = loadYaml modelsMap['cube'].filePath
 
 		modelPromise = meshlib jsonModel
@@ -53,7 +53,7 @@ describe 'Meshlib', ->
 		return expect(modelPromise).to.eventually.be.a.model
 
 
-	it 'should create a face-vertex mesh', ->
+	it 'creates a face-vertex mesh', ->
 		jsonModel = loadYaml modelsMap['cube'].filePath
 
 		modelPromise = meshlib jsonModel
@@ -63,7 +63,7 @@ describe 'Meshlib', ->
 		return expect(modelPromise).to.eventually.have.faceVertexMesh
 
 
-	it 'should calculate face-normals', ->
+	it 'calculates face-normals', ->
 		jsonModel = loadYaml modelsMap['cube'].filePath
 
 		jsonModel.faces.forEach (face) ->
@@ -76,7 +76,7 @@ describe 'Meshlib', ->
 		return expect(modelPromise).to.eventually.have.correctNormals
 
 
-	it 'should extract individual geometries to submodels', ->
+	it 'extracts individual geometries to submodels', ->
 		jsonModel = loadYaml modelsMap['tetrahedrons'].filePath
 
 		modelPromise = meshlib jsonModel
@@ -87,24 +87,25 @@ describe 'Meshlib', ->
 		.and.to.have.length(2)
 
 
-	it 'should be two-manifold', ->
-		jsonModel = loadYaml modelsMap['tetrahedron'].filePath
+	describe 'Two-Manifold Test', ->
+		it 'recognizes that model is two-manifold', ->
+			jsonModel = loadYaml modelsMap['tetrahedron'].filePath
 
-		modelPromise = meshlib jsonModel
-		.buildFaceVertexMesh()
-		.isTwoManifold()
+			modelPromise = meshlib jsonModel
+			.buildFaceVertexMesh()
+			.isTwoManifold()
 
-		return expect(modelPromise).to.eventually.be.true
+			return expect(modelPromise).to.eventually.be.true
 
 
-	it 'should not be two-manifold', ->
-		jsonModel = loadYaml modelsMap['missingFace'].filePath
+		it 'recognizes that model is not two-manifold', ->
+			jsonModel = loadYaml modelsMap['missingFace'].filePath
 
-		modelPromise = meshlib jsonModel
-		.buildFaceVertexMesh()
-		.isTwoManifold()
+			modelPromise = meshlib jsonModel
+			.buildFaceVertexMesh()
+			.isTwoManifold()
 
-		return expect(modelPromise).to.eventually.be.false
+			return expect(modelPromise).to.eventually.be.false
 
 
 	describe 'calculateBoundingBox', ->
