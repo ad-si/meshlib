@@ -73,6 +73,33 @@ module.exports = (chai, utils) ->
 			chai.expect(face).to.equalFace(faces[faceIndex])
 
 
+	chai.Assertion.addMethod 'equalFaceVertexMesh', (mesh) ->
+		@_obj.verticesCoordinates.forEach (coordinate, coordinateIndex) ->
+			chai.expect(coordinate)
+			.to.be.closeTo(
+				mesh.verticesCoordinates[coordinateIndex],
+				maxCoordinateDelta
+			)
+
+		@_obj.facesVerticesIndices.forEach (faceVertexIndex, arrayIndex) ->
+			chai.expect(faceVertexIndex)
+			.to.equal(mesh.facesVerticesIndices[arrayIndex])
+
+		@_obj.facesNormals.forEach (coordinate, coordinateIndex) ->
+			chai.expect(coordinate)
+			.to.be.closeTo(
+				mesh.facesNormals[coordinateIndex],
+				maxCoordinateDelta
+			)
+
+		@_obj.verticesNormals.forEach (coordinate, coordinateIndex) ->
+			chai.expect(coordinate)
+			.to.be.closeTo(
+				mesh.verticesNormals[coordinateIndex],
+				maxCoordinateDelta
+			)
+
+
 	chai.Assertion.addProperty 'correctNormals', () ->
 
 		### TODO
