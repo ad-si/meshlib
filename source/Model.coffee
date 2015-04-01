@@ -98,4 +98,36 @@ class Model
 		return @_boundingBox
 
 
+	forEachFace: (callback) ->
+		coordinates = @mesh.faceVertex.verticesCoordinates
+		indices = @mesh.faceVertex.facesVerticesIndices
+		normalCoordinates = @mesh.faceVertex.facesNormals
+
+		for index in [0..indices.length - 1] by 3
+			callback {
+					vertices: [
+						{
+							x: coordinates[indices[index] * 3]
+							y: coordinates[indices[index] * 3 + 1]
+							z: coordinates[indices[index] * 3 + 2]
+						}
+						{
+							x: coordinates[indices[index + 1] * 3]
+							y: coordinates[indices[index + 1] * 3 + 1]
+							z: coordinates[indices[index + 1] * 3 + 2]
+						}
+						{
+							x: coordinates[indices[index + 2] * 3]
+							y: coordinates[indices[index + 2] * 3 + 1]
+							z: coordinates[indices[index + 2] * 3 + 2]
+						}
+					]
+					normal:
+						x: normalCoordinates[index]
+						y: normalCoordinates[index + 1]
+						z: normalCoordinates[index + 2]
+				},
+				index / 3
+
+
 module.exports = Model

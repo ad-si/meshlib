@@ -28,6 +28,9 @@ class ModelPromise
 	getBoundingBox: =>
 		return @done => @model.getBoundingBox()
 
+	forEachFace: (callback) =>
+		return @next => @model.forEachFace(callback)
+
 	next: (onFulfilled, onRejected) =>
 		@done onFulfilled, onRejected
 		return @

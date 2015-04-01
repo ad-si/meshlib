@@ -173,29 +173,4 @@ class OptimizedModel
 			@facesNormals.push face.normal.y
 			@facesNormals.push face.normal.z
 
-	forEachFace: (callback) =>
-		for i in [0..@facesVerticesIndices.length - 1] by 3
-			p0 = {
-				x: @verticesCoordinates[@facesVerticesIndices[i] * 3]
-				y: @verticesCoordinates[@facesVerticesIndices[i] * 3 + 1]
-				z: @verticesCoordinates[@facesVerticesIndices[i] * 3 + 2]
-			}
-			p1 = {
-				x: @verticesCoordinates[@facesVerticesIndices[i + 1] * 3]
-				y: @verticesCoordinates[@facesVerticesIndices[i + 1] * 3 + 1]
-				z: @verticesCoordinates[@facesVerticesIndices[i + 1] * 3 + 2]
-			}
-			p2 = {
-				x: @verticesCoordinates[@facesVerticesIndices[i + 2] * 3]
-				y: @verticesCoordinates[@facesVerticesIndices[i + 2] * 3 + 1]
-				z: @verticesCoordinates[@facesVerticesIndices[i + 2] * 3 + 2]
-			}
-			n = {
-				x: @facesNormals[i]
-				y: @facesNormals[i + 1]
-				z: @facesNormals[i + 2]
-			}
-
-			callback p0, p1, p2, n
-
 module.exports = OptimizedModel

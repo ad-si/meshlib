@@ -27,10 +27,10 @@ models = [
 	'missingFace'
 ].map (model) ->
 	return {
-		name: model
-		filePath: path.join(
-			__dirname, 'models/', model + '.yaml'
-		)
+	name: model
+	filePath: path.join(
+		__dirname, 'models/', model + '.yaml'
+	)
 	}
 
 modelsMap = generateMap models
@@ -48,7 +48,7 @@ describe 'Meshlib', ->
 		jsonModel = loadYaml modelsMap['cube'].filePath
 
 		modelPromise = meshlib jsonModel
-			.done (model) -> model
+		.done (model) -> model
 
 		return expect(modelPromise).to.eventually.be.a.model
 
@@ -57,8 +57,8 @@ describe 'Meshlib', ->
 		jsonModel = loadYaml modelsMap['cube'].filePath
 
 		modelPromise = meshlib jsonModel
-			.buildFaceVertexMesh()
-			.done (model) -> model
+		.buildFaceVertexMesh()
+		.done (model) -> model
 
 		return expect(modelPromise).to.eventually.have.faceVertexMesh
 
@@ -70,8 +70,8 @@ describe 'Meshlib', ->
 			delete face.normal
 
 		modelPromise = meshlib jsonModel
-			.calculateNormals()
-			.done (model) -> model
+		.calculateNormals()
+		.done (model) -> model
 
 		return expect(modelPromise).to.eventually.have.correctNormals
 
@@ -80,21 +80,21 @@ describe 'Meshlib', ->
 		jsonModel = loadYaml modelsMap['tetrahedrons'].filePath
 
 		modelPromise = meshlib jsonModel
-			.buildFaceVertexMesh()
-			.getSubmodels()
-			.then (models) -> models
+		.buildFaceVertexMesh()
+		.getSubmodels()
+		.then (models) -> models
 
 		return expect(modelPromise).to.eventually.be.an('array')
-			.and.to.have.length(2)
+		.and.to.have.length(2)
 
 
 	it 'should be two-manifold', () ->
 		jsonModel = loadYaml modelsMap['tetrahedron'].filePath
 
 		modelPromise = meshlib jsonModel
-			.buildFaceVertexMesh()
-			.isTwoManifold()
-			.then (isTwoManifold) -> isTwoManifold
+		.buildFaceVertexMesh()
+		.isTwoManifold()
+		.then (isTwoManifold) -> isTwoManifold
 
 		return expect(modelPromise).to.eventually.be.true
 
@@ -111,9 +111,7 @@ describe 'Meshlib', ->
 
 
 	describe 'calculateBoundingBox', ->
-
 		it 'calculates the bounding box of a tetrahedron', () ->
-
 			jsonTetrahedron = loadYaml modelsMap['tetrahedron'].filePath
 
 			modelPromise = meshlib jsonTetrahedron
@@ -122,13 +120,12 @@ describe 'Meshlib', ->
 			.then (boundingBox) -> boundingBox
 
 			return expect(modelPromise).to.eventually.deep.equal({
-					min: { x: 0, y: 0, z: 0 },
-					max: { x: 1, y: 1, z: 1 }
-				})
+				min: {x: 0, y: 0, z: 0},
+				max: {x: 1, y: 1, z: 1}
+			})
 
 
 		it 'calculates the bounding box of a cube', () ->
-
 			jsonCube = loadYaml modelsMap['cube'].filePath
 
 			modelPromise = meshlib jsonCube
@@ -138,5 +135,17 @@ describe 'Meshlib', ->
 
 			return expect(modelPromise).to.eventually.deep.equal({
 				min: {x: -1, y: -1, z: -1},
-				max: { x: 1, y: 1, z: 1 }
+				max: {x: 1, y: 1, z: 1}
 			})
+
+
+	it 'iterates over all faces in the face-vertex-mesh', () ->
+		jsonTetrahedron = loadYaml modelsMap['tetrahedron'].filePath,
+			vertices = []
+
+		return meshlib jsonTetrahedron
+		.buildFaceVertexMesh()
+		.forEachFace (face, index) ->
+			vertices.push [face, index]
+		.done () ->
+			expect(vertices).to.have.length(4)
