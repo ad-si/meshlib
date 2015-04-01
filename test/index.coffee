@@ -82,7 +82,6 @@ describe 'Meshlib', ->
 		modelPromise = meshlib jsonModel
 		.buildFaceVertexMesh()
 		.getSubmodels()
-		.then (models) -> models
 
 		return expect(modelPromise).to.eventually.be.an('array')
 		.and.to.have.length(2)
@@ -94,7 +93,6 @@ describe 'Meshlib', ->
 		modelPromise = meshlib jsonModel
 		.buildFaceVertexMesh()
 		.isTwoManifold()
-		.then (isTwoManifold) -> isTwoManifold
 
 		return expect(modelPromise).to.eventually.be.true
 
@@ -105,7 +103,6 @@ describe 'Meshlib', ->
 		modelPromise = meshlib jsonModel
 		.buildFaceVertexMesh()
 		.isTwoManifold()
-		.then (isTwoManifold) -> isTwoManifold
 
 		return expect(modelPromise).to.eventually.be.false
 
@@ -117,7 +114,6 @@ describe 'Meshlib', ->
 			modelPromise = meshlib jsonTetrahedron
 			.buildFaceVertexMesh()
 			.getBoundingBox()
-			.then (boundingBox) -> boundingBox
 
 			return expect(modelPromise).to.eventually.deep.equal({
 				min: {x: 0, y: 0, z: 0},
