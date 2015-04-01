@@ -1,5 +1,3 @@
-OptimizedModel = require './../OptimizedModel'
-
 # creates an standalone optimized model from an equivalence class and an
 # existing optimized model
 # TODO needs to be tested
