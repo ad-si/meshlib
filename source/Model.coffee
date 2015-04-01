@@ -14,6 +14,8 @@ class Model
 			faceVertex: {}
 		}
 		@options ?= {}
+		@fileName = ''
+		@name = ''
 
 
 	buildFaceVertexMesh: =>

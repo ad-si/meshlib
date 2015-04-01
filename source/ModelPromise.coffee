@@ -7,6 +7,9 @@ class ModelPromise
 			@model = new Model mesh, options
 		return @
 
+	setName: (name) =>
+		return @next => @model.name = name
+
 	setFaces: (faces) =>
 		return @next => @model.setFaces faces
 
