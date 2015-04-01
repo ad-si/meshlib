@@ -5,6 +5,7 @@ buildFaceVertexMesh = require './helpers/buildFaceVertexMesh'
 testTwoManifoldness = require './helpers/testTwoManifoldness'
 calculateBoundingBox = require './helpers/calculateBoundingBox'
 convertToBase64 = require './helpers/convertToBase64'
+buildMeshFromBase64 = require './helpers/buildMeshFromBase64'
 NoFacesError = require './errors/NoFacesError'
 
 # Abstracts the actual model from the external fluid api
@@ -132,7 +133,15 @@ class Model
 				},
 				index / 3
 
+
 	getBase64: () ->
 		return convertToBase64(@mesh.faceVertex) + '|' + @name
+
+
+	fromBase64: (base64String) ->
+		data = buildMeshFromBase64 base64String
+		@mesh.faceVertex = data.faceVertexMesh
+		@mesh.name = data.name
+
 
 module.exports = Model

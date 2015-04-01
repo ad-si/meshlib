@@ -4,15 +4,7 @@
 
 THREE = require 'three'
 
-base64ByteLength = (base64Length) ->
-	return (base64Length / 4) * 3
 
-stringToUint8Array = (str) ->
-	ab = new ArrayBuffer(str.length)
-	uintarray = new Uint8Array(ab)
-	for i in [0..str.length - 1]
-		uintarray[i] = str.charCodeAt i
-	return uintarray
 
 class OptimizedModel
 	constructor: () ->
@@ -22,32 +14,6 @@ class OptimizedModel
 		@facesNormals = []
 		@originalFileName = 'Unknown file'
 
-	fromBase64: (base64String) ->
-		strArray = base64String.split '|'
-
-		@verticesCoordinates = @base64ToFloat32Array strArray[0]
-		@facesVerticesIndices = new @base64ToInt32Array strArray[1]
-		@verticesNormals = @base64ToFloat32Array strArray[2]
-		@facesNormals = @base64ToFloat32Array strArray[3]
-		@originalFileName = strArray[4]
-
-	base64ToFloat32Array: (b64) ->
-		numFloats = (base64ByteLength b64.length) / 4
-		result = new Float32Array(numFloats)
-		decoded = stringToUint8Array atob(b64)
-		pview = new DataView(decoded.buffer)
-		for i in [0..numFloats - 1]
-			result[i] = pview.getFloat32 i * 4, true
-		return result
-
-	base64ToInt32Array: (b64) ->
-		numInts = (base64ByteLength b64.length) / 4
-		result = new Int32Array(numInts)
-		decoded = stringToUint8Array atob(b64)
-		pview = new DataView(decoded.buffer)
-		for i in [0..numInts - 1]
-			result[i] = pview.getInt32 i * 4, true
-		return result
 
 	# Creates a ThreeGeometry out of an optimized model
 	# if bufferGeoemtry is set to true, a BufferGeometry using

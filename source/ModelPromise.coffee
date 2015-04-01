@@ -13,6 +13,9 @@ class ModelPromise
 	setFaces: (faces) =>
 		return @next => @model.setFaces faces
 
+	getFaceVertexMesh: =>
+		return @done => @model.mesh.faceVertex
+
 	buildFaceVertexMesh: =>
 		return @next => @model.buildFaceVertexMesh()
 
@@ -36,6 +39,9 @@ class ModelPromise
 
 	getBase64: () =>
 		return @done => @model.getBase64()
+
+	fromBase64: (base64String) =>
+		return @next => @model.fromBase64 base64String
 
 	next: (onFulfilled, onRejected) =>
 		@done onFulfilled, onRejected

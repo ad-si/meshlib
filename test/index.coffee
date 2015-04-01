@@ -151,31 +151,48 @@ describe 'Meshlib', ->
 			expect(vertices).to.have.length(4)
 
 
-	it 'exports model to base64 representation', () ->
-		model = modelsMap['tetrahedron']
-		jsonTetrahedron = loadYaml model.filePath
-
-		modelPromise = meshlib jsonTetrahedron
-		.setName(model.name)
-		.buildFaceVertexMesh()
-		.getBase64()
-
-		expect(modelPromise).to.eventually.be.equal([
+	describe 'Base64', ->
+		tetrahedronBase64Array = [
 			# vertexCoordinates
-			'AADCgD8AAAAAAAAAAAAAAAAAAMKAPwAAAAAAA' +
-				'AAAAAAAAAAAwoA/AAAAAAAAAAAAAAAA',
+			'AACAPwAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAAAA',
 
 			# faceVertexIndices
 			'AAAAAAEAAAACAAAAAwAAAAAAAAACAAAAAwAAAAIAAAABAAAAAwAAAAEAAAAAAAAA',
 
 			# vertexNormalCoordinates
-			'w6rDmjE/w7EyAsK/w7EyAsK/w7EyAsK/w6rDmjE/w7EyAsK/w7EyAsK/w7EyAsK/' +
-				'w6rDmjE/OsONE8K/OsONE8K/OsONE8K/',
+			'6toxP/EyAr/xMgK/8TICv+raMT/xMgK/8TICv/EyAr/q2jE/Os0TvzrNE786zRO/',
 
 			# faceNormalCoordinates
-			'OsONEz86w40TPzrDjRM/AAAAAAAAwoDCvwAAAAAAAMKAwr8AAAAAAAAAAAAAAAAA' +
-				'AAAAAADCgMK/',
+			'Os0TPzrNEz86zRM/AAAAAAAAgL8AAAAAAACAvwAAAAAAAAAAAAAAAAAAAAAAAIC/',
 
 			# name
 			'tetrahedron'
-		].join('|'))
+		]
+
+
+		it 'exports model to base64 representation', ->
+			model = modelsMap['tetrahedron']
+			jsonTetrahedron = loadYaml model.filePath
+
+			modelPromise = meshlib jsonTetrahedron
+			.setName model.name
+			.buildFaceVertexMesh()
+			.getBase64()
+			.then (base64String) -> base64String.split('|')
+
+			expect(modelPromise)
+			.to.eventually.be.deep.equal(tetrahedronBase64Array)
+
+
+		it 'creates model from base64 representation', ->
+			jsonTetrahedron = loadYaml modelsMap['tetrahedron'].filePath
+
+			return meshlib jsonTetrahedron
+			.buildFaceVertexMesh()
+			.getFaceVertexMesh()
+			.then (faceVertexMesh) ->
+				actual = meshlib()
+				.fromBase64 tetrahedronBase64Array.join('|')
+				.getFaceVertexMesh()
+
+				expect(actual).to.eventually.equalFaceVertexMesh(faceVertexMesh)
