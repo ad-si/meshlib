@@ -76,7 +76,7 @@ describe 'Meshlib', ->
 		return expect(modelPromise).to.eventually.have.correctNormals
 
 
-	it.skip 'should extract individual geometries to submodels', ->
+	it 'should extract individual geometries to submodels', ->
 		jsonModel = loadYaml modelsMap['tetrahedrons'].filePath
 
 		modelPromise = meshlib jsonModel

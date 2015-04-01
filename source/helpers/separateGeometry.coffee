@@ -1,11 +1,16 @@
 # creates an standalone optimized model from an equivalence class and an
 # existing optimized model
 # TODO needs to be tested
-createModelFromEquivalenceClass = (equivalenceClass, optimizedModel) ->
+createModelFromEquivalenceClass = (equivalenceClass, faceVertexMesh) ->
 	nextPointIndex = 0
 	polyTranslationTable = {}
 
-	model = new OptimizedModel()
+	model = {
+		verticesCoordinates: []
+		verticesNormals: []
+		facesNormals: []
+		facesVerticesIndices: []
+	}
 
 	# inserts a point into the new model,
 	# adjust the id to prevent undefined position entries
@@ -14,30 +19,30 @@ createModelFromEquivalenceClass = (equivalenceClass, optimizedModel) ->
 			polyTranslationTable[currentId] = nextPointIndex
 			nextPointIndex++
 			model.verticesCoordinates.push(
-				optimizedModel.verticesCoordinates[currentId * 3]
+				faceVertexMesh.verticesCoordinates[currentId * 3]
 			)
 			model.verticesCoordinates.push(
-				optimizedModel.verticesCoordinates[currentId * 3 + 1]
+				faceVertexMesh.verticesCoordinates[currentId * 3 + 1]
 			)
 			model.verticesCoordinates.push(
-				optimizedModel.verticesCoordinates[currentId * 3 + 2]
+				faceVertexMesh.verticesCoordinates[currentId * 3 + 2]
 			)
 			model.verticesNormals.push(
-				optimizedModel.verticesNormals[currentId * 3]
+				faceVertexMesh.verticesNormals[currentId * 3]
 			)
 			model.verticesNormals.push(
-				optimizedModel.verticesNormals[currentId * 3 + 1]
+				faceVertexMesh.verticesNormals[currentId * 3 + 1]
 			)
 			model.verticesNormals.push(
-				optimizedModel.verticesNormals[currentId * 3 + 2]
+				faceVertexMesh.verticesNormals[currentId * 3 + 2]
 			)
 
 		return polyTranslationTable[currentId]
 
 	equivalenceClass.faces.enumerate (pi) ->
-		p0 = optimizedModel.facesVerticesIndices[pi * 3]
-		p1 = optimizedModel.facesVerticesIndices[pi * 3 + 1]
-		p2 = optimizedModel.facesVerticesIndices[pi * 3 + 2]
+		p0 = faceVertexMesh.facesVerticesIndices[pi * 3]
+		p1 = faceVertexMesh.facesVerticesIndices[pi * 3 + 1]
+		p2 = faceVertexMesh.facesVerticesIndices[pi * 3 + 2]
 
 		p0n = insertPoint p0
 		p1n = insertPoint p1
@@ -46,9 +51,9 @@ createModelFromEquivalenceClass = (equivalenceClass, optimizedModel) ->
 		model.facesVerticesIndices.push p0n
 		model.facesVerticesIndices.push p1n
 		model.facesVerticesIndices.push p2n
-		model.facesNormals.push optimizedModel.facesNormals[pi * 3]
-		model.facesNormals.push optimizedModel.facesNormals[pi * 3 + 1]
-		model.facesNormals.push optimizedModel.facesNormals[pi * 3 + 2]
+		model.facesNormals.push faceVertexMesh.facesNormals[pi * 3]
+		model.facesNormals.push faceVertexMesh.facesNormals[pi * 3 + 1]
+		model.facesNormals.push faceVertexMesh.facesNormals[pi * 3 + 2]
 
 	return model
 
@@ -56,15 +61,15 @@ createModelFromEquivalenceClass = (equivalenceClass, optimizedModel) ->
 # represents several faces that share points. if the model has
 # several equivalence classes, it contains several geometries
 # that are not connected to each other
-createEquivalenceClasses = (optimizedModel) ->
+createEquivalenceClasses = (faceVertexMesh) ->
 	equivalenceClasses = []
 
-	for faceIndex in [0..optimizedModel.facesVerticesIndices.length - 1] by 3
+	for faceIndex in [0..faceVertexMesh.facesVerticesIndices.length - 1] by 3
 		poly = {
 			index: faceIndex / 3
-			p0: optimizedModel.facesVerticesIndices[faceIndex]
-			p1: optimizedModel.facesVerticesIndices[faceIndex + 1]
-			p2: optimizedModel.facesVerticesIndices[faceIndex + 2]
+			p0: faceVertexMesh.facesVerticesIndices[faceIndex]
+			p1: faceVertexMesh.facesVerticesIndices[faceIndex + 1]
+			p2: faceVertexMesh.facesVerticesIndices[faceIndex + 2]
 		}
 
 		connectedClasses = []
@@ -155,14 +160,14 @@ class Hashmap
 # contains several geometries (-> connected faces) that
 # have no connection between each other
 
-module.exports = (optimizedModel) ->
+module.exports = (faceVertexMesh) ->
 	models = []
-	equivalenceClasses = createEquivalenceClasses optimizedModel
+	equivalenceClasses = createEquivalenceClasses faceVertexMesh
 
 	if equivalenceClasses.length is 1
-		models.push optimizedModel
+		models.push faceVertexMesh
 	else
 		for eq in equivalenceClasses
-			models.push createModelFromEquivalenceClass eq, optimizedModel
+			models.push createModelFromEquivalenceClass eq, faceVertexMesh
 
 	return models

@@ -88,7 +88,7 @@ class Model
 		return @
 
 	getSubmodels: =>
-		return geometrySplitter @mesh
+		return geometrySplitter @mesh.faceVertex
 
 
 	isTwoManifold: ->
