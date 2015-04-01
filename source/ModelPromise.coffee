@@ -34,6 +34,9 @@ class ModelPromise
 	forEachFace: (callback) =>
 		return @next => @model.forEachFace(callback)
 
+	getBase64: () =>
+		return @done => @model.getBase64()
+
 	next: (onFulfilled, onRejected) =>
 		@done onFulfilled, onRejected
 		return @

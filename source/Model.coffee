@@ -4,6 +4,7 @@ geometrySplitter = require './helpers/separateGeometry'
 buildFaceVertexMesh = require './helpers/buildFaceVertexMesh'
 testTwoManifoldness = require './helpers/testTwoManifoldness'
 calculateBoundingBox = require './helpers/calculateBoundingBox'
+convertToBase64 = require './helpers/convertToBase64'
 NoFacesError = require './errors/NoFacesError'
 
 # Abstracts the actual model from the external fluid api
@@ -131,5 +132,7 @@ class Model
 				},
 				index / 3
 
+	getBase64: () ->
+		return convertToBase64(@mesh.faceVertex) + '|' + @name
 
 module.exports = Model

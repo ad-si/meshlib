@@ -149,3 +149,33 @@ describe 'Meshlib', ->
 			vertices.push [face, index]
 		.done () ->
 			expect(vertices).to.have.length(4)
+
+
+	it 'exports model to base64 representation', () ->
+		model = modelsMap['tetrahedron']
+		jsonTetrahedron = loadYaml model.filePath
+
+		modelPromise = meshlib jsonTetrahedron
+		.setName(model.name)
+		.buildFaceVertexMesh()
+		.getBase64()
+
+		expect(modelPromise).to.eventually.be.equal([
+			# vertexCoordinates
+			'AADCgD8AAAAAAAAAAAAAAAAAAMKAPwAAAAAAA' +
+				'AAAAAAAAAAAwoA/AAAAAAAAAAAAAAAA',
+
+			# faceVertexIndices
+			'AAAAAAEAAAACAAAAAwAAAAAAAAACAAAAAwAAAAIAAAABAAAAAwAAAAEAAAAAAAAA',
+
+			# vertexNormalCoordinates
+			'w6rDmjE/w7EyAsK/w7EyAsK/w7EyAsK/w6rDmjE/w7EyAsK/w7EyAsK/w7EyAsK/' +
+				'w6rDmjE/OsONE8K/OsONE8K/OsONE8K/',
+
+			# faceNormalCoordinates
+			'OsONEz86w40TPzrDjRM/AAAAAAAAwoDCvwAAAAAAAMKAwr8AAAAAAAAAAAAAAAAA' +
+				'AAAAAADCgMK/',
+
+			# name
+			'tetrahedron'
+		].join('|'))

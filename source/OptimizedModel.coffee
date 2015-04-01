@@ -22,40 +22,6 @@ class OptimizedModel
 		@facesNormals = []
 		@originalFileName = 'Unknown file'
 
-
-	toBase64: () ->
-		posA = new Float32Array(@verticesCoordinates.length)
-		for i in [0..@verticesCoordinates.length - 1]
-			posA[i] = @verticesCoordinates[i]
-		indA = new Int32Array(@facesVerticesIndices.length)
-		for i in [0..@facesVerticesIndices.length - 1]
-			indA[i] = @facesVerticesIndices[i]
-		vnA = new Float32Array(@verticesNormals.length)
-		for i in [0..@verticesNormals.length - 1]
-			vnA[i] = @verticesNormals[i]
-		fnA = new Float32Array(@facesNormals.length)
-		for i in [0..@facesNormals.length - 1]
-			fnA[i] = @facesNormals[i]
-
-		posBase = @arrayBufferToBase64 posA.buffer
-		baseString = posBase
-		baseString += '|'
-
-		indBase = @arrayBufferToBase64 indA.buffer
-		baseString += indBase
-		baseString += '|'
-
-		vnBase = @arrayBufferToBase64 vnA.buffer
-		baseString += vnBase
-		baseString += '|'
-
-		fnBase = @arrayBufferToBase64 fnA.buffer
-		baseString += fnBase
-
-		baseString += '|' + @originalFileName
-
-		return baseString
-
 	fromBase64: (base64String) ->
 		strArray = base64String.split '|'
 
@@ -82,14 +48,6 @@ class OptimizedModel
 		for i in [0..numInts - 1]
 			result[i] = pview.getInt32 i * 4, true
 		return result
-
-	arrayBufferToBase64: (buffer) ->
-		binary = ''
-		bytes = new Uint8Array(buffer)
-		len = bytes.byteLength
-		for i in [0..len - 1]
-			binary += String.fromCharCode(bytes[i])
-		return window.btoa binary
 
 	# Creates a ThreeGeometry out of an optimized model
 	# if bufferGeoemtry is set to true, a BufferGeometry using
