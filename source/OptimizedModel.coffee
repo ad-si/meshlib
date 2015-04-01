@@ -173,33 +173,6 @@ class OptimizedModel
 			@facesNormals.push face.normal.y
 			@facesNormals.push face.normal.z
 
-	boundingBox: ->
-		if @_boundingBox
-			return @_boundingBox
-
-		minX = maxX = @verticesCoordinates[0]
-		minY = maxY = @verticesCoordinates[1]
-		minZ = maxZ = @verticesCoordinates[2]
-		for i in [0..@verticesCoordinates.length - 1] by 3
-			minX = @verticesCoordinates[i]     if @verticesCoordinates[i] < minX
-			minY = @verticesCoordinates[i + 1] if @verticesCoordinates[i + 1] < minY
-			minZ = @verticesCoordinates[i + 2] if @verticesCoordinates[i + 2] < minZ
-			maxX = @verticesCoordinates[i]     if @verticesCoordinates[i] > maxX
-			maxY = @verticesCoordinates[i + 1] if @verticesCoordinates[i + 1] > maxY
-			maxZ = @verticesCoordinates[i + 2] if @verticesCoordinates[i + 2] > maxZ
-
-		@_boundingBox =
-			min:
-				x: minX
-				y: minY
-				z: minZ
-			max:
-				x: maxX
-				y: maxY
-				z: maxZ
-
-		return @_boundingBox
-
 	forEachFace: (callback) =>
 		for i in [0..@facesVerticesIndices.length - 1] by 3
 			p0 = {
