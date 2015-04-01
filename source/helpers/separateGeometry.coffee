@@ -6,10 +6,10 @@ createModelFromEquivalenceClass = (equivalenceClass, faceVertexMesh) ->
 	polyTranslationTable = {}
 
 	model = {
-		verticesCoordinates: []
-		verticesNormals: []
-		facesNormals: []
-		facesVerticesIndices: []
+		vertexCoordinates: []
+		vertexNormalCoordinates: []
+		faceNormalCoordinates: []
+		faceVertexIndices: []
 	}
 
 	# inserts a point into the new model,
@@ -18,42 +18,42 @@ createModelFromEquivalenceClass = (equivalenceClass, faceVertexMesh) ->
 		if not polyTranslationTable[currentId]?
 			polyTranslationTable[currentId] = nextPointIndex
 			nextPointIndex++
-			model.verticesCoordinates.push(
-				faceVertexMesh.verticesCoordinates[currentId * 3]
+			model.vertexCoordinates.push(
+				faceVertexMesh.vertexCoordinates[currentId * 3]
 			)
-			model.verticesCoordinates.push(
-				faceVertexMesh.verticesCoordinates[currentId * 3 + 1]
+			model.vertexCoordinates.push(
+				faceVertexMesh.vertexCoordinates[currentId * 3 + 1]
 			)
-			model.verticesCoordinates.push(
-				faceVertexMesh.verticesCoordinates[currentId * 3 + 2]
+			model.vertexCoordinates.push(
+				faceVertexMesh.vertexCoordinates[currentId * 3 + 2]
 			)
-			model.verticesNormals.push(
-				faceVertexMesh.verticesNormals[currentId * 3]
+			model.vertexNormalCoordinates.push(
+				faceVertexMesh.vertexNormalCoordinates[currentId * 3]
 			)
-			model.verticesNormals.push(
-				faceVertexMesh.verticesNormals[currentId * 3 + 1]
+			model.vertexNormalCoordinates.push(
+				faceVertexMesh.vertexNormalCoordinates[currentId * 3 + 1]
 			)
-			model.verticesNormals.push(
-				faceVertexMesh.verticesNormals[currentId * 3 + 2]
+			model.vertexNormalCoordinates.push(
+				faceVertexMesh.vertexNormalCoordinates[currentId * 3 + 2]
 			)
 
 		return polyTranslationTable[currentId]
 
 	equivalenceClass.faces.enumerate (pi) ->
-		p0 = faceVertexMesh.facesVerticesIndices[pi * 3]
-		p1 = faceVertexMesh.facesVerticesIndices[pi * 3 + 1]
-		p2 = faceVertexMesh.facesVerticesIndices[pi * 3 + 2]
+		p0 = faceVertexMesh.faceVertexIndices[pi * 3]
+		p1 = faceVertexMesh.faceVertexIndices[pi * 3 + 1]
+		p2 = faceVertexMesh.faceVertexIndices[pi * 3 + 2]
 
 		p0n = insertPoint p0
 		p1n = insertPoint p1
 		p2n = insertPoint p2
 
-		model.facesVerticesIndices.push p0n
-		model.facesVerticesIndices.push p1n
-		model.facesVerticesIndices.push p2n
-		model.facesNormals.push faceVertexMesh.facesNormals[pi * 3]
-		model.facesNormals.push faceVertexMesh.facesNormals[pi * 3 + 1]
-		model.facesNormals.push faceVertexMesh.facesNormals[pi * 3 + 2]
+		model.faceVertexIndices.push p0n
+		model.faceVertexIndices.push p1n
+		model.faceVertexIndices.push p2n
+		model.faceNormalCoordinates.push faceVertexMesh.faceNormalCoordinates[pi * 3]
+		model.faceNormalCoordinates.push faceVertexMesh.faceNormalCoordinates[pi * 3 + 1]
+		model.faceNormalCoordinates.push faceVertexMesh.faceNormalCoordinates[pi * 3 + 2]
 
 	return model
 
@@ -64,12 +64,12 @@ createModelFromEquivalenceClass = (equivalenceClass, faceVertexMesh) ->
 createEquivalenceClasses = (faceVertexMesh) ->
 	equivalenceClasses = []
 
-	for faceIndex in [0..faceVertexMesh.facesVerticesIndices.length - 1] by 3
+	for faceIndex in [0..faceVertexMesh.faceVertexIndices.length - 1] by 3
 		poly = {
 			index: faceIndex / 3
-			p0: faceVertexMesh.facesVerticesIndices[faceIndex]
-			p1: faceVertexMesh.facesVerticesIndices[faceIndex + 1]
-			p2: faceVertexMesh.facesVerticesIndices[faceIndex + 2]
+			p0: faceVertexMesh.faceVertexIndices[faceIndex]
+			p1: faceVertexMesh.faceVertexIndices[faceIndex + 1]
+			p2: faceVertexMesh.faceVertexIndices[faceIndex + 2]
 		}
 
 		connectedClasses = []

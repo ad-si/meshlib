@@ -17,28 +17,28 @@ arrayBufferToBase64 = (buffer) ->
 
 module.exports = (mesh) ->
 	{
-	verticesCoordinates,
-	facesVerticesIndices,
-	verticesNormals,
-	facesNormals
+	vertexCoordinates,
+	faceVertexIndices,
+	vertexNormalCoordinates,
+	faceNormalCoordinates
 	} = mesh
 
-	posA = new Float32Array(verticesCoordinates.length)
+	posA = new Float32Array(vertexCoordinates.length)
 
-	for i in [0..verticesCoordinates.length - 1]
-		posA[i] = verticesCoordinates[i]
-	indA = new Int32Array(facesVerticesIndices.length)
+	for i in [0..vertexCoordinates.length - 1]
+		posA[i] = vertexCoordinates[i]
+	indA = new Int32Array(faceVertexIndices.length)
 
-	for i in [0..facesVerticesIndices.length - 1]
-		indA[i] = facesVerticesIndices[i]
-	vnA = new Float32Array(verticesNormals.length)
+	for i in [0..faceVertexIndices.length - 1]
+		indA[i] = faceVertexIndices[i]
+	vnA = new Float32Array(vertexNormalCoordinates.length)
 
-	for i in [0..verticesNormals.length - 1]
-		vnA[i] = verticesNormals[i]
-	fnA = new Float32Array(facesNormals.length)
+	for i in [0..vertexNormalCoordinates.length - 1]
+		vnA[i] = vertexNormalCoordinates[i]
+	fnA = new Float32Array(faceNormalCoordinates.length)
 
-	for i in [0..facesNormals.length - 1]
-		fnA[i] = facesNormals[i]
+	for i in [0..faceNormalCoordinates.length - 1]
+		fnA[i] = faceNormalCoordinates[i]
 
 	posBase = arrayBufferToBase64 posA.buffer
 	baseString = posBase

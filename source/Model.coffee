@@ -103,9 +103,9 @@ class Model
 
 
 	forEachFace: (callback) ->
-		coordinates = @mesh.faceVertex.verticesCoordinates
-		indices = @mesh.faceVertex.facesVerticesIndices
-		normalCoordinates = @mesh.faceVertex.facesNormals
+		coordinates = @mesh.faceVertex.vertexCoordinates
+		indices = @mesh.faceVertex.faceVertexIndices
+		normalCoordinates = @mesh.faceVertex.faceNormalCoordinates
 
 		for index in [0..indices.length - 1] by 3
 			callback {

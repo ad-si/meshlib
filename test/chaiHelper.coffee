@@ -15,22 +15,22 @@ module.exports = (chai, utils) ->
 	chai.Assertion.addProperty 'faceVertexMesh', () ->
 
 		@assert(
-			@_obj.mesh.faceVertex.hasOwnProperty 'facesVerticesIndices'
-			'expected #{this} to have facesVerticesIndices',
-			'expected #{this} to not have facesVerticesIndices'
+			@_obj.mesh.faceVertex.hasOwnProperty 'faceVertexIndices'
+			'expected #{this} to have faceVertexIndices',
+			'expected #{this} to not have faceVertexIndices'
 		)
 		@assert(
-			@_obj.mesh.faceVertex.hasOwnProperty 'verticesCoordinates'
-			'expected #{this} to have verticesCoordinates',
-			'expected #{this} to not have verticesCoordinates'
+			@_obj.mesh.faceVertex.hasOwnProperty 'vertexCoordinates'
+			'expected #{this} to have vertexCoordinates',
+			'expected #{this} to not have vertexCoordinates'
 		)
 		@assert(
-			@_obj.mesh.faceVertex.hasOwnProperty 'verticesNormals'
+			@_obj.mesh.faceVertex.hasOwnProperty 'vertexNormalCoordinates'
 			'expected #{this} to have vertexNormals',
 			'expected #{this} to not have vertexNormals'
 		)
 		@assert(
-			@_obj.mesh.faceVertex.hasOwnProperty 'facesNormals'
+			@_obj.mesh.faceVertex.hasOwnProperty 'faceNormalCoordinates'
 			'expected #{this} to have faceNormals',
 			'expected #{this} to not have faceNormals'
 		)
@@ -61,8 +61,8 @@ module.exports = (chai, utils) ->
 
 	chai.Assertion.addMethod 'equalFace', (face) ->
 
-		@_obj.verticesCoordinates.every (vertex, vertexIndex) ->
-			chai.expect(vertex).to.equalVector(face.verticesCoordinates[vertexIndex])
+		@_obj.vertexCoordinates.every (vertex, vertexIndex) ->
+			chai.expect(vertex).to.equalVector(face.vertexCoordinates[vertexIndex])
 
 		chai.expect(@_obj.normal).to.equalVector(face.normal)
 
@@ -74,28 +74,28 @@ module.exports = (chai, utils) ->
 
 
 	chai.Assertion.addMethod 'equalFaceVertexMesh', (mesh) ->
-		@_obj.verticesCoordinates.forEach (coordinate, coordinateIndex) ->
+		@_obj.vertexCoordinates.forEach (coordinate, coordinateIndex) ->
 			chai.expect(coordinate)
 			.to.be.closeTo(
-				mesh.verticesCoordinates[coordinateIndex],
+				mesh.vertexCoordinates[coordinateIndex],
 				maxCoordinateDelta
 			)
 
-		@_obj.facesVerticesIndices.forEach (faceVertexIndex, arrayIndex) ->
+		@_obj.faceVertexIndices.forEach (faceVertexIndex, arrayIndex) ->
 			chai.expect(faceVertexIndex)
-			.to.equal(mesh.facesVerticesIndices[arrayIndex])
+			.to.equal(mesh.faceVertexIndices[arrayIndex])
 
-		@_obj.facesNormals.forEach (coordinate, coordinateIndex) ->
+		@_obj.faceNormalCoordinates.forEach (coordinate, coordinateIndex) ->
 			chai.expect(coordinate)
 			.to.be.closeTo(
-				mesh.facesNormals[coordinateIndex],
+				mesh.faceNormalCoordinates[coordinateIndex],
 				maxCoordinateDelta
 			)
 
-		@_obj.verticesNormals.forEach (coordinate, coordinateIndex) ->
+		@_obj.vertexNormalCoordinates.forEach (coordinate, coordinateIndex) ->
 			chai.expect(coordinate)
 			.to.be.closeTo(
-				mesh.verticesNormals[coordinateIndex],
+				mesh.vertexNormalCoordinates[coordinateIndex],
 				maxCoordinateDelta
 			)
 

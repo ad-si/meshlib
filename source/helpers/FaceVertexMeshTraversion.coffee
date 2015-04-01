@@ -1,5 +1,5 @@
 module.exports.forEachEdge = (faceVertexMesh, callback) ->
-	faceVertexIndices = faceVertexMesh.facesVerticesIndices
+	faceVertexIndices = faceVertexMesh.faceVertexIndices
 
 	for index in [0...faceVertexIndices.length] by 3
 		v1 = faceVertexIndices[index]

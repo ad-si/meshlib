@@ -27,8 +27,8 @@ module.exports = (faces, options = {}) ->
 	vertexNormals = octree.getAveragedNormalList()
 
 	return {
-		verticesCoordinates: vertexCoordinates
-		facesVerticesIndices: faceVertexIndices
-		verticesNormals: vertexNormals
-		facesNormals: faceNormals
+		vertexCoordinates: vertexCoordinates
+		faceVertexIndices: faceVertexIndices
+		vertexNormalCoordinates: vertexNormals
+		faceNormalCoordinates: faceNormals
 	}

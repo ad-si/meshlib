@@ -49,11 +49,11 @@ module.exports = (base64String) ->
 
 	return {
 	faceVertexMesh:
-		verticesCoordinates: base64ToArray strArray[0]
-		facesVerticesIndices: Array.prototype.slice.call(
+		vertexCoordinates: base64ToArray strArray[0]
+		faceVertexIndices: Array.prototype.slice.call(
 			base64ToInt32Array strArray[1]
 		)
-		verticesNormals: base64ToArray strArray[2]
-		facesNormals: base64ToArray strArray[3]
+		vertexNormalCoordinates: base64ToArray strArray[2]
+		faceNormalCoordinates: base64ToArray strArray[3]
 	name: strArray[4]
 	}
