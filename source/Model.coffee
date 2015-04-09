@@ -11,6 +11,9 @@ class Model
 	setName: (name) =>
 		return @next => @model.name = name
 
+	setFileName: (fileName) =>
+		return @next => @model.fileName = fileName
+
 	setFaces: (faces) =>
 		return @next => @model.setFaces faces
 
