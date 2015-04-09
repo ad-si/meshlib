@@ -1,7 +1,7 @@
 ExplicitModel = require './ExplicitModel'
 
 
-class ModelPromise
+class Model
 	constructor: (mesh, options) ->
 		@ready = Promise.resolve().then =>
 			if mesh
@@ -57,4 +57,4 @@ class ModelPromise
 		@ready = @ready.catch onRejected
 		return @ready
 
-module.exports = ModelPromise
+module.exports = Model
