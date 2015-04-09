@@ -44,6 +44,9 @@ class Model
 	fromBase64: (base64String) =>
 		return @next => @model.fromBase64 base64String
 
+	getJSON: () =>
+		return @done => JSON.stringify @model
+
 	next: (onFulfilled, onRejected) =>
 		@done onFulfilled, onRejected
 		return @

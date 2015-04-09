@@ -87,6 +87,16 @@ describe 'Meshlib', ->
 		.and.to.have.length(2)
 
 
+	it 'returns a JSON representation of the model', ->
+		jsonModel = loadYaml modelsMap['cube'].filePath
+
+		modelPromise = meshlib jsonModel
+		.buildFaceVertexMesh()
+		.getJSON()
+
+		return expect(modelPromise).to.eventually.be.a('string')
+
+
 	describe 'Two-Manifold Test', ->
 		it 'recognizes that model is two-manifold', ->
 			jsonModel = loadYaml modelsMap['tetrahedron'].filePath
