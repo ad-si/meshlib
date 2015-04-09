@@ -47,6 +47,9 @@ class Model
 	getJSON: () =>
 		return @done => JSON.stringify @model
 
+	getObject: () =>
+		return @done => @model.toObject()
+
 	next: (onFulfilled, onRejected) =>
 		@done onFulfilled, onRejected
 		return @

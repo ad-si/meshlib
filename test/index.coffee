@@ -91,10 +91,19 @@ describe 'Meshlib', ->
 		jsonModel = loadYaml modelsMap['cube'].filePath
 
 		modelPromise = meshlib jsonModel
-		.buildFaceVertexMesh()
 		.getJSON()
 
 		return expect(modelPromise).to.eventually.be.a('string')
+
+
+	it 'returns a javascript object representing the model', ->
+		jsonModel = loadYaml modelsMap['cube'].filePath
+
+		modelPromise = meshlib jsonModel
+		.getObject()
+
+		return expect(modelPromise).to.eventually.be.an('object')
+		.and.to.have.all.keys(['name', 'fileName', 'mesh'])
 
 
 	describe 'Two-Manifold Test', ->

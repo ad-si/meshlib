@@ -144,12 +144,14 @@ class ExplicitModel
 		@mesh.name = data.name
 
 
-	toJSON: () ->
+	toObject: () ->
 		return {
 		name: @name
 		fileName: @fileName
 		mesh: @mesh
 		}
+
+	toJSON: @toObject
 
 
 module.exports = ExplicitModel
