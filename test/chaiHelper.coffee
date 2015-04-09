@@ -1,15 +1,15 @@
-Model = require '../source/Model'
+ExplicitModel = require '../source/ExplicitModel'
 Vector = require '../source/primitives/Vector'
 
 maxCoordinateDelta = 0.00001
 
 
 module.exports = (chai, utils) ->
-	chai.Assertion.addProperty 'model', () ->
+	chai.Assertion.addProperty 'explicitModel', () ->
 		@assert(
-			@_obj instanceof Model,
-			'expected #{this} to be a Model',
-			'expected #{this} to not be a Model'
+			@_obj instanceof ExplicitModel,
+			'expected #{this} to be an explicit Model',
+			'expected #{this} to not be an explicit Model'
 		)
 
 	chai.Assertion.addProperty 'faceVertexMesh', () ->

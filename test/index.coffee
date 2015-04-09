@@ -3,7 +3,7 @@ path = require 'path'
 chai = require 'chai'
 yaml = require 'js-yaml'
 
-Model = require '../source/Model'
+ExplicitModel = require '../source/ExplicitModel'
 meshlib = require '../source/index'
 
 chai.use require './chaiHelper'
@@ -50,7 +50,7 @@ describe 'Meshlib', ->
 		modelPromise = meshlib jsonModel
 		.done (model) -> model
 
-		return expect(modelPromise).to.eventually.be.a.model
+		return expect(modelPromise).to.eventually.be.an.explicitModel
 
 
 	it 'creates a face-vertex mesh', ->

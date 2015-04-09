@@ -1,10 +1,11 @@
-Model = require './Model'
+ExplicitModel = require './ExplicitModel'
 
 
 class ModelPromise
 	constructor: (mesh, options) ->
 		@ready = Promise.resolve().then =>
-			@model = new Model mesh, options
+			if mesh
+				@model = new ExplicitModel mesh, options
 		return @
 
 	setName: (name) =>

@@ -9,7 +9,7 @@ buildMeshFromBase64 = require './helpers/buildMeshFromBase64'
 NoFacesError = require './errors/NoFacesError'
 
 # Abstracts the actual model from the external fluid api
-class Model
+class ExplicitModel
 	constructor: (@mesh, @options) ->
 		@mesh ?= {
 			faces: [],
@@ -144,4 +144,4 @@ class Model
 		@mesh.name = data.name
 
 
-module.exports = Model
+module.exports = ExplicitModel
