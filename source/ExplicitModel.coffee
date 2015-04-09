@@ -16,8 +16,9 @@ class ExplicitModel
 			faceVertex: {}
 		}
 		@options ?= {}
-		@fileName = ''
 		@name = ''
+		@fileName = ''
+		@faceCount = ''
 
 
 	buildFaceVertexMesh: =>
@@ -148,6 +149,7 @@ class ExplicitModel
 		return {
 		name: @name
 		fileName: @fileName
+		faceCount: @faceCount
 		mesh: @mesh
 		}
 

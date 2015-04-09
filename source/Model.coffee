@@ -17,6 +17,9 @@ class Model
 	setFaces: (faces) =>
 		return @next => @model.setFaces faces
 
+	setFaceCount: (numberOfFaces) =>
+		return @next => @model.faceCount = numberOfFaces
+
 	getFaceVertexMesh: =>
 		return @done => @model.mesh.faceVertex
 
