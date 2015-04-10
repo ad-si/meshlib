@@ -8,6 +8,11 @@ class Model
 				@model = new ExplicitModel mesh, options
 		return @
 
+	@fromBase64: (base64String) =>
+		exportModel = new Model()
+		exportModel.model = ExplicitModel.fromBase64 base64String
+		return exportModel
+
 	setName: (name) =>
 		return @next => @model.name = name
 
@@ -46,9 +51,6 @@ class Model
 
 	getBase64: () =>
 		return @done => @model.getBase64()
-
-	fromBase64: (base64String) =>
-		return @next => @model.fromBase64 base64String
 
 	getJSON: () =>
 		return @done => JSON.stringify @model

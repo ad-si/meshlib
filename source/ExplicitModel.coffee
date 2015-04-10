@@ -21,6 +21,15 @@ class ExplicitModel
 		@faceCount = ''
 
 
+	@fromBase64: (base64String) ->
+		data = buildMeshFromBase64 base64String
+
+		model = new ExplicitModel {faceVertex: data.faceVertexMesh}
+		model.name = data.name
+
+		return model
+
+
 	buildFaceVertexMesh: =>
 		@mesh.faceVertex = buildFaceVertexMesh @mesh.faces
 		return @
@@ -137,12 +146,6 @@ class ExplicitModel
 
 	getBase64: () ->
 		return convertToBase64(@mesh.faceVertex) + '|' + @name
-
-
-	fromBase64: (base64String) ->
-		data = buildMeshFromBase64 base64String
-		@mesh.faceVertex = data.faceVertexMesh
-		@mesh.name = data.name
 
 
 	toObject: () ->

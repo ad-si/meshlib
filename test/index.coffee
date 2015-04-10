@@ -206,7 +206,8 @@ describe 'Meshlib', ->
 			.buildFaceVertexMesh()
 			.getFaceVertexMesh()
 			.then (faceVertexMesh) ->
-				actual = meshlib()
+				actual = meshlib
+				.Model
 				.fromBase64 tetrahedronBase64Array.join('|')
 				.getFaceVertexMesh()
 
