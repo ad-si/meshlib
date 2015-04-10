@@ -8,6 +8,15 @@ class Model
 				@model = new ExplicitModel mesh, options
 		return @
 
+	@fromObject: (object, options) =>
+		return new Model object.mesh, options
+		.setName object.name
+		.setFileName object.fileName
+		.setFaceCount object.faceCount
+
+	@fromFaces: (faces, options) =>
+		return new Model {mesh: {faces: faces}}, options
+
 	@fromBase64: (base64String) =>
 		exportModel = new Model()
 		exportModel.model = ExplicitModel.fromBase64 base64String
