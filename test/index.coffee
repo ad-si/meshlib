@@ -103,7 +103,7 @@ describe 'Meshlib', ->
 		.getObject()
 
 		return expect(modelPromise).to.eventually.be.an('object')
-		.and.to.have.all.keys(['name', 'fileName', 'mesh'])
+		.and.to.have.any.keys('name', 'fileName', 'mesh')
 
 
 	describe 'Two-Manifold Test', ->
