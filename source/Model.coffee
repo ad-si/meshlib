@@ -56,7 +56,7 @@ class Model
 		return @done => @model.getBoundingBox()
 
 	forEachFace: (callback) =>
-		return @next => @model.forEachFace(callback)
+		return @next => @model.forEachFace callback
 
 	getBase64: () =>
 		return @done => @model.getBase64()
