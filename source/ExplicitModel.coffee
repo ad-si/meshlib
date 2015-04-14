@@ -143,6 +143,8 @@ class ExplicitModel
 				},
 				index / 3
 
+		return @
+
 
 	getBase64: () ->
 		return convertToBase64(@mesh.faceVertex) + '|' + @name
