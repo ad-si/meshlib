@@ -1,0 +1,82 @@
+name: tetrahedron irregular
+faceCount: 4
+faces:
+  -
+    normal:
+      x: 0.2857142984867096
+      y: 0.4285714626312256
+      z: 0.8571429252624512
+    vertices:
+      -
+        x: 3
+        y: 0
+        z: 0
+      -
+        x: 0
+        y: 2
+        z: 0
+      -
+        x: 0
+        y: 0
+        z: 1
+    attribute: 0
+
+  -
+    normal:
+      x: 0
+      y: -1
+      z: 0
+    vertices:
+      -
+        x: 0
+        y: 0
+        z: 0
+      -
+        x: 3
+        y: 0
+        z: 0
+      -
+        x: 0
+        y: 0
+        z: 1
+    attribute: 0
+
+  -
+    normal:
+      x: -1
+      y: 0
+      z: 0
+    vertices:
+      -
+        x: 0
+        y: 0
+        z: 0
+      -
+        x: 0
+        y: 0
+        z: 1
+      -
+        x: 0
+        y: 2
+        z: 0
+    attribute: 0
+
+  -
+    normal:
+      x: 0
+      y: 0
+      z: -1
+    vertices:
+      -
+        x: 0
+        y: 0
+        z: 0
+      -
+        x: 0
+        y: 2
+        z: 0
+      -
+        x: 3
+        y: 0
+        z: 0
+    attribute: 0

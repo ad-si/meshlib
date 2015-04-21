@@ -5,6 +5,9 @@ yaml = require 'js-yaml'
 
 ExplicitModel = require '../source/ExplicitModel'
 meshlib = require '../source/index'
+calculateProjectedFaceArea = require(
+	'../source/helpers/calculateProjectedFaceArea'
+)
 
 chai.use require './chaiHelper'
 chai.use require 'chai-as-promised'
@@ -23,6 +26,7 @@ generateMap = (collection) ->
 models = [
 	'cube'
 	'tetrahedron'
+	'tetrahedronIrregular'
 	'tetrahedrons'
 	'missingFace'
 ].map (model) ->
@@ -153,17 +157,56 @@ describe 'Meshlib', ->
 				max: {x: 1, y: 1, z: 1}
 			})
 
+	describe 'Faces', ->
+		it 'calculates the in xy-plane projected surface-area of a face', ->
+			expect calculateProjectedFaceArea {
+				vertices: [
+					{x: 0, y: 0, z: 2}
+					{x: 1, y: 0, z: 0}
+					{x: 0, y: 1, z: 0}
+				]
+			}
+			.to.equal 0.5
 
-	it 'iterates over all faces in the face-vertex-mesh', ->
-		jsonTetrahedron = loadYaml modelsMap['tetrahedron'].filePath,
-			vertices = []
+			expect calculateProjectedFaceArea {
+				vertices: [
+					{x: 0, y: 0, z: -2}
+					{x: 2, y: 0, z: 0}
+					{x: 0, y: 4, z: 0}
+				]
+			}
+			.to.equal 4
 
-		return meshlib jsonTetrahedron
-		.buildFaceVertexMesh()
-		.forEachFace (face, index) ->
-			vertices.push [face, index]
-		.done () ->
-			expect(vertices).to.have.length(4)
+
+		it 'retrieves the face with the largest xy-projection', ->
+			jsonTetrahedron = loadYaml(
+				modelsMap['tetrahedronIrregular'].filePath
+			)
+
+			modelPromise =  meshlib jsonTetrahedron
+			.getFaceWithLargestProjection()
+
+			return expect(modelPromise).to.eventually.deep.equal {
+				normal: {x: 0, y: 0, z: -1}
+				vertices: [
+					{x: 0, y: 0, z: 0}
+					{x: 0, y: 2, z: 0}
+					{x: 3, y: 0, z: 0}
+				]
+				attribute: 0
+			}
+
+
+		it 'iterates over all faces in the face-vertex-mesh', ->
+			jsonTetrahedron = loadYaml modelsMap['tetrahedron'].filePath,
+				vertices = []
+
+			return meshlib jsonTetrahedron
+			.buildFaceVertexMesh()
+			.forEachFace (face, index) ->
+				vertices.push [face, index]
+			.done () ->
+				expect(vertices).to.have.length(4)
 
 
 	describe 'Base64', ->
