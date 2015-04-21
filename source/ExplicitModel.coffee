@@ -147,6 +147,7 @@ class ExplicitModel
 		return {
 		x: -centroid.x
 		y: -centroid.y
+		z: -@getBoundingBox().min.z
 		}
 
 	forEachFace: (callback) ->

@@ -165,11 +165,14 @@ describe 'Meshlib', ->
 			jsonModel = loadYaml modelsMap['tetrahedron'].filePath
 
 			modelPromise = meshlib jsonModel
+			.translate {z: 1}
+			.buildFaceVertexMesh()
 			.getModificationInvariantTranslation()
 
 			return expect(modelPromise).to.eventually.deep.equal {
 				x: -0.3333333333333333
 				y: -0.3333333333333333
+				z: -1
 			}
 
 
