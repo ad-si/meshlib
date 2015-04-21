@@ -9,6 +9,8 @@ calculateProjectedFaceArea = require(
 	'../source/helpers/calculateProjectedFaceArea')
 calculateProjectionCentroid = require(
 	'../source/helpers/calculateProjectionCentroid')
+buildFacesFromFaceVertexMesh = require(
+	'../source/helpers/buildFacesFromFaceVertexMesh')
 
 
 chai.use require './chaiHelper'
@@ -67,6 +69,23 @@ describe 'Meshlib', ->
 		.done (model) -> model
 
 		return expect(modelPromise).to.eventually.have.faceVertexMesh
+
+
+	it 'builds faces from face vertex mesh', ->
+		jsonModel = loadYaml modelsMap['tetrahedron'].filePath
+
+		modelPromise = meshlib jsonModel
+		.buildFaceVertexMesh()
+		.setFaces(null)
+		.buildFacesFromFaceVertexMesh()
+		.getObject()
+		.then (object) ->
+			return object.mesh.faces
+
+		return expect(modelPromise)
+		.to.eventually.deep.equal(
+			loadYaml(modelsMap['tetrahedron'].filePath).faces
+		)
 
 
 	it 'calculates face-normals', ->

@@ -2,6 +2,7 @@ Vector = require './primitives/Vector'
 Face = require './primitives/Face'
 geometrySplitter = require './helpers/separateGeometry'
 buildFaceVertexMesh = require './helpers/buildFaceVertexMesh'
+buildFacesFromFaceVertexMesh = require './helpers/buildFacesFromFaceVertexMesh'
 testTwoManifoldness = require './helpers/testTwoManifoldness'
 calculateBoundingBox = require './helpers/calculateBoundingBox'
 calculateProjectedFaceArea = require './helpers/calculateProjectedFaceArea'
@@ -34,6 +35,11 @@ class ExplicitModel
 
 	buildFaceVertexMesh: =>
 		@mesh.faceVertex = buildFaceVertexMesh @mesh.faces
+		return @
+
+
+	buildFacesFromFaceVertexMesh: =>
+		@mesh.faces = buildFacesFromFaceVertexMesh @mesh.faceVertex
 		return @
 
 

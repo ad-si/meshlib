@@ -43,6 +43,9 @@ class Model
 	fixFaces: =>
 		return @next => @model.fixFaces()
 
+	buildFacesFromFaceVertexMesh: =>
+		return @next => @model.buildFacesFromFaceVertexMesh()
+
 	calculateNormals: =>
 		return @next => @model.calculateNormals()
 
