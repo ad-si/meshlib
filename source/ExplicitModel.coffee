@@ -33,6 +33,14 @@ class ExplicitModel
 		return model
 
 
+	translate: (vector) =>
+		@mesh.faces.forEach (face) =>
+			face.vertices.forEach (vertex) =>
+				vertex.x += vector.x
+				vertex.y += vector.y
+				vertex.z += vector.z
+
+
 	buildFaceVertexMesh: =>
 		@mesh.faceVertex = buildFaceVertexMesh @mesh.faces
 		return @

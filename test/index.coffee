@@ -131,6 +131,22 @@ describe 'Meshlib', ->
 		.and.to.have.any.keys('name', 'fileName', 'mesh')
 
 
+	it 'translates a model', ->
+		jsonModel = loadYaml modelsMap['tetrahedron'].filePath
+
+		modelPromise = meshlib jsonModel
+		.translate {x: 1, y: 1, z: 1}
+		.getObject()
+		.then (object) ->
+			return object.mesh.faces[0].vertices
+
+		return expect(modelPromise).to.eventually.deep.equal [
+			{x: 2, y: 1, z: 1},
+			{x: 1, y: 2, z: 1},
+			{x: 1, y: 1, z: 2}
+		]
+
+
 	describe 'Modification Invariant Translation', ->
 		it 'calculates the centroid of a face-projection', ->
 			expect calculateProjectionCentroid {

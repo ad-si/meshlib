@@ -22,6 +22,9 @@ class Model
 		exportModel.model = ExplicitModel.fromBase64 base64String
 		return exportModel
 
+	translate: (vector) =>
+		return @next => @model.translate vector
+
 	setName: (name) =>
 		return @next => @model.name = name
 
