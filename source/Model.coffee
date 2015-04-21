@@ -58,6 +58,9 @@ class Model
 	getFaceWithLargestProjection: =>
 		return @done => @model.getFaceWithLargestProjection()
 
+	getModificationInvariantTranslation: =>
+		return @done => @model.getModificationInvariantTranslation()
+
 	forEachFace: (callback) =>
 		return @next => @model.forEachFace callback
 

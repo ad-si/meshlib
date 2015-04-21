@@ -8,6 +8,7 @@ calculateProjectedFaceArea = require './helpers/calculateProjectedFaceArea'
 convertToBase64 = require './helpers/convertToBase64'
 buildMeshFromBase64 = require './helpers/buildMeshFromBase64'
 NoFacesError = require './errors/NoFacesError'
+calculateProjectionCentroid = require './helpers/calculateProjectionCentroid'
 
 # Abstracts the actual model from the external fluid api
 class ExplicitModel
@@ -114,7 +115,6 @@ class ExplicitModel
 
 
 	getFaceWithLargestProjection: =>
-
 		faceIndex = 0
 
 		@mesh.faces
@@ -127,6 +127,13 @@ class ExplicitModel
 
 		return @mesh.faces[faceIndex]
 
+	getModificationInvariantTranslation: =>
+		centroid = calculateProjectionCentroid @getFaceWithLargestProjection()
+
+		return {
+		x: -centroid.x
+		y: -centroid.y
+		}
 
 	forEachFace: (callback) ->
 		coordinates = @mesh.faceVertex.vertexCoordinates
