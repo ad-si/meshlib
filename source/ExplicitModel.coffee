@@ -36,9 +36,9 @@ class ExplicitModel
 	translate: (vector) =>
 		@mesh.faces.forEach (face) =>
 			face.vertices.forEach (vertex) =>
-				vertex.x += vector.x
-				vertex.y += vector.y
-				vertex.z += vector.z
+				vertex.x += vector.x || 0
+				vertex.y += vector.y || 0
+				vertex.z += vector.z || 0
 
 
 	buildFaceVertexMesh: =>
