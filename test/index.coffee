@@ -6,8 +6,10 @@ yaml = require 'js-yaml'
 ExplicitModel = require '../source/ExplicitModel'
 meshlib = require '../source/index'
 calculateProjectedFaceArea = require(
-	'../source/helpers/calculateProjectedFaceArea'
-)
+	'../source/helpers/calculateProjectedFaceArea')
+calculateProjectionCentroid = require(
+	'../source/helpers/calculateProjectionCentroid')
+
 
 chai.use require './chaiHelper'
 chai.use require 'chai-as-promised'
@@ -108,6 +110,32 @@ describe 'Meshlib', ->
 
 		return expect(modelPromise).to.eventually.be.an('object')
 		.and.to.have.any.keys('name', 'fileName', 'mesh')
+
+
+	describe 'Modification Invariant Translation', ->
+		it 'calculates the centroid of a face-projection', ->
+			expect calculateProjectionCentroid {
+				vertices: [
+					{x: 0, y: 0, z: 0}
+					{x: 2, y: 0, z: 0}
+					{x: 0, y: 2, z: 0}
+				]
+			}
+			.to.deep.equal {
+				x: 0.6666666666666666
+				y: 0.6666666666666666
+			}
+
+		it 'returns a modification invariant translation matrix', ->
+			jsonModel = loadYaml modelsMap['tetrahedron'].filePath
+
+			modelPromise = meshlib jsonModel
+			.getModificationInvariantTranslation()
+
+			return expect(modelPromise).to.eventually.deep.equal {
+				x: -0.3333333333333333
+				y: -0.3333333333333333
+			}
 
 
 	describe 'Two-Manifold Test', ->
