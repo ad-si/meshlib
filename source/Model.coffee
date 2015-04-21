@@ -55,6 +55,9 @@ class Model
 	getBoundingBox: =>
 		return @done => @model.getBoundingBox()
 
+	getFaceWithLargestProjection: =>
+		return @done => @model.getFaceWithLargestProjection()
+
 	forEachFace: (callback) =>
 		return @next => @model.forEachFace callback
 

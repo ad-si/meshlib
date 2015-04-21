@@ -4,6 +4,7 @@ geometrySplitter = require './helpers/separateGeometry'
 buildFaceVertexMesh = require './helpers/buildFaceVertexMesh'
 testTwoManifoldness = require './helpers/testTwoManifoldness'
 calculateBoundingBox = require './helpers/calculateBoundingBox'
+calculateProjectedFaceArea = require './helpers/calculateProjectedFaceArea'
 convertToBase64 = require './helpers/convertToBase64'
 buildMeshFromBase64 = require './helpers/buildMeshFromBase64'
 NoFacesError = require './errors/NoFacesError'
@@ -110,6 +111,21 @@ class ExplicitModel
 		if not @_boundingBox
 			@_boundingBox = calculateBoundingBox @mesh.faceVertex
 		return @_boundingBox
+
+
+	getFaceWithLargestProjection: =>
+
+		faceIndex = 0
+
+		@mesh.faces
+		.map (face) ->
+			return calculateProjectedFaceArea face
+		.reduce (previous, current, currentIndex) ->
+			if current > previous
+				faceIndex = currentIndex
+			return current
+
+		return @mesh.faces[faceIndex]
 
 
 	forEachFace: (callback) ->
