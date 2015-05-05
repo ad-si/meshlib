@@ -34,6 +34,9 @@ class Model
 	setFaces: (faces) =>
 		return @next => @model.setFaces faces
 
+	getFaces: (options) =>
+		return @done => return @model.getFaces options
+
 	setFaceCount: (numberOfFaces) =>
 		return @next => @model.faceCount = numberOfFaces
 

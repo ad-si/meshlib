@@ -223,7 +223,47 @@ describe 'Meshlib', ->
 				max: {x: 1, y: 1, z: 1}
 			})
 
+
 	describe 'Faces', ->
+		it 'returns all faces', ->
+			jsonTetrahedron = loadYaml modelsMap['tetrahedron'].filePath
+
+			modelPromise = meshlib jsonTetrahedron
+			.getFaces()
+
+			expect(modelPromise).to.eventually
+			.deep.equal(jsonTetrahedron.faces)
+
+
+		it 'returns all faces which are orthogonal to the xy-plane', ->
+			jsonTetrahedron = loadYaml modelsMap['tetrahedron'].filePath
+
+			modelPromise = meshlib jsonTetrahedron
+			.getFaces {
+				filter: (face) ->
+					return face.normal.z is 0
+			}
+
+			expect(modelPromise).to.eventually.deep.equal [
+				{
+					vertices: [
+						{x: 0, y: 0, z: 0},
+						{x: 1, y: 0, z: 0},
+						{x: 0, y: 0, z: 1}
+					],
+					normal: {x: 0, y: -1, z: 0}
+				},
+				{
+					vertices: [
+						{x: 0, y: 0, z: 0},
+						{x: 0, y: 0, z: 1},
+						{x: 0, y: 1, z: 0}
+					],
+					normal: {x: -1, y: 0, z: 0}
+				}
+			]
+
+
 		it 'calculates the in xy-plane projected surface-area of a face', ->
 			expect calculateProjectedFaceArea {
 				vertices: [
@@ -249,7 +289,7 @@ describe 'Meshlib', ->
 				modelsMap['tetrahedronIrregular'].filePath
 			)
 
-			modelPromise =  meshlib jsonTetrahedron
+			modelPromise = meshlib jsonTetrahedron
 			.getFaceWithLargestProjection()
 
 			return expect(modelPromise).to.eventually.deep.equal {
@@ -264,8 +304,8 @@ describe 'Meshlib', ->
 
 
 		it 'iterates over all faces in the face-vertex-mesh', ->
-			jsonTetrahedron = loadYaml modelsMap['tetrahedron'].filePath,
-				vertices = []
+			jsonTetrahedron = loadYaml modelsMap['tetrahedron'].filePath
+			vertices = []
 
 			return meshlib jsonTetrahedron
 			.buildFaceVertexMesh()

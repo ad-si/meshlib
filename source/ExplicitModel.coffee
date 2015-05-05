@@ -56,6 +56,13 @@ class ExplicitModel
 		return @
 
 
+	getFaces: (options = {}) =>
+		if options.filter and typeof options.filter is 'function'
+			return @mesh.faces.filter(options.filter)
+
+		return @mesh.faces
+
+
 	fixFaces: =>
 		deletedFaces = []
 
