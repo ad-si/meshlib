@@ -6,6 +6,7 @@ yaml = require 'js-yaml'
 ExplicitModel = require '../source/ExplicitModel'
 meshlib = require '../source/index'
 Face = require '../source/primitives/Face'
+Matrix = require '../source/primitives/Matrix'
 calculateProjectedFaceArea = require(
 	'../source/helpers/calculateProjectedFaceArea')
 calculateProjectionCentroid = require(

@@ -1,5 +1,6 @@
 Vector = require './primitives/Vector'
 Face = require './primitives/Face'
+Matrix = require './primitives/Matrix'
 geometrySplitter = require './helpers/separateGeometry'
 buildFaceVertexMesh = require './helpers/buildFaceVertexMesh'
 buildFacesFromFaceVertexMesh = require './helpers/buildFacesFromFaceVertexMesh'
