@@ -330,6 +330,22 @@ describe 'Meshlib', ->
 				expect(vertices).to.have.length(4)
 
 
+		it 'returns a rotation matrix to align the model
+		  to the cartesian grid', ->
+			jsonCube = loadYaml modelsMap['tetrahedron'].filePath
+			cubePromise =  meshlib(jsonCube).getGridAlignRotation()
+			expect(cubePromise).to.eventually.equal 0
+
+			jsonCube = loadYaml modelsMap['cube'].filePath
+			cubePromise =  meshlib jsonCube
+			.rotate {angle: 42, unit: 'degree'}
+			.calculateNormals()
+			.getGridAlignRotation {unit: 'degree'}
+
+			expect(cubePromise).to.eventually.equal 42
+
+
+
 	describe 'Base64', ->
 		tetrahedronBase64Array = [
 			# vertexCoordinates
@@ -376,3 +392,128 @@ describe 'Meshlib', ->
 				.getFaceVertexMesh()
 
 				expect(actual).to.eventually.equalFaceVertexMesh(faceVertexMesh)
+
+
+	describe 'Matrix', ->
+		it 'builds a Matrix from colum-major arrays', ->
+			matrix = Matrix.fromColums [
+				[1, 2, 3]
+				[4, 5, 6]
+				[7, 8, 9]
+			]
+
+			expect matrix.toRows()
+			.to.deep.equal [
+				[1, 4, 7]
+				[2, 5, 8]
+				[3, 6, 9]
+			]
+
+		it 'multiplies a 3x2 Matrix by a 2x3 Matrix', ->
+			matrix = Matrix.fromRows [
+				[1, 2, 3]
+				[4, 5, 6]
+			]
+
+			expect matrix.multiply [
+				[7, 8]
+				[9, 10]
+				[11, 12]
+			]
+			.to.deep.equal [
+				[58, 64]
+				[139, 154]
+			]
+
+
+		it 'multiplies a 3x1 Matrix by a 4x3 Matrix', ->
+
+			matrix = Matrix.fromRows [
+				[3, 4, 2]
+			]
+
+			expect matrix.multiply [
+				[13, 9, 7, 15]
+				[8, 7, 4, 6]
+				[6, 4, 0, 3]
+			]
+			.to.deep.equal [
+				[83, 63, 37, 75]
+			]
+
+
+		it 'multiplies a 1x3 Matrix by a 4x4 Matrix', ->
+
+			matrix = Matrix.fromRows [
+				[1, 0, 0, 7]
+				[0, 1, 0, 6]
+				[0, 0, 1, 8]
+				[0, 0, 0, 1]
+			]
+
+			expect matrix.multiply [
+				[3]
+				[4]
+				[2]
+				[1]
+			]
+			.to.deep.equal [
+				[10]
+				[10]
+				[10]
+				[1]
+			]
+
+
+		it 'creates a Matrix from a continuous Array', ->
+
+			matrix = Matrix.fromValues [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]
+
+			expect matrix.toRows()
+			.to.deep.equal [
+				[1,0,0,0]
+				[0,1,0,0]
+				[0,0,1,0]
+				[0,0,0,1]
+			]
+
+
+	describe 'Transformations', ->
+		it 'can be transformed by applying a matrix', ->
+			jsonModel = loadYaml modelsMap['tetrahedron'].filePath
+
+			modelPromise = meshlib jsonModel
+			.applyMatrix [
+				[1, 0, 0, 10],
+				[0, 1, 0, 20],
+				[0, 0, 1, 30],
+				[0, 0, 0,  1]
+			]
+			.getFaces()
+			.then (faces) ->
+				return faces[0].vertices
+
+			expect modelPromise
+			.to.eventually.deep.equal [
+				{ x: 11, y: 20, z: 30 },
+				{ x: 10, y: 21, z: 30 },
+				{ x: 10, y: 20, z: 31 }
+			]
+
+		it 'can be rotated', ->
+			jsonModel = loadYaml modelsMap['tetrahedron'].filePath
+
+			modelPromise = meshlib jsonModel
+			.rotate {angle: 45, unit: 'degree'}
+			.getFaces()
+			.then (faces) ->
+				return faces[0].vertices
+
+			expect modelPromise
+			.to.eventually.deep.equal [
+				{ x: 0.7071067811865476, y: 0.7071067811865475, z: 0 }
+				{ x: -0.7071067811865475, y: 0.7071067811865476, z: 0 }
+				{ x: 0, y: 0, z: 1 }
+			]
+
+
