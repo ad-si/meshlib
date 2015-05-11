@@ -22,8 +22,15 @@ class Model
 		exportModel.model = ExplicitModel.fromBase64 base64String
 		return exportModel
 
+
+	applyMatrix: (matrix) =>
+		return @next => @model.applyMatrix matrix
+
 	translate: (vector) =>
 		return @next => @model.translate vector
+
+	rotate: (options) =>
+		return @next => @model.rotate options
 
 	setName: (name) =>
 		return @next => @model.name = name
@@ -69,6 +76,9 @@ class Model
 
 	getModificationInvariantTranslation: =>
 		return @done => @model.getModificationInvariantTranslation()
+
+	getGridAlignRotation: (options) =>
+		return @done => @model.getGridAlignRotation options
 
 	forEachFace: (callback) =>
 		return @next => @model.forEachFace callback

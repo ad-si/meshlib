@@ -11,6 +11,54 @@ convertToBase64 = require './helpers/convertToBase64'
 buildMeshFromBase64 = require './helpers/buildMeshFromBase64'
 NoFacesError = require './errors/NoFacesError'
 calculateProjectionCentroid = require './helpers/calculateProjectionCentroid'
+deg2rad = require 'deg2rad'
+rad2deg = require 'rad2deg'
+
+
+getExtremes = (array) ->
+	return array.reduce(
+		(previous, current, index) ->
+			unless previous.maximum.value and current?
+				previous.maximum = previous.minimum =
+					value: current
+					index: index
+
+			else if current > previous.maximum.value
+				previous.maximum =
+					value: current
+					index: index
+
+			else if current < previous.minimum.value
+				previous.minimum =
+					value: current
+					index: index
+
+			return previous
+		,
+		minimum:
+			value: null
+			index: null
+		maximum:
+			value: null
+			index: null
+	)
+
+
+applyMatrixToPoint = (matrix, point) ->
+	newMatrix = Matrix.multiply matrix, [
+		[point.x]
+		[point.y]
+		[point.z]
+		[1]
+	]
+	newPoint = {
+		x: newMatrix[0][0]
+		y: newMatrix[1][0]
+		z: newMatrix[2][0]
+	}
+
+	return newPoint
+
 
 # Abstracts the actual model from the external fluid api
 class ExplicitModel
@@ -34,12 +82,60 @@ class ExplicitModel
 		return model
 
 
+	applyMatrix: (matrix) =>
+		@mesh.faces = @mesh.faces.map (face) ->
+			face.vertices = face.vertices.map (vertex) ->
+				return applyMatrixToPoint matrix, vertex
+			return face
+		return @
+
+
 	translate: (vector) =>
 		@mesh.faces.forEach (face) =>
 			face.vertices.forEach (vertex) =>
 				vertex.x += vector.x || 0
 				vertex.y += vector.y || 0
 				vertex.z += vector.z || 0
+		return @
+
+	rotate: ({angle, axis, unit} = {}) =>
+
+		unless angle
+			return @
+
+		unit ?= 'radian'
+		axis ?= 'z'
+
+		if unit is 'degree'
+			angle = deg2rad angle
+
+
+		cos = Math.cos angle
+		sin = Math.sin angle
+
+		switch axis
+			when 'x'
+				@applyMatrix [
+					[1, 0, 0, 0]
+					[0, cos, -sin, 0]
+					[0, sin, cos, 0]
+					[0, 0, 0, 1]
+				]
+			when 'y'
+				@applyMatrix [
+					[cos, 0, sin, 0]
+					[0, 1, 0, 0]
+					[-sin, 0, cos, 0]
+					[0, 0, 0, 1]
+				]
+			when 'z'
+				@applyMatrix [
+					[cos, -sin, 0, 0]
+					[sin, cos, 0, 0]
+					[0, 0, 1, 0]
+					[0, 0, 0, 1]
+				]
+		return @
 
 
 	buildFaceVertexMesh: =>
@@ -149,6 +245,7 @@ class ExplicitModel
 
 		return @mesh.faces[faceIndex]
 
+
 	getModificationInvariantTranslation: =>
 		centroid = calculateProjectionCentroid @getFaceWithLargestProjection()
 
@@ -157,6 +254,53 @@ class ExplicitModel
 		y: -centroid.y
 		z: -@getBoundingBox().min.z
 		}
+
+
+	getGridAlignRotation: ({rotationAxis, unit} = {}) =>
+
+		unit ?= 'degree'
+		rotationAxis ?= 'z'
+
+		angleSurfaceAreaHistogram = @mesh.faces
+		.filter (face) ->
+			# Get all faces aligned along the rotationAxis
+			return Math.abs(face.normal[rotationAxis]) < 0.01
+
+		.map (face) ->
+			face.surfaceArea = Face.calculateSurfaceArea face
+
+			# Get rotation angle
+			rotationAngle = switch
+				when rotationAxis is 'x'
+					Math.atan2 face.normal.z, face.normal.y
+				when rotationAxis is 'y'
+					Math.atan2 face.normal.x, face.normal.z
+				when rotationAxis is 'z'
+					Math.atan2 face.normal.y, face.normal.x
+
+			# Calculate rotation angle modulo 90 deg
+			angleModulusHalfPi = (rotationAngle + Math.PI) % (Math.PI / 2)
+
+			# Convert to deg and round to nearest integer
+			face.nearestAngleInDegrees = Math.round rad2deg angleModulusHalfPi
+
+			return face
+
+		.reduce (histogram, face) ->
+			histogram[face.nearestAngleInDegrees] ?= 0
+			histogram[face.nearestAngleInDegrees] += face.surfaceArea
+			return histogram
+
+		, new Array(90)
+
+		# Return angle with the largest surface area
+		angleInDegrees = getExtremes(angleSurfaceAreaHistogram).maximum.index
+
+		if unit is 'radians' or unit is 'rad'
+			return deg2rad angleInDegrees
+
+		return angleInDegrees
+
 
 	forEachFace: (callback) ->
 		coordinates = @mesh.faceVertex.vertexCoordinates
