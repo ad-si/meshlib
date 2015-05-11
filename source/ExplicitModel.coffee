@@ -1,3 +1,5 @@
+clone = require 'clone'
+
 Vector = require './primitives/Vector'
 Face = require './primitives/Face'
 Matrix = require './primitives/Matrix'
@@ -67,6 +69,7 @@ class ExplicitModel
 			faces: [],
 			faceVertex: {}
 		}
+		@transformations = []
 		@options ?= {}
 		@name = ''
 		@fileName = ''
@@ -80,6 +83,19 @@ class ExplicitModel
 		model.name = data.name
 
 		return model
+
+
+	clone: () =>
+		modelClone = new ExplicitModel()
+
+		modelClone.mesh = clone @mesh
+		modelClone.transformations = clone @transformations
+		modelClone.options = clone @options
+		modelClone.name = @name
+		modelClone.fileName = @fileName
+		modelClone.faceCount = @faceCount
+
+		return modelClone
 
 
 	applyMatrix: (matrix) =>

@@ -26,6 +26,16 @@ class Model
 	applyMatrix: (matrix) =>
 		return @next => @model.applyMatrix matrix
 
+	getClone: () =>
+		return @done =>
+			modelClone = new Model()
+
+			modelClone
+			.done()
+			.then () =>
+				modelClone.model = @model.clone()
+				return modelClone
+
 	translate: (vector) =>
 		return @next => @model.translate vector
 

@@ -103,6 +103,26 @@ describe 'Meshlib', ->
 		return expect(modelPromise).to.eventually.have.correctNormals
 
 
+	it 'returns a clone', (done) ->
+		jsonModel = loadYaml modelsMap['cube'].filePath
+
+		model = meshlib jsonModel
+
+		model
+		.getObject()
+		.then (object) ->
+			model
+			.getClone()
+			.then (modelClone) ->
+				return modelClone.getObject()
+			.then (cloneObject) ->
+				try
+					expect(cloneObject).to.deep.equal(object)
+					done()
+				catch error
+					done(error)
+
+
 	it 'extracts individual geometries to submodels', ->
 		jsonModel = loadYaml modelsMap['tetrahedrons'].filePath
 
