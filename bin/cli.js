@@ -88,10 +88,13 @@ else {
 				else
 					console.log(JSON.stringify(modelObject))
 			})
+			.catch(function (error) {
+				console.error(error.stack)
+			})
 	})
 
 	modelBuilder.on('error', function (error) {
-		console.error(error)
+		console.error(error.stack)
 		process.exit(1)
 	})
 
