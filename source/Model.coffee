@@ -4,8 +4,7 @@ ExplicitModel = require './ExplicitModel'
 class Model
 	constructor: (mesh, options) ->
 		@ready = Promise.resolve().then =>
-			if mesh
-				@model = new ExplicitModel mesh, options
+			@model = new ExplicitModel mesh, options
 		return @
 
 	@fromObject: (object, options) =>
