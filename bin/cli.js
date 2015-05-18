@@ -14,16 +14,6 @@ var fs = require('fs'),
 
 program
 	.version(packageData.version)
-	.option(
-		'-e, --encoding [value]',
-		'Set encoding of output-file. Options: binary (default), utf-8' +
-		indent + 'Only available for some file formats (e.g. stl)'
-	)
-	.option(
-		'--input-encoding [value]',
-		'Force read of input file with specified encoding (e.g. binary, utf-8).' +
-		indent + 'Otherwise automatic recognition.'
-	)
 	.option('--indent', 'Indent JSON output')
 	.option('--js-object', 'Print a plain Javascript object')
 	.option('--colors', 'Print a colored plain Javascript object')
