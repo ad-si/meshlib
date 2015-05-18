@@ -20,6 +20,13 @@ program
 	.option('--depth', 'Set depth for printing Javascript objects')
 
 	.option('--build-face-vertex-mesh', 'Build a face vertex mesh from faces')
+	.option('--translate <"x y z">', 'Translate model in x, y, z', function (value) {
+		return value
+			.split(' ')
+			.map(function (numberString) {
+				return Number(numberString)
+			})
+	})
 
 	.usage('<input-file> [options] <output-file>')
 	.parse(process.argv)
@@ -69,6 +76,9 @@ else {
 	modelBuilder.on('model', function (model) {
 
 		var modelChain = model
+
+		if (program.translate)
+			modelChain = modelChain.translate(program.translate)
 
 		if (program.buildFaceVertexMesh)
 			modelChain = modelChain.buildFaceVertexMesh()
