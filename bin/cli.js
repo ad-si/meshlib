@@ -22,7 +22,7 @@ program
 	'--indent [n]',
 	'Indent JSON output with n (default: 2) spaces or a specified string')
 	.option('--no-colors', 'Do not color terminal output')
-	.option('--depth', 'Set depth for printing Javascript objects')
+	.option('--depth <levels>', 'Set depth for printing Javascript objects')
 
 	.option('--build-face-vertex-mesh', 'Build a face vertex mesh from faces')
 	.option('--translate <"x y z">', 'Translate model in x, y, z',
@@ -97,7 +97,7 @@ else {
 
 				if (process.stdout.isTTY) {
 					console.dir(modelObject, {
-						depth: program.depth || null,
+						depth: Number(program.depth) || null,
 						colors: program.colors
 					})
 				}
