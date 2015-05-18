@@ -17,7 +17,10 @@ program
 	.option('--indent', 'Indent JSON output')
 	.option('--js-object', 'Print a plain Javascript object')
 	.option('--colors', 'Print a colored plain Javascript object')
-	.option('--depth', 'Set depth for printed Javscript objects')
+	.option('--depth', 'Set depth for printing Javascript objects')
+
+	.option('--build-face-vertex-mesh', 'Build a face vertex mesh from faces')
+
 	.usage('<input-file> [options] <output-file>')
 	.parse(process.argv)
 
@@ -64,7 +67,13 @@ else {
 	var modelBuilder = new meshlib.ModelBuilder()
 
 	modelBuilder.on('model', function (model) {
-		model
+
+		var modelChain = model
+
+		if (program.buildFaceVertexMesh)
+			modelChain = modelChain.buildFaceVertexMesh()
+
+		modelChain
 			.getObject()
 			.then(function (modelObject) {
 				if (program.indent)
@@ -72,7 +81,10 @@ else {
 				else if (program.jsObject)
 					console.dir(modelObject, {depth: program.depth || null})
 				else if (program.colors)
-					console.dir(modelObject, {depth: program.depth || null, colors: true})
+					console.dir(modelObject, {
+						depth: program.depth || null,
+						colors: true
+					})
 				else
 					console.log(JSON.stringify(modelObject))
 			})
