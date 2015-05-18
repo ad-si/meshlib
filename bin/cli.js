@@ -12,11 +12,16 @@ var fs = require('fs'),
 	indent = '\n\t\t\t      '
 
 
+function isNumber(obj) {
+	return !isNaN(parseFloat(obj))
+}
+
 program
 	.version(packageData.version)
-	.option('--indent', 'Indent JSON output')
-	.option('--js-object', 'Print a plain Javascript object')
-	.option('--colors', 'Print a colored plain Javascript object')
+	.option(
+	'--indent [n]',
+	'Indent JSON output with n (default: 2) spaces or a specified string')
+	.option('--no-colors', 'Do not color terminal output')
 	.option('--depth', 'Set depth for printing Javascript objects')
 
 	.option('--build-face-vertex-mesh', 'Build a face vertex mesh from faces')
@@ -87,17 +92,37 @@ else {
 		modelChain
 			.getObject()
 			.then(function (modelObject) {
-				if (program.indent)
-					console.log(JSON.stringify(modelObject, null, 2))
-				else if (program.jsObject)
-					console.dir(modelObject, {depth: program.depth || null})
-				else if (program.colors)
+
+				var indent
+
+				if (process.stdout.isTTY) {
 					console.dir(modelObject, {
 						depth: program.depth || null,
-						colors: true
+						colors: program.colors
 					})
-				else
-					console.log(JSON.stringify(modelObject))
+				}
+				else {
+
+					if (program.indent === true)
+						indent = 2
+
+					else if (isNumber(program.indent))
+						indent = Number(program.indent)
+
+					else if (program.indent)
+						indent = program.indent
+
+					else
+						indent = null
+
+					console.log(
+						JSON.stringify(
+							modelObject,
+							null,
+							indent
+						)
+					)
+				}
 			})
 			.catch(function (error) {
 				console.error(error.stack)
