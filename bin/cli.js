@@ -24,6 +24,7 @@ program
 	'Indent JSON output with n (default: 2) spaces or a specified string')
 	.option('--no-colors', 'Do not color terminal output')
 	.option('--depth <levels>', 'Set depth for printing Javascript objects')
+	.option('--jsonl', 'Print model as a newline seperated JSON stream (jsonl)')
 
 	.option('--build-face-vertex-mesh', 'Build a face vertex mesh from faces')
 	.option('--translate <"x y z">', 'Translate model in x, y, z direction',
@@ -90,19 +91,32 @@ else {
 		if (program.buildFaceVertexMesh)
 			modelChain = modelChain.buildFaceVertexMesh()
 
-		modelChain
-			.getObject()
-			.then(function (modelObject) {
 
-				var indent
+		if (program.jsonl) {
+			modelChain = modelChain
+				.getStream()
+				.then(function (modelStream) {
+					modelStream.pipe(process.stdout)
+				})
+		}
 
-				if (process.stdout.isTTY) {
+		else if (process.stdout.isTTY) {
+			modelChain = modelChain
+				.getObject()
+				.then(function (modelObject) {
 					console.dir(modelObject, {
 						depth: Number(program.depth) || null,
 						colors: program.colors
 					})
-				}
-				else {
+				})
+		}
+
+		else {
+			modelChain = modelChain
+				.getObject()
+				.then(function (modelObject) {
+
+					var indent
 
 					if (program.indent === true)
 						indent = 2
@@ -123,8 +137,8 @@ else {
 							indent
 						)
 					)
-				}
-			})
+				})
+		}
 
 		modelChain = modelChain
 			.catch(function (error) {
