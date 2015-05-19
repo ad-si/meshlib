@@ -15,6 +15,7 @@ convertToBase64 = require './helpers/convertToBase64'
 buildMeshFromBase64 = require './helpers/buildMeshFromBase64'
 NoFacesError = require './errors/NoFacesError'
 calculateProjectionCentroid = require './helpers/calculateProjectionCentroid'
+ModelStream = require './ModelStream'
 
 
 getExtremes = (array) ->
@@ -365,6 +366,14 @@ class ExplicitModel
 		}
 
 	toJSON: @toObject
+
+	getStream: (options) =>
+		return new ModelStream {
+			name: @name
+			fileName: @fileName
+			faceCount: @faceCount
+			mesh: @mesh
+		}, options
 
 
 module.exports = ExplicitModel

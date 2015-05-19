@@ -101,6 +101,10 @@ class Model
 	getObject: () =>
 		return @done => @model.toObject()
 
+	getStream: () =>
+		return @done => @model.getStream()
+
+
 	next: (onFulfilled, onRejected) =>
 		@done onFulfilled, onRejected
 		return @
