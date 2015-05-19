@@ -18,6 +18,7 @@ function isNumber(obj) {
 
 program
 	.version(packageData.version)
+	.description(packageData.description)
 	.option(
 	'--indent [n]',
 	'Indent JSON output with n (default: 2) spaces or a specified string')
