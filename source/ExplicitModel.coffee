@@ -1,4 +1,6 @@
 clone = require 'clone'
+deg2rad = require 'deg2rad'
+rad2deg = require 'rad2deg'
 
 Vector = require './primitives/Vector'
 Face = require './primitives/Face'
@@ -13,8 +15,6 @@ convertToBase64 = require './helpers/convertToBase64'
 buildMeshFromBase64 = require './helpers/buildMeshFromBase64'
 NoFacesError = require './errors/NoFacesError'
 calculateProjectionCentroid = require './helpers/calculateProjectionCentroid'
-deg2rad = require 'deg2rad'
-rad2deg = require 'rad2deg'
 
 
 getExtremes = (array) ->
