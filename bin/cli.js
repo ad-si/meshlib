@@ -12,7 +12,7 @@ var fs = require('fs'),
 	indent = '\n\t\t\t      '
 
 
-function isNumber(obj) {
+function isNumber (obj) {
 	return !isNaN(parseFloat(obj))
 }
 
