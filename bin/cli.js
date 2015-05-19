@@ -124,6 +124,8 @@ else {
 					)
 				}
 			})
+
+		modelChain = modelChain
 			.catch(function (error) {
 				console.error(error.stack)
 			})
