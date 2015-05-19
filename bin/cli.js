@@ -26,7 +26,7 @@ program
 	.option('--depth <levels>', 'Set depth for printing Javascript objects')
 
 	.option('--build-face-vertex-mesh', 'Build a face vertex mesh from faces')
-	.option('--translate <"x y z">', 'Translate model in x, y, z',
+	.option('--translate <"x y z">', 'Translate model in x, y, z direction',
 	function (value) {
 		return value
 			.split(' ')
