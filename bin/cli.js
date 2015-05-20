@@ -24,6 +24,8 @@ program
 	'Indent JSON output with n (default: 2) spaces or a specified string')
 	.option('--no-colors', 'Do not color terminal output')
 	.option('--depth <levels>', 'Set depth for printing Javascript objects')
+
+	.option('--json', 'Print model as JSON (default for non TTY environments)')
 	.option('--jsonl', 'Print model as a newline seperated JSON stream (jsonl)')
 
 	.option('--build-face-vertex-mesh', 'Build a face vertex mesh from faces')
@@ -83,7 +85,8 @@ else {
 
 	modelBuilder.on('model', function (model) {
 
-		var modelChain = model
+		var modelChain = model,
+			indent = null
 
 		if (program.translate)
 			modelChain = modelChain.translate(program.translate)
@@ -100,7 +103,7 @@ else {
 				})
 		}
 
-		else if (process.stdout.isTTY) {
+		else if (process.stdout.isTTY && !program.json) {
 			modelChain = modelChain
 				.getObject()
 				.then(function (modelObject) {
@@ -112,32 +115,20 @@ else {
 		}
 
 		else {
+
+			if (program.indent === true)
+				indent = 2
+
+			else if (isNumber(program.indent))
+				indent = Number(program.indent)
+
+			else if (program.indent)
+				indent = program.indent
+
+
 			modelChain = modelChain
-				.getObject()
-				.then(function (modelObject) {
-
-					var indent
-
-					if (program.indent === true)
-						indent = 2
-
-					else if (isNumber(program.indent))
-						indent = Number(program.indent)
-
-					else if (program.indent)
-						indent = program.indent
-
-					else
-						indent = null
-
-					console.log(
-						JSON.stringify(
-							modelObject,
-							null,
-							indent
-						)
-					)
-				})
+				.getJSON(null, indent)
+				.then(console.log)
 		}
 
 		modelChain = modelChain

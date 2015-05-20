@@ -95,8 +95,8 @@ class Model
 	getBase64: () =>
 		return @done => @model.getBase64()
 
-	getJSON: () =>
-		return @done => JSON.stringify @model
+	getJSON: (replacer, space) =>
+		return @done => JSON.stringify @model, replacer, space
 
 	getObject: () =>
 		return @done => @model.toObject()
