@@ -93,6 +93,53 @@ applyMatrixToPoint = (matrix, point) ->
 	return newPoint
 
 
+calculateGridAlignRotationAngle = (faces, {rotationAxis, unit} = {}) ->
+	unit ?= 'radian'
+	rotationAxis ?= 'z'
+
+	angleSurfaceAreaHistogram = faces
+	.filter (face) ->
+		# Get all faces aligned along the rotationAxis
+		return Math.abs(face.normal[rotationAxis]) < 0.01
+
+	.map (face) ->
+		face.surfaceArea = Face.calculateSurfaceArea face
+
+		# Get rotation angle
+		rotationAngle = switch
+			when rotationAxis is 'x'
+				Math.atan2 face.normal.z, face.normal.y
+			when rotationAxis is 'y'
+				Math.atan2 face.normal.x, face.normal.z
+			when rotationAxis is 'z'
+				Math.atan2 face.normal.y, face.normal.x
+
+		# Calculate rotation angle modulo 90 deg
+		angleModulusHalfPi = (rotationAngle + Math.PI) % (Math.PI / 2)
+
+		# Convert to deg and round to nearest integer
+		face.nearestAngleInDegrees = Math.round rad2deg angleModulusHalfPi
+
+		return face
+
+	.reduce (histogram, face) ->
+		histogram[face.nearestAngleInDegrees] ?= 0
+		histogram[face.nearestAngleInDegrees] += face.surfaceArea
+		return histogram
+
+	, new Array(90)
+
+	console.log(angleSurfaceAreaHistogram)
+
+	# Return angle with the largest surface area
+	angleInDegrees = getExtremes(angleSurfaceAreaHistogram).maximum.index
+
+	if unit is 'degree' or unit is 'deg'
+		return angleInDegrees
+
+	return deg2rad angleInDegrees
+
+
 # Abstracts the actual model from the external fluid api
 class ExplicitModel
 	constructor: (@mesh, @options) ->
@@ -285,15 +332,10 @@ class ExplicitModel
 		}
 
 
-	getGridAlignRotation: ({rotationAxis, unit} = {}) =>
 
-		unit ?= 'degree'
-		rotationAxis ?= 'z'
 
-		angleSurfaceAreaHistogram = @mesh.faces
-		.filter (face) ->
-			# Get all faces aligned along the rotationAxis
-			return Math.abs(face.normal[rotationAxis]) < 0.01
+	getGridAlignRotationAngle: (options) =>
+		return calculateGridAlignRotationAngle @mesh.faces, options
 
 		.map (face) ->
 			face.surfaceArea = Face.calculateSurfaceArea face

@@ -86,8 +86,9 @@ class Model
 	getModificationInvariantTranslation: =>
 		return @done => @model.getModificationInvariantTranslation()
 
-	getGridAlignRotation: (options) =>
-		return @done => @model.getGridAlignRotation options
+	getGridAlignRotationAngle: (options) =>
+		return @done => @model.getGridAlignRotationAngle options
+
 
 	forEachFace: (callback) =>
 		return @next => @model.forEachFace callback
