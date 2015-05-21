@@ -18,6 +18,36 @@ calculateProjectionCentroid = require './helpers/calculateProjectionCentroid'
 ModelStream = require './ModelStream'
 
 
+getRotationMatrix = ({axis, angle} = {}) =>
+	axis ?= 'z'
+
+	cos = Math.cos angle
+	sin = Math.sin angle
+
+	switch axis
+		when 'x'
+			return [
+				[1, 0, 0, 0]
+				[0, cos, -sin, 0]
+				[0, sin, cos, 0]
+				[0, 0, 0, 1]
+			]
+		when 'y'
+			return [
+				[cos, 0, sin, 0]
+				[0, 1, 0, 0]
+				[-sin, 0, cos, 0]
+				[0, 0, 0, 1]
+			]
+		when 'z'
+			return [
+				[cos, -sin, 0, 0]
+				[sin, cos, 0, 0]
+				[0, 0, 1, 0]
+				[0, 0, 0, 1]
+			]
+
+
 getExtremes = (array) ->
 	return array.reduce(
 		(previous, current, index) ->
@@ -134,33 +164,7 @@ class ExplicitModel
 		if unit is 'degree'
 			angle = deg2rad angle
 
-
-		cos = Math.cos angle
-		sin = Math.sin angle
-
-		switch axis
-			when 'x'
-				@applyMatrix [
-					[1, 0, 0, 0]
-					[0, cos, -sin, 0]
-					[0, sin, cos, 0]
-					[0, 0, 0, 1]
-				]
-			when 'y'
-				@applyMatrix [
-					[cos, 0, sin, 0]
-					[0, 1, 0, 0]
-					[-sin, 0, cos, 0]
-					[0, 0, 0, 1]
-				]
-			when 'z'
-				@applyMatrix [
-					[cos, -sin, 0, 0]
-					[sin, cos, 0, 0]
-					[0, 0, 1, 0]
-					[0, 0, 0, 1]
-				]
-		return @
+		@applyMatrix getRotationMatrix {axis: axis, angle: angle}
 
 
 	buildFaceVertexMesh: =>
