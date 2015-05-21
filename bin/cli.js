@@ -70,6 +70,10 @@ program
 
 	.option('--build-face-vertex-mesh', 'Build a face vertex mesh from faces')
 	.option(
+	'--apply-grid-align-rotation',
+	'Rotate model with its dominant rotation angle relative to the cartesian ' +
+	'grid in order to align it to the cartesian grid')
+	.option(
 	'--grid-align-rotation-angle',
 	'Print dominant rotation angle relative to cartesian grid')
 
@@ -143,6 +147,12 @@ else {
 
 		if (program.buildFaceVertexMesh)
 			modelChain = modelChain.buildFaceVertexMesh()
+
+		if (program.applyGridAlignRotation)
+			modelChain = modelChain
+				.calculateNormals()
+				.applyGridAlignRotation()
+				.calculateNormals()
 
 
 		if (program.gridAlignRotationAngle)

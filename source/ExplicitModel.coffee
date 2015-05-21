@@ -330,45 +330,25 @@ class ExplicitModel
 		}
 
 
-
-
 	getGridAlignRotationAngle: (options) =>
 		return calculateGridAlignRotationAngle @mesh.faces, options
 
-		.map (face) ->
-			face.surfaceArea = Face.calculateSurfaceArea face
 
-			# Get rotation angle
-			rotationAngle = switch
-				when rotationAxis is 'x'
-					Math.atan2 face.normal.z, face.normal.y
-				when rotationAxis is 'y'
-					Math.atan2 face.normal.x, face.normal.z
-				when rotationAxis is 'z'
-					Math.atan2 face.normal.y, face.normal.x
+	applyGridAlignRotation: ({rotationAxis} = {}) =>
 
-			# Calculate rotation angle modulo 90 deg
-			angleModulusHalfPi = (rotationAngle + Math.PI) % (Math.PI / 2)
+		@rotate {
+			angle: - calculateGridAlignRotationAngle @mesh.faces, {
+				rotationAxis: rotationAxis
+			}
+		}
+		return @
 
-			# Convert to deg and round to nearest integer
-			face.nearestAngleInDegrees = Math.round rad2deg angleModulusHalfPi
 
-			return face
 
-		.reduce (histogram, face) ->
-			histogram[face.nearestAngleInDegrees] ?= 0
-			histogram[face.nearestAngleInDegrees] += face.surfaceArea
-			return histogram
 
-		, new Array(90)
 
-		# Return angle with the largest surface area
-		angleInDegrees = getExtremes(angleSurfaceAreaHistogram).maximum.index
 
-		if unit is 'radians' or unit is 'rad'
-			return deg2rad angleInDegrees
 
-		return angleInDegrees
 
 
 	forEachFace: (callback) ->
