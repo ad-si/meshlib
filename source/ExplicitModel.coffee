@@ -108,15 +108,23 @@ class ExplicitModel
 
 
 	translate: (vector) =>
+
+		if(Array.isArray(vector))
+			vector =
+				x: Number(vector[0])
+				y: Number(vector[1])
+				z: Number(vector[2])
+
 		@mesh.faces.forEach (face) =>
 			face.vertices.forEach (vertex) =>
 				vertex.x += vector.x || 0
 				vertex.y += vector.y || 0
 				vertex.z += vector.z || 0
+
 		return @
 
-	rotate: ({angle, axis, unit} = {}) =>
 
+	rotate: ({angle, axis, unit} = {}) =>
 		unless angle
 			return @
 
