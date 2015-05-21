@@ -36,6 +36,11 @@ program
 				return Number(numberString)
 			})
 	})
+
+	.option(
+	'--rotate <angleInDegrees>',
+	'Rotate model <angleInDegrees>˚ around 0,0')
+
 	.option(
 	'--transform <transformations>',
 	'Transform model with translate(x y z), ' +
@@ -122,6 +127,12 @@ else {
 				)
 			})
 		}
+
+		if (program.rotate)
+			modelChain = modelChain.rotate({
+				angle: program.rotate,
+				unit: 'degree'
+			})
 
 		if (program.translate)
 			modelChain = modelChain.translate(program.translate)
