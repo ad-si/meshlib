@@ -30,15 +30,41 @@ program
 
 	.option('--build-face-vertex-mesh', 'Build a face vertex mesh from faces')
 	.option('--translate <"x y z">', 'Translate model in x, y, z direction',
-	function (value) {
-		return value
+	function (string) {
+		return string
 			.split(' ')
 			.map(function (numberString) {
 				return Number(numberString)
 			})
 	})
+	.option(
+	'--transform <transformations>',
+	'Transform model with translate(x y z), ' +
+	'rotate(angleInDegrees) & scale(x y)',
+	function (string) {
+		return string
+			.split(')')
+			.slice(0,-1)
+			.map(function (transformationString) {
 
-	.usage('<input-file> [options] <output-file>')
+				var subStrings = transformationString.split('('),
+					transformation = subStrings[0].trim(),
+					values = subStrings[1].split(' ')
+
+				if (transformation === 'rotate')
+					values = {
+						angle: values,
+						unit: 'degree'
+					}
+
+				return {
+					type: transformation,
+					values: values
+				}
+			})
+	})
+
+	.usage('<input-file> [options] [output-file]')
 	.parse(process.argv)
 
 
@@ -87,6 +113,15 @@ else {
 
 		var modelChain = model,
 			indent = null
+
+		if (program.transform) {
+
+			program.transform.forEach(function (transformation) {
+				modelChain = modelChain[transformation.type](
+					transformation.values
+				)
+			})
+		}
 
 		if (program.translate)
 			modelChain = modelChain.translate(program.translate)
