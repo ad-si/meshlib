@@ -285,7 +285,7 @@ class ExplicitModel
 						newNormals.push normal
 
 				face.normal = normal
-				return face
+				return face.toObject()
 		else
 			throw new NoFacesError
 

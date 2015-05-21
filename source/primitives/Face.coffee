@@ -34,5 +34,10 @@ class Face
 	getSurfaceArea: =>
 		return calculateSurfaceArea @vertices
 
+	toObject: =>
+		return {
+			vertices: @vertices,
+			normal: @normal
+		}
 
 module.exports = Face
