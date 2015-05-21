@@ -69,6 +69,10 @@ program
 	})
 
 	.option('--build-face-vertex-mesh', 'Build a face vertex mesh from faces')
+	.option(
+	'--grid-align-rotation-angle',
+	'Print dominant rotation angle relative to cartesian grid')
+
 	.usage('<input-file> [options] [output-file]')
 	.parse(process.argv)
 
@@ -141,7 +145,15 @@ else {
 			modelChain = modelChain.buildFaceVertexMesh()
 
 
-		if (program.jsonl) {
+		if (program.gridAlignRotationAngle)
+			modelChain = modelChain
+				.calculateNormals()
+				.getGridAlignRotationAngle({unit: 'degree'})
+				.then(function (angle) {
+					console.log(angle)
+				})
+
+		else if (program.jsonl) {
 			modelChain = modelChain
 				.getStream()
 				.then(function (modelStream) {
