@@ -350,20 +350,20 @@ describe 'Meshlib', ->
 				expect(vertices).to.have.length(4)
 
 
-		it 'returns a rotation matrix to align the model
-		  to the cartesian grid', ->
-			jsonCube = loadYaml modelsMap['tetrahedron'].filePath
-			cubePromise =  meshlib(jsonCube).getGridAlignRotation()
-			expect(cubePromise).to.eventually.equal 0
+		it 'returns a rotation angle
+			to align the model to the cartesian grid', ->
+			jsonTetrahedron = loadYaml modelsMap['tetrahedron'].filePath
+			tetrahedronPromise = meshlib(jsonTetrahedron).getGridAlignRotationAngle()
+
+			expect(tetrahedronPromise).to.eventually.equal 0
 
 			jsonCube = loadYaml modelsMap['cube'].filePath
-			cubePromise =  meshlib jsonCube
+			cubePromise = meshlib jsonCube
 			.rotate {angle: 42, unit: 'degree'}
 			.calculateNormals()
-			.getGridAlignRotation {unit: 'degree'}
+			.getGridAlignRotationAngle {unit: 'degree'}
 
 			expect(cubePromise).to.eventually.equal 42
-
 
 
 	describe 'Base64', ->
@@ -411,6 +411,7 @@ describe 'Meshlib', ->
 				.fromBase64 tetrahedronBase64Array.join('|')
 				.getFaceVertexMesh()
 
+
 				expect(actual).to.eventually.equalFaceVertexMesh(faceVertexMesh)
 
 
@@ -447,7 +448,6 @@ describe 'Meshlib', ->
 
 
 		it 'multiplies a 3x1 Matrix by a 4x3 Matrix', ->
-
 			matrix = Matrix.fromRows [
 				[3, 4, 2]
 			]
@@ -463,7 +463,6 @@ describe 'Meshlib', ->
 
 
 		it 'multiplies a 1x3 Matrix by a 4x4 Matrix', ->
-
 			matrix = Matrix.fromRows [
 				[1, 0, 0, 7]
 				[0, 1, 0, 6]
@@ -486,15 +485,17 @@ describe 'Meshlib', ->
 
 
 		it 'creates a Matrix from a continuous Array', ->
-
-			matrix = Matrix.fromValues [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]
+			matrix = Matrix.fromValues [1, 0, 0, 0,
+										0, 1, 0, 0,
+										0, 0, 1, 0,
+										0, 0, 0, 1]
 
 			expect matrix.toRows()
 			.to.deep.equal [
-				[1,0,0,0]
-				[0,1,0,0]
-				[0,0,1,0]
-				[0,0,0,1]
+				[1, 0, 0, 0]
+				[0, 1, 0, 0]
+				[0, 0, 1, 0]
+				[0, 0, 0, 1]
 			]
 
 
@@ -507,7 +508,7 @@ describe 'Meshlib', ->
 				[1, 0, 0, 10],
 				[0, 1, 0, 20],
 				[0, 0, 1, 30],
-				[0, 0, 0,  1]
+				[0, 0, 0, 1]
 			]
 			.getFaces()
 			.then (faces) ->
@@ -515,9 +516,9 @@ describe 'Meshlib', ->
 
 			expect modelPromise
 			.to.eventually.deep.equal [
-				{ x: 11, y: 20, z: 30 },
-				{ x: 10, y: 21, z: 30 },
-				{ x: 10, y: 20, z: 31 }
+				{x: 11, y: 20, z: 30},
+				{x: 10, y: 21, z: 30},
+				{x: 10, y: 20, z: 31}
 			]
 
 		it 'can be rotated', ->
@@ -531,9 +532,9 @@ describe 'Meshlib', ->
 
 			expect modelPromise
 			.to.eventually.deep.equal [
-				{ x: 0.7071067811865476, y: 0.7071067811865475, z: 0 }
-				{ x: -0.7071067811865475, y: 0.7071067811865476, z: 0 }
-				{ x: 0, y: 0, z: 1 }
+				{x: 0.7071067811865476, y: 0.7071067811865475, z: 0}
+				{x: -0.7071067811865475, y: 0.7071067811865476, z: 0}
+				{x: 0, y: 0, z: 1}
 			]
 
 
