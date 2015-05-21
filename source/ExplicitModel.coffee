@@ -129,8 +129,6 @@ calculateGridAlignRotationAngle = (faces, {rotationAxis, unit} = {}) ->
 
 	, new Array(90)
 
-	console.log(angleSurfaceAreaHistogram)
-
 	# Return angle with the largest surface area
 	angleInDegrees = getExtremes(angleSurfaceAreaHistogram).maximum.index
 
