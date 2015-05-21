@@ -28,7 +28,6 @@ program
 	.option('--json', 'Print model as JSON (default for non TTY environments)')
 	.option('--jsonl', 'Print model as a newline seperated JSON stream (jsonl)')
 
-	.option('--build-face-vertex-mesh', 'Build a face vertex mesh from faces')
 	.option('--translate <"x y z">', 'Translate model in x, y, z direction',
 	function (string) {
 		return string
@@ -64,6 +63,7 @@ program
 			})
 	})
 
+	.option('--build-face-vertex-mesh', 'Build a face vertex mesh from faces')
 	.usage('<input-file> [options] [output-file]')
 	.parse(process.argv)
 
