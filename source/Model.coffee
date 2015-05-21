@@ -17,10 +17,7 @@ class Model
 		return new Model {mesh: {faces: faces}}, options
 
 	@fromBase64: (base64String) =>
-		exportModel = new Model()
-		exportModel.model = ExplicitModel.fromBase64 base64String
-		return exportModel
-
+		return Model.fromObject ExplicitModel.fromBase64 base64String
 
 	applyMatrix: (matrix) =>
 		return @next => @model.applyMatrix matrix
