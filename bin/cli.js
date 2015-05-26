@@ -81,6 +81,12 @@ program
 
 
 	.option(
+	'--grid-align-translation',
+	'Print translation matrix to align model to the cartesian grid')
+
+	.option(
+	'--apply-grid-align-translation',
+	'Align model to the cartesian grid by translating it in x and y direction')
 
 	.usage('<input-file> [options] [output-file]')
 	.parse(process.argv)
@@ -159,11 +165,24 @@ else {
 				.applyGridAlignRotation()
 				.calculateNormals()
 
+		if (program.applyGridAlignTranslation)
+			modelChain = modelChain
+				.calculateNormals()
+				.applyGridAlignTranslation()
+
 
 		if (program.gridAlignRotationAngle)
 			modelChain = modelChain
 				.calculateNormals()
 				.getGridAlignRotationAngle({unit: 'degree'})
+				.then(function (angle) {
+					console.log(angle)
+				})
+
+		else if (program.gridAlignTranslation)
+			modelChain = modelChain
+				.calculateNormals()
+				.getGridAlignTranslationMatrix()
 				.then(function (angle) {
 					console.log(angle)
 				})

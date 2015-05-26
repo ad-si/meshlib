@@ -18,6 +18,12 @@ calculateProjectionCentroid = require './helpers/calculateProjectionCentroid'
 ModelStream = require './ModelStream'
 
 
+modulo = (value1, value2) ->
+	# Work around javascript modulo bug
+	# javascript.about.com/od/problemsolving/a/modulobug.htm
+	return ((value1 % value2) + value2) % value2
+
+
 getRotationMatrix = ({axis, angle} = {}) =>
 	axis ?= 'z'
 
@@ -137,6 +143,54 @@ calculateGridAlignRotationAngle = (faces, {rotationAxis, unit} = {}) ->
 
 	return deg2rad angleInDegrees
 
+
+calculateGridAlignTranslation = ({faces, translationAxes, gridSize}) ->
+	axes = ['x', 'y', 'z']
+
+	gridSize ?= {x: 1, y: 1, z: 1}
+	translationAxes ?= ['x', 'y']
+	returnObject = {}
+
+	translationAxes.forEach (translationAxis) ->
+		invariantAxes = axes.filter (axis) ->
+			return translationAxis.indexOf(axis) < 0
+
+		offsetHistogram = faces
+		.filter (face) ->
+			return Math.abs(face.normal[invariantAxes[0]]) < 0.01 and
+					Math.abs(face.normal[invariantAxes[1]]) < 0.01
+		.map (face) ->
+			face.normal[invariantAxes[0]] =
+				modulo face.normal[translationAxis], gridSize[translationAxis]
+			return face
+
+		.map (face) ->
+			face.surfaceArea = Face.calculateSurfaceArea face
+			return face
+
+		.reduce (histogram, currentFace) ->
+
+			# Get offset in percentage of grid-size rounded to 1%
+
+			offsetPercentage = Math.round(
+				(modulo(
+					currentFace.vertices[0][translationAxis],
+					gridSize[translationAxis]
+				) / gridSize[translationAxis]) * 100
+			)
+
+			histogram[offsetPercentage] ?= 0
+			histogram[offsetPercentage] += currentFace.surfaceArea
+
+			return histogram
+
+		, new Array(100)
+
+		returnObject[translationAxis] =
+			-(gridSize[translationAxis] *
+			getExtremes(offsetHistogram).maximum.index) / 100
+
+	return returnObject
 
 # Abstracts the actual model from the external fluid api
 class ExplicitModel

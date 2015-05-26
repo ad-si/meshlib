@@ -91,6 +91,10 @@ class Model
 		return @next => @model.applyGridAlignRotation options
 
 
+	applyGridAlignTranslation: (options) =>
+		return @next => @model.applyGridAlignTranslation options
+
+
 	forEachFace: (callback) =>
 		return @next => @model.forEachFace callback
 
