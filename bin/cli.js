@@ -70,6 +70,16 @@ program
 
 	.option('--build-face-vertex-mesh', 'Build a face vertex mesh from faces')
 
+
+	.option(
+	'--centering-matrix',
+	'Print matrix to center object in x and y direction')
+
+	.option(
+	'--center',
+	'Center model in x and y direction')
+
+
 	.option(
 	'--grid-align-rotation-angle',
 	'Print dominant rotation angle relative to cartesian grid')
@@ -156,6 +166,10 @@ else {
 		if (program.translate)
 			modelChain = modelChain.translate(program.translate)
 
+		if (program.center)
+			modelChain = modelChain.center()
+
+
 		if (program.buildFaceVertexMesh)
 			modelChain = modelChain.buildFaceVertexMesh()
 
@@ -186,6 +200,11 @@ else {
 				.then(function (angle) {
 					console.log(angle)
 				})
+
+		else if (program.centeringMatrix)
+			modelChain = modelChain
+				.getCenteringMatrix()
+				.then(console.log)
 
 		else if (program.jsonl) {
 			modelChain = modelChain

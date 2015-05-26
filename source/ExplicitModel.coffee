@@ -408,6 +408,23 @@ class ExplicitModel
 		return @
 
 
+	getCenteringMatrix: () =>
+		boundingBox = @getBoundingBox {recalculate: true, source: 'faces'}
+
+		return [
+			[1, 0, 0, -(boundingBox.min.x +
+			((boundingBox.max.x - boundingBox.min.x) / 2)) ]
+			[0, 1, 0, -(boundingBox.min.y +
+			((boundingBox.max.y - boundingBox.min.y) / 2)) ]
+			[0, 0, 1, -boundingBox.min.z]
+			[0, 0, 0, 1]
+		]
+
+	center: () =>
+		@applyMatrix @getCenteringMatrix()
+		return @
+
+
 	applyGridAlignTranslation: (options = {}) =>
 		options.faces = @mesh.faces
 		@translate calculateGridAlignTranslation options
