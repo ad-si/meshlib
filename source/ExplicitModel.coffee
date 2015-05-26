@@ -353,8 +353,8 @@ class ExplicitModel
 		return @_isTwoManifold
 
 
-	getBoundingBox: ->
-		if not @_boundingBox
+	getBoundingBox: ({recalculate} = {}) ->
+		if not @_boundingBox or recalculate is true
 			@_boundingBox = calculateBoundingBox @mesh.faceVertex
 		return @_boundingBox
 
