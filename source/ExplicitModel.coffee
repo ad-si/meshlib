@@ -183,7 +183,6 @@ class ExplicitModel
 
 
 	translate: (vector) =>
-
 		if(Array.isArray(vector))
 			vector =
 				x: Number(vector[0])
@@ -335,9 +334,8 @@ class ExplicitModel
 
 
 	applyGridAlignRotation: ({rotationAxis} = {}) =>
-
 		@rotate {
-			angle: - calculateGridAlignRotationAngle @mesh.faces, {
+			angle: -calculateGridAlignRotationAngle @mesh.faces, {
 				rotationAxis: rotationAxis
 			}
 		}
