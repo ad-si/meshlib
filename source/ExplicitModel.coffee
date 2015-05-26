@@ -396,6 +396,12 @@ class ExplicitModel
 		return @
 
 
+	applyGridAlignTranslation: (options = {}) =>
+		options.faces = @mesh.faces
+		@translate calculateGridAlignTranslation options
+		return @
+
+
 
 
 
