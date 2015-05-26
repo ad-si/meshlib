@@ -69,13 +69,18 @@ program
 	})
 
 	.option('--build-face-vertex-mesh', 'Build a face vertex mesh from faces')
+
+	.option(
+	'--grid-align-rotation-angle',
+	'Print dominant rotation angle relative to cartesian grid')
+
 	.option(
 	'--apply-grid-align-rotation',
 	'Rotate model with its dominant rotation angle relative to the cartesian ' +
 	'grid in order to align it to the cartesian grid')
+
+
 	.option(
-	'--grid-align-rotation-angle',
-	'Print dominant rotation angle relative to cartesian grid')
 
 	.usage('<input-file> [options] [output-file]')
 	.parse(process.argv)
