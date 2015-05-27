@@ -370,6 +370,12 @@ class ExplicitModel
 
 		return @
 
+
+	calculateFaceSurfaceAreas: =>
+		for index in [0...@mesh.faces.length]
+			@mesh.faces[index].surfaceArea = Face.calculateSurfaceArea face
+
+
 	getSubmodels: =>
 		return geometrySplitter @mesh.faceVertex
 
