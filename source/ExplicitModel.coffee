@@ -400,6 +400,12 @@ class ExplicitModel
 		return calculateGridAlignRotationAngle options
 
 
+	getGridAlignRotationMatrix: (options = {}) =>
+		options.faces = @mesh.faces
+		rotationAngle = @getGridAlignRotationAngle options
+		return getRotationMatrix {angle: rotationAngle}
+
+
 	applyGridAlignRotation: (options = {}) =>
 		options.faces = @mesh.faces
 		@rotate {
