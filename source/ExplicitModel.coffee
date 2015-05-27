@@ -99,7 +99,7 @@ applyMatrixToPoint = (matrix, point) ->
 	return newPoint
 
 
-calculateGridAlignRotationAngle = (faces, {rotationAxis, unit} = {}) ->
+calculateGridAlignRotationAngle = ({faces, rotationAxis, unit} = {}) ->
 	unit ?= 'radian'
 	rotationAxis ?= 'z'
 
@@ -395,15 +395,15 @@ class ExplicitModel
 		}
 
 
-	getGridAlignRotationAngle: (options) =>
-		return calculateGridAlignRotationAngle @mesh.faces, options
+	getGridAlignRotationAngle: (options = {}) =>
+		options.faces = @mesh.faces
+		return calculateGridAlignRotationAngle options
 
 
-	applyGridAlignRotation: ({rotationAxis} = {}) =>
+	applyGridAlignRotation: (options = {}) =>
+		options.faces = @mesh.faces
 		@rotate {
-			angle: -calculateGridAlignRotationAngle @mesh.faces, {
-				rotationAxis: rotationAxis
-			}
+			angle: -calculateGridAlignRotationAngle options
 		}
 		return @
 
