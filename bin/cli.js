@@ -88,6 +88,10 @@ program
 	'Print dominant rotation angle relative to cartesian grid')
 
 	.option(
+	'--grid-align-rotation-matrix',
+	'Print rotation matrix which would align model to cartesian grid')
+
+	.option(
 	'--apply-grid-align-rotation',
 	'Rotate model with its dominant rotation angle relative to the cartesian ' +
 	'grid in order to align it to the cartesian grid')
@@ -160,7 +164,9 @@ else {
 	modelBuilder.on('model', function (model) {
 
 		var modelChain = model,
-			indent = null
+			indent = null,
+			listMatrix,
+			matrix
 
 		if (program.transform) {
 
@@ -226,6 +232,12 @@ else {
 				.then(function (angle) {
 					console.log(angle)
 				})
+
+		else if (program.gridAlignRotationMatrix)
+			modelChain = modelChain
+				.calculateNormals()
+				.getGridAlignRotationMatrix()
+				.then(console.log)
 
 		else if (program.gridAlignTranslation)
 			modelChain = modelChain
