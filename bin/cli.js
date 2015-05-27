@@ -166,18 +166,18 @@ else {
 		if (program.translate)
 			modelChain = modelChain.translate(program.translate)
 
-		if (program.center)
-			modelChain = modelChain.center()
-
-
 		if (program.buildFaceVertexMesh)
 			modelChain = modelChain.buildFaceVertexMesh()
+
 
 		if (program.applyGridAlignRotation)
 			modelChain = modelChain
 				.calculateNormals()
 				.applyGridAlignRotation()
 				.calculateNormals()
+
+		if (program.center)
+			modelChain = modelChain.center()
 
 		if (program.applyGridAlignTranslation)
 			modelChain = modelChain
