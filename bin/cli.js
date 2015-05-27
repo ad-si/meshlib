@@ -68,6 +68,9 @@ program
 			})
 	})
 
+	.option('--apply-matrix <matrix>', 'Applies 4x4 matrix ' +
+	'(provided as list of 16 row-major values)')
+
 	.option('--build-face-vertex-mesh', 'Build a face vertex mesh from faces')
 
 
@@ -177,6 +180,21 @@ else {
 		if (program.translate)
 			modelChain = modelChain.translate(program.translate)
 
+		if (program.applyMatrix) {
+			listMatrix = program.applyMatrix
+			.split(/\s/)
+			.map(Number)
+			.filter(Boolean)
+
+			matrix = [
+				listMatrix.slice(0, 4),
+				listMatrix.slice(4, 8),
+				listMatrix.slice(8, 12),
+				listMatrix.slice(12, 16)
+			]
+
+			modelChain = modelChain.applyMatrix(matrix)
+		}
 		if (program.buildFaceVertexMesh)
 			modelChain = modelChain.buildFaceVertexMesh()
 
