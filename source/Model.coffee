@@ -94,6 +94,9 @@ class Model
 		return @next => @model.applyGridAlignRotation options
 
 
+	getGridAlignTranslationMatrix: (options) =>
+		return @done => @model.getGridAlignTranslationMatrix options
+
 	applyGridAlignTranslation: (options) =>
 		return @next => @model.applyGridAlignTranslation options
 

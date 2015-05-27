@@ -431,13 +431,22 @@ class ExplicitModel
 		return @
 
 
+	getGridAlignTranslationMatrix: (options = {}) =>
+		options.faces = @mesh.faces
+		translation = calculateGridAlignTranslation options
+
+		return [
+			[1, 0, 0, translation.x]
+			[0, 1, 0, translation.y]
+			[0, 0, 1, 0]
+			[0, 0, 0, 1]
+		]
+
+
 	applyGridAlignTranslation: (options = {}) =>
 		options.faces = @mesh.faces
 		@translate calculateGridAlignTranslation options
 		return @
-
-
-
 
 
 
