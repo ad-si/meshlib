@@ -101,6 +101,13 @@ class Model
 		return @next => @model.applyGridAlignTranslation options
 
 
+	getAutoAlignMatrix: (options) =>
+		return @done => @model.getAutoAlignMatrix options
+
+	autoAlign: (options) =>
+		return @next => @model.autoAlign(options)
+
+
 	forEachFace: (callback) =>
 		return @next => @model.forEachFace callback
 

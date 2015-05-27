@@ -98,6 +98,17 @@ program
 	'--apply-grid-align-translation',
 	'Align model to the cartesian grid by translating it in x and y direction')
 
+
+	.option(
+	'--auto-align-matrix',
+	'Print transformation matrix to rotate, center and align ' +
+	'model to the cartesian grid')
+
+	.option(
+	'--auto-align',
+	'Automatically rotate, center and align model to the cartesian grid')
+
+
 	.usage('<input-file> [options] [output-file]')
 	.parse(process.argv)
 
@@ -184,6 +195,11 @@ else {
 				.calculateNormals()
 				.applyGridAlignTranslation()
 
+		if (program.autoAlign)
+			modelChain = modelChain
+				.calculateNormals()
+				.autoAlign()
+
 
 		if (program.gridAlignRotationAngle)
 			modelChain = modelChain
@@ -204,6 +220,12 @@ else {
 		else if (program.centeringMatrix)
 			modelChain = modelChain
 				.getCenteringMatrix()
+				.then(console.log)
+
+		else if (program.autoAlignMatrix)
+			modelChain = modelChain
+				.calculateNormals()
+				.getAutoAlignMatrix()
 				.then(console.log)
 
 		else if (program.jsonl) {

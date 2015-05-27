@@ -192,6 +192,32 @@ calculateGridAlignTranslation = ({faces, translationAxes, gridSize}) ->
 
 	return returnObject
 
+
+calculateAutoAlignMatrix = ({model, rotationAxis} = {}) ->
+	rotationAxis ?= 'z'
+
+	transformations = []
+
+	rotationAngle = calculateGridAlignRotationAngle {
+		faces: model.mesh.faces,
+		rotationAxis: rotationAxis
+	}
+	transformations.unshift getRotationMatrix {
+		angle: -rotationAngle
+	}
+	model.rotate {angle: -rotationAngle}
+
+	centeringMatrix = model.getCenteringMatrix()
+	transformations.unshift centeringMatrix
+	model.applyMatrix centeringMatrix
+
+	gridAlignTranslationMatrix = model.getGridAlignTranslationMatrix()
+	transformations.unshift gridAlignTranslationMatrix
+
+	return transformations.reduce (previous, current) ->
+		return Matrix.multiply previous, current
+
+
 # Abstracts the actual model from the external fluid api
 class ExplicitModel
 	constructor: (@mesh, @options) ->
@@ -449,7 +475,12 @@ class ExplicitModel
 		return @
 
 
+	getAutoAlignMatrix: () ->
+		return calculateAutoAlignMatrix @clone()
 
+	autoAlign: (options = {}) ->
+		options.model ?= @clone()
+		@applyMatrix calculateAutoAlignMatrix options
 
 
 
