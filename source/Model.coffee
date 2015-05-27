@@ -101,6 +101,13 @@ class Model
 		return @next => @model.applyGridAlignTranslation options
 
 
+	getCenteringMatrix: (options) =>
+		return @done => @model.getCenteringMatrix options
+
+	center: (options) =>
+		return @next => @model.center options
+
+
 	getAutoAlignMatrix: (options) =>
 		return @done => @model.getAutoAlignMatrix options
 
