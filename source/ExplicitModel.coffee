@@ -484,11 +484,6 @@ class ExplicitModel
 	getAutoAlignMatrix: () ->
 		return calculateAutoAlignMatrix @clone()
 
-	autoAlign: (options = {}) ->
-		options.model ?= @clone()
-		@applyMatrix calculateAutoAlignMatrix options
-
-
 
 	forEachFace: (callback) ->
 		coordinates = @mesh.faceVertex.vertexCoordinates

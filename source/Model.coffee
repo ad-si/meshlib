@@ -111,8 +111,13 @@ class Model
 	getAutoAlignMatrix: (options) =>
 		return @done => @model.getAutoAlignMatrix options
 
-	autoAlign: (options) =>
-		return @next => @model.autoAlign(options)
+	autoAlign: ({gridSize} = {}) =>
+		return @next => @model
+			.applyGridAlignRotation()
+			.center()
+			.applyGridAlignTranslation {
+				gridSize
+			}
 
 
 	forEachFace: (callback) =>
