@@ -417,16 +417,6 @@ class ExplicitModel
 		return @mesh.faces[faceIndex]
 
 
-	getModificationInvariantTranslation: =>
-		centroid = calculateProjectionCentroid @getFaceWithLargestProjection()
-
-		return {
-		x: -centroid.x
-		y: -centroid.y
-		z: -@getBoundingBox().min.z
-		}
-
-
 	getGridAlignRotationAngle: (options = {}) =>
 		options.faces = @mesh.faces
 		return calculateGridAlignRotationAngle options

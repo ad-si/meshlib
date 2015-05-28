@@ -169,33 +169,18 @@ describe 'Meshlib', ->
 		]
 
 
-	describe 'Modification Invariant Translation', ->
-		it 'calculates the centroid of a face-projection', ->
-			expect calculateProjectionCentroid {
-				vertices: [
-					{x: 0, y: 0, z: 0}
-					{x: 2, y: 0, z: 0}
-					{x: 0, y: 2, z: 0}
-				]
-			}
-			.to.deep.equal {
-				x: 0.6666666666666666
-				y: 0.6666666666666666
-			}
-
-		it 'returns a modification invariant translation matrix', ->
-			jsonModel = loadYaml modelsMap['tetrahedron'].filePath
-
-			modelPromise = meshlib jsonModel
-			.translate {z: 1}
-			.buildFaceVertexMesh()
-			.getModificationInvariantTranslation()
-
-			return expect(modelPromise).to.eventually.deep.equal {
-				x: -0.3333333333333333
-				y: -0.3333333333333333
-				z: -1
-			}
+	it 'calculates the centroid of a face-projection', ->
+		expect calculateProjectionCentroid {
+			vertices: [
+				{x: 0, y: 0, z: 0}
+				{x: 2, y: 0, z: 0}
+				{x: 0, y: 2, z: 0}
+			]
+		}
+		.to.deep.equal {
+			x: 0.6666666666666666
+			y: 0.6666666666666666
+		}
 
 
 	describe 'Two-Manifold Test', ->
@@ -536,5 +521,3 @@ describe 'Meshlib', ->
 				{x: -0.7071067811865475, y: 0.7071067811865476, z: 0}
 				{x: 0, y: 0, z: 1}
 			]
-
-

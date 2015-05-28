@@ -80,9 +80,6 @@ class Model
 	getFaceWithLargestProjection: =>
 		return @done => @model.getFaceWithLargestProjection()
 
-	getModificationInvariantTranslation: =>
-		return @done => @model.getModificationInvariantTranslation()
-
 
 	getGridAlignRotationAngle: (options) =>
 		return @done => @model.getGridAlignRotationAngle options
