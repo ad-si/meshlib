@@ -24,7 +24,7 @@ modulo = (value1, value2) ->
 	return ((value1 % value2) + value2) % value2
 
 
-getRotationMatrix = ({axis, angle} = {}) =>
+getRotationMatrix = ({axis, angle} = {}) ->
 	axis ?= 'z'
 
 	cos = Math.cos angle
@@ -269,8 +269,8 @@ class ExplicitModel
 				y: Number(vector[1])
 				z: Number(vector[2])
 
-		@mesh.faces.forEach (face) =>
-			face.vertices.forEach (vertex) =>
+		@mesh.faces.forEach (face) ->
+			face.vertices.forEach (vertex) ->
 				vertex.x += vector.x || 0
 				vertex.y += vector.y || 0
 				vertex.z += vector.z || 0

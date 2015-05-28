@@ -7,16 +7,16 @@ class Model
 			@model = new ExplicitModel mesh, options
 		return @
 
-	@fromObject: (object, options) =>
+	@fromObject: (object, options) ->
 		return new Model object.mesh, options
 		.setName object.name
 		.setFileName object.fileName
 		.setFaceCount object.faceCount
 
-	@fromFaces: (faces, options) =>
+	@fromFaces: (faces, options) ->
 		return new Model {mesh: {faces: faces}}, options
 
-	@fromBase64: (base64String) =>
+	@fromBase64: (base64String) ->
 		return Model.fromObject ExplicitModel.fromBase64 base64String
 
 	applyMatrix: (matrix) =>
