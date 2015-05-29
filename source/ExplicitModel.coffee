@@ -193,8 +193,8 @@ calculateGridAlignTranslation = ({faces, translationAxes, gridSize}) ->
 	return returnObject
 
 
-calculateAutoAlignMatrix = ({model, rotationAxis} = {}) ->
-	rotationAxis ?= 'z'
+calculateAutoAlignMatrix = (model) ->
+	rotationAxis = 'z'
 
 	transformations = []
 
