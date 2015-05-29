@@ -199,7 +199,7 @@ calculateAutoAlignMatrix = ({model, rotationAxis} = {}) ->
 	transformations = []
 
 	rotationAngle = calculateGridAlignRotationAngle {
-		faces: model.mesh.faces,
+		faces: model.mesh.faces
 		rotationAxis: rotationAxis
 	}
 	transformations.unshift getRotationMatrix {
