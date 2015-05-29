@@ -1,10 +1,10 @@
-clone = require 'clone'
 deg2rad = require 'deg2rad'
 rad2deg = require 'rad2deg'
 
 Vector = require './primitives/Vector'
 Face = require './primitives/Face'
 Matrix = require './primitives/Matrix'
+fastClone = require './helpers/fastClone'
 geometrySplitter = require './helpers/separateGeometry'
 buildFaceVertexMesh = require './helpers/buildFaceVertexMesh'
 buildFacesFromFaceVertexMesh = require './helpers/buildFacesFromFaceVertexMesh'
@@ -244,9 +244,9 @@ class ExplicitModel
 	clone: () =>
 		modelClone = new ExplicitModel()
 
-		modelClone.mesh = clone @mesh
-		modelClone.transformations = clone @transformations
-		modelClone.options = clone @options
+		modelClone.mesh = fastClone @mesh
+		modelClone.transformations = fastClone @transformations
+		modelClone.options = fastClone @options
 		modelClone.name = @name
 		modelClone.fileName = @fileName
 		modelClone.faceCount = @faceCount
