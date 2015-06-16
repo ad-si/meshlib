@@ -343,27 +343,22 @@ class ExplicitModel
 
 
 	calculateNormals: =>
-		newNormals = []
-
 		if @mesh.faces
 			@mesh.faces = @mesh.faces.map (face) ->
 				face = Face.fromVertexArray face.vertices
 
-				d1 = Vector.fromObject(face.vertices[1]).minus (
-					Vector.fromObject face.vertices[0]
-				)
-				d2 = Vector.fromObject(face.vertices[2]).minus (
-					Vector.fromObject face.vertices[0]
-				)
-				normal = d1.crossProduct d2
-				normal = normal.normalized()
+				delta1 = Vector
+					.fromObject face.vertices[1]
+					.minus Vector.fromObject face.vertices[0]
 
-				if face.normal?
-					distance = face.normal.euclideanDistanceTo normal
-					if distance > 0.001
-						newNormals.push normal
+				delta2 = Vector
+					.fromObject face.vertices[2]
+					.minus Vector.fromObject face.vertices[0]
 
-				face.normal = normal
+				face.normal = delta1
+					.crossProduct delta2
+					.normalized()
+
 				return face.toObject()
 		else
 			throw new NoFacesError
