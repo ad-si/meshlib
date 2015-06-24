@@ -1,173 +1,120 @@
-# creates an standalone optimized model from an equivalence class and an
-# existing optimized model
-# TODO needs to be tested
-createModelFromEquivalenceClass = (equivalenceClass, faceVertexMesh) ->
-	nextPointIndex = 0
-	polyTranslationTable = {}
-
-	model = {
-		vertexCoordinates: []
-		vertexNormalCoordinates: []
-		faceNormalCoordinates: []
-		faceVertexIndices: []
-	}
-
-	# inserts a point into the new model,
-	# adjust the id to prevent undefined position entries
-	insertPoint = (currentId) ->
-		if not polyTranslationTable[currentId]?
-			polyTranslationTable[currentId] = nextPointIndex
-			nextPointIndex++
-			model.vertexCoordinates.push(
-				faceVertexMesh.vertexCoordinates[currentId * 3]
-			)
-			model.vertexCoordinates.push(
-				faceVertexMesh.vertexCoordinates[currentId * 3 + 1]
-			)
-			model.vertexCoordinates.push(
-				faceVertexMesh.vertexCoordinates[currentId * 3 + 2]
-			)
-			model.vertexNormalCoordinates.push(
-				faceVertexMesh.vertexNormalCoordinates[currentId * 3]
-			)
-			model.vertexNormalCoordinates.push(
-				faceVertexMesh.vertexNormalCoordinates[currentId * 3 + 1]
-			)
-			model.vertexNormalCoordinates.push(
-				faceVertexMesh.vertexNormalCoordinates[currentId * 3 + 2]
-			)
-
-		return polyTranslationTable[currentId]
-
-	equivalenceClass.faces.enumerate (pi) ->
-		p0 = faceVertexMesh.faceVertexIndices[pi * 3]
-		p1 = faceVertexMesh.faceVertexIndices[pi * 3 + 1]
-		p2 = faceVertexMesh.faceVertexIndices[pi * 3 + 2]
-
-		p0n = insertPoint p0
-		p1n = insertPoint p1
-		p2n = insertPoint p2
-
-		model.faceVertexIndices.push p0n
-		model.faceVertexIndices.push p1n
-		model.faceVertexIndices.push p2n
-		model.faceNormalCoordinates.push faceVertexMesh.faceNormalCoordinates[pi * 3]
-		model.faceNormalCoordinates.push faceVertexMesh.faceNormalCoordinates[pi * 3 + 1]
-		model.faceNormalCoordinates.push faceVertexMesh.faceNormalCoordinates[pi * 3 + 2]
-
-	return model
-
-# returns an array of equivalence classes. each equivalence class
-# represents several faces that share points. if the model has
-# several equivalence classes, it contains several geometries
-# that are not connected to each other
-createEquivalenceClasses = (faceVertexMesh) ->
-	equivalenceClasses = []
-
-	for faceIndex in [0..faceVertexMesh.faceVertexIndices.length - 1] by 3
-		poly = {
-			index: faceIndex / 3
-			p0: faceVertexMesh.faceVertexIndices[faceIndex]
-			p1: faceVertexMesh.faceVertexIndices[faceIndex + 1]
-			p2: faceVertexMesh.faceVertexIndices[faceIndex + 2]
-		}
-
-		connectedClasses = []
-
-		for eq in equivalenceClasses
-			if eq.points.exists(poly.p0) or
-			  eq.points.exists(poly.p1) or eq.points.exists(poly.p2)
-				eq.points.push poly.p0
-				eq.points.push poly.p1
-				eq.points.push poly.p2
-				eq.faces.push poly.index
-				connectedClasses.push eq
-
-		if connectedClasses.length == 0
-			# no connected classes? add an additional
-			# equivalence class because this is
-			# unconnected geometry
-			eq = {
-				points: new Hashmap()
-				faces: new Hashmap()
-			}
-			eq.points.push poly.p0
-			eq.points.push poly.p1
-			eq.points.push poly.p2
-			eq.faces.push poly.index
-			equivalenceClasses.push eq
-
-		else if connectedClasses.length > 1
-			# this face belongs to more than one class. therefore,
-			# all of these classes are equal. compact to one class
-			# (existing classes are emptied)
-			combined = compactClasses connectedClasses
-			equivalenceClasses.push combined
-			equivalenceClasses = equivalenceClasses.filter (a) ->
-				a.points.length > 0
-
-	return equivalenceClasses
-
-# Merge all points and polgons into one equivalence class
-compactClasses = (equivalenceClasses) ->
-	newClass = {
-		points: new Hashmap()
-		faces: new Hashmap()
-	}
-
-	for eq in equivalenceClasses
-		# add points and faces to new class. The hashmap
-		# automatically prevents inserting duplicate values
-		eq.points.enumerate (point) ->
-			newClass.points.push point
-
-		eq.faces.enumerate (face) ->
-			newClass.faces.push face
-
-		# clear old class
-		eq.points = new Hashmap()
-		eq.faces = new Hashmap()
-
-	return newClass
-
-
-# not really a true hashmap, but something that stores
-# numbers and can say whether it contains a certain number very efficiently
-class Hashmap
-	constructor: ->
-		@length = 0
-		@_enumarray = []
-		@_existsarray = []
-
-	push: (number) =>
-		if not @_existsarray[number]
-			@length++
-			@_existsarray[number] = true
-			@_enumarray.push number
-
-	exists: (number) =>
-		if @_existsarray[number]?
-			return true
-		return false
-
-	enumerate: (callback) =>
-		for i in [0..@_enumarray.length - 1] by 1
-			callback @_enumarray[i]
-
-
-# Takes an optimized model and looks for connected geometry
-# returns a list of optimized models if the original model
+# Takes a face-vertex-mesh and looks for connected geometry
+# returns a list of face-vertex meshes if the original mesh
 # contains several geometries (-> connected faces) that
 # have no connection between each other
 
 module.exports = (faceVertexMesh) ->
-	models = []
-	equivalenceClasses = createEquivalenceClasses faceVertexMesh
+	vertexLabels = labelVertices faceVertexMesh
 
-	if equivalenceClasses.length is 1
-		models.push faceVertexMesh
-	else
-		for eq in equivalenceClasses
-			models.push createModelFromEquivalenceClass eq, faceVertexMesh
+	meshes = buildMeshes faceVertexMesh, vertexLabels
 
-	return models
+	return meshes
+
+
+labelVertices = ({vertexCoordinates, faceVertexIndices}) ->
+	# Each vertex (there are numberOfVertices / 3) needs a label
+	vertexLabels = new Array vertexCoordinates.length / 3
+	# Each label belongs to a equivalence class: labelTable[label] = eqClass
+	labelTable = []
+
+	# For all faces
+	for faceStart in [0...faceVertexIndices.length] by 3
+
+		# Read vertex indices for current face
+		indices = [0, 1, 2].map (o) -> faceVertexIndices[faceStart + o]
+
+		# Collect all defined labels of those vertices
+		labels = [0, 1, 2]
+			.map (o) -> vertexLabels[indices[o]]
+			.filter (l) -> l?
+
+		if labels.length is 0
+			# Introduce a new label if all vertices are unlabeled so far
+			label = labelTable.length
+			# The label is currently the only member of a new equivalence class
+			labelTable[label] = label
+		else
+			# Use the equivalence class of the first label as label for all vertices
+			label = labelTable[labels.pop()]
+
+		# Set the vertices of this face to the selected label
+		# (might have been undefined before)
+		[0, 1, 2].forEach (o) -> vertexLabels[indices[o]] = label
+
+		# Mark labels as merged in equivalence table
+		# All outdated labels...
+		labels.forEach (mergeLabel) ->
+			# ...in the whole equivalence table...
+			labelTable.forEach (val, i) ->
+				# ...are to be replaced by the label of the equivalence class.
+				labelTable[i] = label if val is mergeLabel
+
+	# Apply equivalence table and return the final per-vertex label table
+	return vertexLabels.map (label) -> labelTable[label]
+
+
+buildMeshes = (faceVertexMesh, vertexLabels) ->
+	{
+	vertexCoordinates
+	faceVertexIndices
+	vertexNormalCoordinates
+	faceNormalCoordinates
+	} = faceVertexMesh
+
+	# For each equivalence class, a new face-vertex-mesh has to be created
+	meshes = {}
+	# The indices in the old mesh do not (necessarily) match the indices in the
+	# new mesh -> we have do apply a mapping
+	indexMapping = {}
+
+	# Move the vertices and their normals to their respective new mesh
+	for label, i in vertexLabels
+		# Create mesh data structure for the label if not already present
+		unless meshes[label]?
+			meshes[label] = {
+				vertexCoordinates: []
+				faceVertexIndices: []
+				vertexNormalCoordinates: []
+				faceNormalCoordinates: []
+			}
+			indexMapping[label] = {}
+
+		# Select this mesh for insertion
+		mesh = meshes[label]
+		mapping = indexMapping[label]
+
+		# Store where the vertex will be in the new mesh, mapped to its old index
+		mapping[i] = mesh.vertexCoordinates.length / 3
+
+		# Copy the coordinates of the vertex to the new mesh
+		mesh.vertexCoordinates.push vertexCoordinates[i * 3]
+		mesh.vertexCoordinates.push vertexCoordinates[i * 3 + 1]
+		mesh.vertexCoordinates.push vertexCoordinates[i * 3 + 2]
+
+		# Copy the normal of the vertex to the new mesh
+		mesh.vertexNormalCoordinates.push vertexNormalCoordinates[i * 3]
+		mesh.vertexNormalCoordinates.push vertexNormalCoordinates[i * 3 + 1]
+		mesh.vertexNormalCoordinates.push vertexNormalCoordinates[i * 3 + 2]
+
+	# Move the faces and their normals to their respective new meshes
+	for faceStart in [0...faceVertexIndices.length] by 3
+		# Find out, which mesh the face belongs to
+		label = vertexLabels[faceVertexIndices[faceStart]]
+
+		# Select this mesh for insertion
+		mesh = meshes[label]
+		mapping = indexMapping[label]
+
+		# Insert the vertex indices of this face
+		mesh.faceVertexIndices.push mapping[faceVertexIndices[faceStart]]
+		mesh.faceVertexIndices.push mapping[faceVertexIndices[faceStart + 1]]
+		mesh.faceVertexIndices.push mapping[faceVertexIndices[faceStart + 2]]
+
+		# Insert the face normal of this face
+		mesh.faceNormalCoordinates.push faceNormalCoordinates[faceStart]
+		mesh.faceNormalCoordinates.push faceNormalCoordinates[faceStart + 1]
+		mesh.faceNormalCoordinates.push faceNormalCoordinates[faceStart + 2]
+
+	# Convert the mesh map to a plain array (we don't need labels any more)
+	# and return the final array of separated meshes
+	return (mesh for label, mesh of meshes)
