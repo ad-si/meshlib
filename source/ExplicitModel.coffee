@@ -193,7 +193,7 @@ calculateGridAlignTranslation = ({faces, translationAxes, gridSize}) ->
 	return returnObject
 
 
-calculateAutoAlignMatrix = (model) ->
+calculateAutoAlignMatrix = (model, options = {}) ->
 	rotationAxis = 'z'
 
 	transformations = []
@@ -211,7 +211,7 @@ calculateAutoAlignMatrix = (model) ->
 	transformations.unshift centeringMatrix
 	model.applyMatrix centeringMatrix
 
-	gridAlignTranslationMatrix = model.getGridAlignTranslationMatrix()
+	gridAlignTranslationMatrix = model.getGridAlignTranslationMatrix options
 	transformations.unshift gridAlignTranslationMatrix
 
 	return transformations.reduce (previous, current) ->
@@ -466,8 +466,8 @@ class ExplicitModel
 		return @
 
 
-	getAutoAlignMatrix: () ->
-		return calculateAutoAlignMatrix @clone()
+	getAutoAlignMatrix: (options = {}) ->
+		return calculateAutoAlignMatrix @clone(), options
 
 
 	forEachFace: (callback) ->
@@ -518,7 +518,7 @@ class ExplicitModel
 
 	toJSON: @toObject
 
-	getStream: (options) =>
+	getStream: (options = {}) =>
 		return new ModelStream {
 			name: @name
 			fileName: @fileName
