@@ -1,7 +1,4 @@
-fs = require 'fs'
-path = require 'path'
 chai = require 'chai'
-yaml = require 'js-yaml'
 
 ExplicitModel = require '../source/ExplicitModel'
 meshlib = require '../source/index'
@@ -19,32 +16,7 @@ chai.use require './chaiHelper'
 chai.use require 'chai-as-promised'
 expect = chai.expect
 
-loadYaml = (path) ->
-	return yaml.safeLoad fs.readFileSync path
-
-generateMap = (collection) ->
-	return collection.reduce (previous, current, index) ->
-		previous[current.name] = models[index]
-		return previous
-	, {}
-
-
-models = [
-	'cube'
-	'tetrahedron'
-	'tetrahedronIrregular'
-	'tetrahedrons'
-	'missingFace'
-].map (model) ->
-	return {
-	name: model
-	filePath: path.join(
-		__dirname, 'models/', model + '.yaml'
-	)
-	}
-
-modelsMap = generateMap models
-
+models = require './models/models'
 
 checkEquality = (dataFromAscii, dataFromBinary, arrayName) ->
 	fromAscii = dataFromAscii[arrayName].map (position) -> Math.round position
@@ -55,7 +27,7 @@ checkEquality = (dataFromAscii, dataFromBinary, arrayName) ->
 
 describe 'Meshlib', ->
 	it 'returns a model object', ->
-		jsonModel = loadYaml modelsMap['cube'].filePath
+		jsonModel = models['cube'].load()
 
 		modelPromise = meshlib jsonModel
 		.done (model) -> model
@@ -64,7 +36,7 @@ describe 'Meshlib', ->
 
 
 	it 'creates a face-vertex mesh', ->
-		jsonModel = loadYaml modelsMap['cube'].filePath
+		jsonModel = models['cube'].load()
 
 		modelPromise = meshlib jsonModel
 		.buildFaceVertexMesh()
@@ -74,7 +46,7 @@ describe 'Meshlib', ->
 
 
 	it 'builds faces from face vertex mesh', ->
-		jsonModel = loadYaml modelsMap['tetrahedron'].filePath
+		jsonModel = models['tetrahedron'].load()
 
 		modelPromise = meshlib jsonModel
 		.buildFaceVertexMesh()
@@ -86,12 +58,12 @@ describe 'Meshlib', ->
 
 		return expect(modelPromise)
 		.to.eventually.deep.equal(
-			loadYaml(modelsMap['tetrahedron'].filePath).faces
+			models['tetrahedron'].load().faces
 		)
 
 
 	it 'calculates face-normals', ->
-		jsonModel = loadYaml modelsMap['cube'].filePath
+		jsonModel = models['cube'].load()
 
 		jsonModel.faces.forEach (face) ->
 			delete face.normal
@@ -104,7 +76,7 @@ describe 'Meshlib', ->
 
 
 	it 'returns a clone', (done) ->
-		jsonModel = loadYaml modelsMap['cube'].filePath
+		jsonModel = models['cube'].load()
 
 		model = meshlib jsonModel
 
@@ -124,7 +96,7 @@ describe 'Meshlib', ->
 
 
 	it 'extracts individual geometries to submodels', ->
-		jsonModel = loadYaml modelsMap['tetrahedrons'].filePath
+		jsonModel = models['tetrahedrons'].load()
 
 		modelPromise = meshlib jsonModel
 		.buildFaceVertexMesh()
@@ -135,7 +107,7 @@ describe 'Meshlib', ->
 
 
 	it 'returns a JSON representation of the model', ->
-		jsonModel = loadYaml modelsMap['cube'].filePath
+		jsonModel = models['cube'].load()
 
 		modelPromise = meshlib jsonModel
 		.getJSON()
@@ -144,7 +116,7 @@ describe 'Meshlib', ->
 
 
 	it 'returns a javascript object representing the model', ->
-		jsonModel = loadYaml modelsMap['cube'].filePath
+		jsonModel = models['cube'].load()
 
 		modelPromise = meshlib jsonModel
 		.getObject()
@@ -154,7 +126,7 @@ describe 'Meshlib', ->
 
 
 	it 'translates a model', ->
-		jsonModel = loadYaml modelsMap['tetrahedron'].filePath
+		jsonModel = models['tetrahedron'].load()
 
 		modelPromise = meshlib jsonModel
 		.translate {x: 1, y: 1, z: 1}
@@ -185,7 +157,7 @@ describe 'Meshlib', ->
 
 	describe 'Two-Manifold Test', ->
 		it 'recognizes that model is two-manifold', ->
-			jsonModel = loadYaml modelsMap['tetrahedron'].filePath
+			jsonModel = models['tetrahedron'].load()
 
 			modelPromise = meshlib jsonModel
 			.buildFaceVertexMesh()
@@ -195,7 +167,7 @@ describe 'Meshlib', ->
 
 
 		it 'recognizes that model is not two-manifold', ->
-			jsonModel = loadYaml modelsMap['missingFace'].filePath
+			jsonModel = models['missingFace'].load()
 
 			modelPromise = meshlib jsonModel
 			.buildFaceVertexMesh()
@@ -206,7 +178,7 @@ describe 'Meshlib', ->
 
 	describe 'calculateBoundingBox', ->
 		it 'calculates the bounding box of a tetrahedron', ->
-			jsonTetrahedron = loadYaml modelsMap['tetrahedron'].filePath
+			jsonTetrahedron = models['tetrahedron'].load()
 
 			modelPromise = meshlib jsonTetrahedron
 			.buildFaceVertexMesh()
@@ -219,7 +191,7 @@ describe 'Meshlib', ->
 
 
 		it 'calculates the bounding box of a cube', ->
-			jsonCube = loadYaml modelsMap['cube'].filePath
+			jsonCube = models['cube'].load()
 
 			modelPromise = meshlib jsonCube
 			.buildFaceVertexMesh()
@@ -246,7 +218,7 @@ describe 'Meshlib', ->
 			expect(surfaceArea).to.equal Math.SQRT2 / 2
 
 		it 'returns all faces', ->
-			jsonTetrahedron = loadYaml modelsMap['tetrahedron'].filePath
+			jsonTetrahedron = models['tetrahedron'].load()
 
 			modelPromise = meshlib jsonTetrahedron
 			.getFaces()
@@ -256,7 +228,7 @@ describe 'Meshlib', ->
 
 
 		it 'returns all faces which are orthogonal to the xy-plane', ->
-			jsonTetrahedron = loadYaml modelsMap['tetrahedron'].filePath
+			jsonTetrahedron = models['tetrahedron'].load()
 
 			modelPromise = meshlib jsonTetrahedron
 			.getFaces {
@@ -305,9 +277,7 @@ describe 'Meshlib', ->
 
 
 		it 'retrieves the face with the largest xy-projection', ->
-			jsonTetrahedron = loadYaml(
-				modelsMap['tetrahedronIrregular'].filePath
-			)
+			jsonTetrahedron = models['tetrahedronIrregular'].load()
 
 			modelPromise = meshlib jsonTetrahedron
 			.getFaceWithLargestProjection()
@@ -324,7 +294,7 @@ describe 'Meshlib', ->
 
 
 		it 'iterates over all faces in the face-vertex-mesh', ->
-			jsonTetrahedron = loadYaml modelsMap['tetrahedron'].filePath
+			jsonTetrahedron = models['tetrahedron'].load()
 			vertices = []
 
 			return meshlib jsonTetrahedron
@@ -337,12 +307,12 @@ describe 'Meshlib', ->
 
 		it 'returns a rotation angle
 			to align the model to the cartesian grid', ->
-			jsonTetrahedron = loadYaml modelsMap['tetrahedron'].filePath
+			jsonTetrahedron = models['tetrahedron'].load()
 			tetrahedronPromise = meshlib(jsonTetrahedron).getGridAlignRotationAngle()
 
 			expect(tetrahedronPromise).to.eventually.equal 0
 
-			jsonCube = loadYaml modelsMap['cube'].filePath
+			jsonCube = models['cube'].load()
 			cubePromise = meshlib jsonCube
 			.rotate {angle: 42, unit: 'degree'}
 			.calculateNormals()
@@ -371,8 +341,8 @@ describe 'Meshlib', ->
 
 
 		it 'exports model to base64 representation', ->
-			model = modelsMap['tetrahedron']
-			jsonTetrahedron = loadYaml model.filePath
+			model = models['tetrahedron']
+			jsonTetrahedron = model.load()
 
 			modelPromise = meshlib jsonTetrahedron
 			.setName model.name
@@ -385,7 +355,7 @@ describe 'Meshlib', ->
 
 
 		it 'creates model from base64 representation', ->
-			jsonTetrahedron = loadYaml modelsMap['tetrahedron'].filePath
+			jsonTetrahedron = models['tetrahedron'].load()
 
 			return meshlib jsonTetrahedron
 			.buildFaceVertexMesh()
@@ -486,7 +456,7 @@ describe 'Meshlib', ->
 
 	describe 'Transformations', ->
 		it 'can be transformed by applying a matrix', ->
-			jsonModel = loadYaml modelsMap['tetrahedron'].filePath
+			jsonModel = models['tetrahedron'].load()
 
 			modelPromise = meshlib jsonModel
 			.applyMatrix [
@@ -507,7 +477,7 @@ describe 'Meshlib', ->
 			]
 
 		it 'can be rotated', ->
-			jsonModel = loadYaml modelsMap['tetrahedron'].filePath
+			jsonModel = models['tetrahedron'].load()
 
 			modelPromise = meshlib jsonModel
 			.rotate {angle: 45, unit: 'degree'}
