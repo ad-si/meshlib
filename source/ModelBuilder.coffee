@@ -23,7 +23,8 @@ class ModelBuilder extends stream.Writable
 			@modelObject.name = chunk.name
 			if chunk.faceCount
 				@modelObject.faceCount = chunk.faceCount
-		else
+
+		else if chunk.vertices or chunk.normal
 			@modelObject.mesh.faces.push chunk
 
 		callback()
