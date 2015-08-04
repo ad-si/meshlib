@@ -87,6 +87,9 @@ class Model
 	getGridAlignRotationMatrix: (options) =>
 		return @done => @model.getGridAlignRotationMatrix options
 
+	getGridAlignRotationHistogram: (options) =>
+		return @done => @model.getGridAlignRotationHistogram options
+
 	applyGridAlignRotation: (options) =>
 		return @next => @model.applyGridAlignRotation options
 

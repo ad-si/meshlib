@@ -99,9 +99,21 @@ applyMatrixToPoint = (matrix, point) ->
 	return newPoint
 
 
-calculateGridAlignRotationAngle = ({faces, rotationAxis, unit} = {}) ->
+calculateGridAlignRotationAngle = (
+	{
+		faces
+		rotationAxis
+		unit
+		histogram
+	} = {}
+) ->
 	unit ?= 'radian'
 	rotationAxis ?= 'z'
+
+	reduceToHistorgram = (histogram, face) ->
+		histogram[face.nearestAngleInDegrees] ?= 0
+		histogram[face.nearestAngleInDegrees] += face.surfaceArea
+		return histogram
 
 	angleSurfaceAreaHistogram = faces
 	.filter (face) ->
@@ -128,12 +140,10 @@ calculateGridAlignRotationAngle = ({faces, rotationAxis, unit} = {}) ->
 
 		return face
 
-	.reduce (histogram, face) ->
-		histogram[face.nearestAngleInDegrees] ?= 0
-		histogram[face.nearestAngleInDegrees] += face.surfaceArea
-		return histogram
+	.reduce reduceToHistorgram, new Array(90)
 
-	, new Array(90)
+	if (histogram)
+		return angleSurfaceAreaHistogram
 
 	# Return angle with the largest surface area
 	angleInDegrees = getExtremes(angleSurfaceAreaHistogram).maximum.index
@@ -421,6 +431,15 @@ class ExplicitModel
 		options.faces = @mesh.faces
 		rotationAngle = @getGridAlignRotationAngle options
 		return getRotationMatrix {angle: rotationAngle}
+
+
+	getGridAlignRotationHistogram: (options = {}) =>
+		options.faces = @mesh.faces
+		options.histogram = true
+		histogram = calculateGridAlignRotationAngle options
+
+		return (index + '\t' + (value or 0) for value, index in histogram)
+			.join '\n'
 
 
 	applyGridAlignRotation: (options = {}) =>

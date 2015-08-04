@@ -321,6 +321,23 @@ describe 'Meshlib', ->
 			expect(cubePromise).to.eventually.equal 42
 
 
+		it 'returns a histogram
+			with the surface area for each rotation angle', ->
+			jsonCube = models['cube'].load()
+			cubePromise = meshlib jsonCube
+				.rotate {angle: 42, unit: 'degree'}
+				.calculateNormals()
+				.getGridAlignRotationHistogram()
+			expectedArray = new Array(90)
+			expectedArray[42] = 16
+
+			expectedArray =
+				(index + '\t' + (value or 0) for value, index in expectedArray)
+
+			expect(cubePromise)
+			.to.eventually.deep.equal expectedArray.join '\n'
+
+
 	describe 'Base64', ->
 		tetrahedronBase64Array = [
 			# vertexCoordinates

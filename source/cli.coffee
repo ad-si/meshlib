@@ -80,6 +80,12 @@ processModel = (model) ->
 			.getGridAlignRotationMatrix()
 			.then console.log
 
+	else if program.gridAlignRotationHistogram
+		modelChain = modelChain
+			.calculateNormals()
+			.getGridAlignRotationHistogram()
+			.then console.log
+
 	else if program.gridAlignTranslation
 		modelChain = modelChain
 			.calculateNormals()
@@ -194,14 +200,22 @@ module.exports = (commandLineArguments) ->
 			'--center'
 			'Center model in x and y direction'
 		)
-		.option(
-			'--grid-align-rotation-angle'
-			'Print dominant rotation angle relative to cartesian grid'
+
+		.option('
+			--grid-align-rotation-angle'
+			'Print dominant rotation angle relative to the cartesian grid'
 		)
 		.option(
 			'--grid-align-rotation-matrix'
-			'Print rotation matrix which would align model to cartesian grid'
+			'Print rotation matrix which would align model
+			to the cartesian grid'
 		)
+		.option(
+			'--grid-align-rotation-histogram'
+			'Print a tsv with the surface area for each rotation angle
+			relative to the cartesian grid'
+		)
+
 		.option(
 			'--apply-grid-align-rotation'
 			'Rotate model with its dominant rotation angle
