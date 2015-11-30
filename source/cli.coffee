@@ -142,12 +142,21 @@ module.exports = (commandLineArguments) ->
 	program
 		.version(packageData.version)
 		.description(packageData.description)
-		.option( '--indent [n]', 'Indent JSON output with n (default: 2) spaces
-			or a specified string')
+		.option(
+			'--indent [n]'
+			'Indent JSON output with n (default: 2) spaces
+			or a specified string'
+		)
 		.option('--no-colors', 'Do not color terminal output')
 		.option('--depth <levels>', 'Set depth for printing Javascript objects')
-		.option('--json', 'Print model as JSON (default for non TTY environments)')
-		.option('--jsonl', 'Print model as a newline seperated JSON stream (jsonl)')
+		.option(
+			'--json',
+			'Print model as JSON (default for non TTY environments)'
+		)
+		.option(
+			'--jsonl',
+			'Print model as a newline seperated JSON stream (jsonl)'
+		)
 		.option(
 			'--translate <"x y z">',
 			'Translate model in x, y, z direction',
@@ -158,7 +167,7 @@ module.exports = (commandLineArguments) ->
 						Number numberString
 		)
 		.option(
-			'--rotate <angleInDegrees>',
+			'--rotate <angleInDegrees>'
 			'Rotate model <angleInDegrees>˚ around 0,0'
 		)
 		.option(
@@ -200,7 +209,6 @@ module.exports = (commandLineArguments) ->
 			'--center'
 			'Center model in x and y direction'
 		)
-
 		.option('
 			--grid-align-rotation-angle'
 			'Print dominant rotation angle relative to the cartesian grid'
@@ -215,7 +223,6 @@ module.exports = (commandLineArguments) ->
 			'Print a tsv with the surface area for each rotation angle
 			relative to the cartesian grid'
 		)
-
 		.option(
 			'--apply-grid-align-rotation'
 			'Rotate model with its dominant rotation angle
@@ -240,16 +247,18 @@ module.exports = (commandLineArguments) ->
 			'--auto-align'
 			'Automatically rotate, center and align model to the cartesian grid'
 		)
-		.usage '<input-file> [options] [output-file]'
+		.usage "<input-file> [options] [output-file]
+				\n         <jsonl-stream>
+				| #{path.basename(commandLineArguments)}"
 		.parse commandLineArguments
 
 
 	if process.stdin.isTTY
-		if program.args.length < 2
+		if program.args.length < 1
 			program.help()
 
 		else
-			fs.readFile program.args[0], (error, fileBuffer) ->
+			fs.readFile path.resolve(program.args[0]), (error, fileBuffer) ->
 				if error
 					throw error
 
@@ -259,15 +268,24 @@ module.exports = (commandLineArguments) ->
 					else JSON.parse(fileBuffer)
 
 				meshlib.Model
-					.fromObject(fileContent)
+					.fromObject({mesh: fileContent})
 					.getObject()
 					.then (model) ->
-						outputFilePath = path.join(
-							process.cwd()
-							program.args.pop()
-						)
 
-						fs.writeFileSync outputFilePath, JSON.stringify(model)
+						if program.args.length >= 2
+							outputFilePath = path.join(
+								process.cwd()
+								program.args.pop()
+							)
+
+							fs.writeFileSync(
+								outputFilePath,
+								JSON.stringify(model)
+							)
+
+						else
+							console.log JSON.stringify(model)
+
 						process.exit 0
 
 					.catch (error) ->
