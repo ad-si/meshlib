@@ -524,3 +524,30 @@ describe 'Meshlib', ->
 				.toString()
 
 			expect(actualOutput).to.equal expectedOutput
+
+
+		it 'parses a JSONL stream', ->
+			command =
+				path.resolve(__dirname, '../cli/index-dev.js') +
+				' --json < ' +
+				path.resolve(__dirname, 'models/tetrahedron.jsonl')
+			expectedOutput = JSON.stringify({
+				mesh: models['tetrahedron-normal-first'].load()
+			}) + '\n'
+
+			actualOutput = JSON.parse(
+				child_process.execSync(command, {stdio: [0]})
+			)
+
+			actualOutput.mesh.faces = actualOutput.mesh.faces
+				.map (face) ->
+					delete face.number
+					return face
+
+			delete actualOutput.name
+			delete actualOutput.transformations
+			delete actualOutput.options
+
+			actualOutput = JSON.stringify(actualOutput) + '\n'
+
+			expect(actualOutput).to.equal expectedOutput

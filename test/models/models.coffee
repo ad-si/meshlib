@@ -16,6 +16,7 @@ models = [
 	'cube'
 	'tetrahedron'
 	'tetrahedronIrregular'
+	'tetrahedron-normal-first'
 	'tetrahedrons'
 	'missingFace'
 ].map (model) ->
