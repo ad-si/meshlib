@@ -1,3 +1,5 @@
+path = require 'path'
+child_process = require 'child_process'
 chai = require 'chai'
 
 ExplicitModel = require '../source/ExplicitModel'
@@ -508,3 +510,17 @@ describe 'Meshlib', ->
 				{x: -0.7071067811865475, y: 0.7071067811865476, z: 0}
 				{x: 0, y: 0, z: 1}
 			]
+
+	describe 'Command Line Interface', ->
+		it 'parses a YAML file', ->
+			command = path.resolve(__dirname, '../cli/index-dev.js') + ' ' +
+				path.resolve(__dirname, 'models/tetrahedron.yaml')
+			expectedOutput = JSON.stringify({
+				mesh: models['tetrahedron'].load()
+			}) + '\n'
+
+			actualOutput = child_process
+				.execSync(command, {stdio: [0]})
+				.toString()
+
+			expect(actualOutput).to.equal expectedOutput
