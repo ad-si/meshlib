@@ -6,7 +6,7 @@
   "browser": "build/index",
   "bin": {
     "meshlib": "./cli/index.js",
-    "meshlib-coffee": "./cli/index.coffee"
+    "meshlib-dev": "./cli/index-dev.js"
   },
   "directories": {
     "test": "test"
