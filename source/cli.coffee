@@ -147,6 +147,10 @@ module.exports = (commandLineArguments) ->
 			'Indent JSON output with n (default: 2) spaces
 			or a specified string'
 		)
+		.option(
+			'--input [type]'
+			'Set input format'
+		)
 		.option('--no-colors', 'Do not color terminal output')
 		.option('--depth <levels>', 'Set depth for printing Javascript objects')
 		.option(
@@ -250,12 +254,26 @@ module.exports = (commandLineArguments) ->
 		.usage "<input-file> [options] [output-file]
 				\n         <jsonl-stream>
 				| #{path.basename(commandLineArguments)}"
+		.arguments '<input-file> [output-file]'
 		.parse commandLineArguments
 
 
 	if process.stdin.isTTY
 		if program.args.length < 1
 			program.help()
+			return process.exit(1)
+
+		if program.input is 'base64'
+			fs.readFile path.resolve(program.args[0]), (error, fileBuffer) ->
+				if error
+					throw error
+
+				meshlib.Model
+					.fromBase64(fileBuffer.toString())
+					.buildFacesFromFaceVertexMesh()
+					.getStream()
+					.then (modelStream) ->
+						modelStream.pipe process.stdout
 
 		else
 			fs.readFile path.resolve(program.args[0]), (error, fileBuffer) ->
@@ -272,7 +290,7 @@ module.exports = (commandLineArguments) ->
 					.getObject()
 					.then (model) ->
 
-						if program.args.length >= 2
+						if program.args[1]
 							outputFilePath = path.join(
 								process.cwd()
 								program.args.pop()
@@ -290,6 +308,8 @@ module.exports = (commandLineArguments) ->
 
 					.catch (error) ->
 						console.error error.stack
+						process.exit 1
+
 
 	else
 		modelBuilder = new meshlib.ModelBuilder()

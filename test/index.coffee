@@ -587,3 +587,15 @@ describe 'Meshlib', ->
 			actualOutput = JSON.stringify(actualOutput) + '\n'
 
 			expect(actualOutput).to.equal expectedOutput
+
+
+		it 'parses a base64 file and emits a JSONL stream', ->
+			command = path.resolve(__dirname, '../cli/index-dev.js') +
+				' --input base64 ' +
+				path.resolve(__dirname, 'models/heart.base64')
+
+			actualOutput = child_process
+				.execSync(command, {stdio: [0]})
+				.toString()
+
+			expect(actualOutput).to.match(/^\{.*\}$/gm)
