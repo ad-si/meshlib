@@ -68,6 +68,7 @@
   "devDependencies": {
     "chai": "^2.0.0",
     "chai-as-promised": "^4.2.0",
+    "chai-json-schema": "^1.2.0",
     "coffeelint": "^1.9.2",
     "coffeelint-newline-at-eof": "^0.4.1",
     "express": "^4.11.1",

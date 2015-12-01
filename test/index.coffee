@@ -1,6 +1,8 @@
 path = require 'path'
 child_process = require 'child_process'
 chai = require 'chai'
+chaiPromised = require 'chai-as-promised'
+chaiJsonSchema = require 'chai-json-schema'
 
 ExplicitModel = require '../source/ExplicitModel'
 meshlib = require '../source/index'
@@ -12,13 +14,16 @@ calculateProjectionCentroid = require(
 	'../source/helpers/calculateProjectionCentroid')
 buildFacesFromFaceVertexMesh = require(
 	'../source/helpers/buildFacesFromFaceVertexMesh')
+chaiHelper = require './chaiHelper'
+models = require './models/models'
 
-
-chai.use require './chaiHelper'
-chai.use require 'chai-as-promised'
 expect = chai.expect
 
-models = require './models/models'
+# Order of use statments is important
+chai.use chaiHelper
+chai.use chaiPromised
+chai.use chaiJsonSchema
+
 
 checkEquality = (dataFromAscii, dataFromBinary, arrayName) ->
 	fromAscii = dataFromAscii[arrayName].map (position) -> Math.round position
@@ -388,6 +393,36 @@ describe 'Meshlib', ->
 
 				expect(actual).to.eventually.equalFaceVertexMesh(faceVertexMesh)
 
+		it 'parses a complex base64 encoded model', ->
+			base64Model = models['heart'].load()
+			modelSchema = {
+				title: 'Meshlib-model schema'
+				type: 'object'
+				required: ['mesh']
+				properties:
+					name: {type: 'string'}
+					fileName: {type: 'string'}
+					mesh:
+						type: 'object'
+						required: ['faceVertex']
+						properties:
+							faceVertex:
+								type: 'object'
+								required: [
+									'faceVertexIndices'
+									'vertexCoordinates'
+									'vertexNormalCoordinates'
+									'faceNormalCoordinates'
+								]
+			}
+			modelPromise = meshlib.Model
+				.fromBase64(base64Model)
+				.getObject()
+				.then (object) ->
+					return expect(object).to.be.jsonSchema(modelSchema)
+
+			return expect(modelPromise).to.eventually.be.ok
+
 
 	describe 'Matrix', ->
 		it 'builds a Matrix from colum-major arrays', ->
@@ -510,6 +545,7 @@ describe 'Meshlib', ->
 				{x: -0.7071067811865475, y: 0.7071067811865476, z: 0}
 				{x: 0, y: 0, z: 1}
 			]
+
 
 	describe 'Command Line Interface', ->
 		it 'parses a YAML file', ->

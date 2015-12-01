@@ -19,11 +19,14 @@ models = [
 	'tetrahedron-normal-first'
 	'tetrahedrons'
 	'missingFace'
+	'heart'
 ].map (model) ->
 	return {
 	name: model
 	filePath: path.join(
-		__dirname, '/', model + '.yaml'
+		__dirname,
+		'/',
+		model + (if model is 'heart' then '.base64' else '.yaml')
 	)
 	load: -> loadYaml @filePath
 	}
