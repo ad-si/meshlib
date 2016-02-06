@@ -1,6 +1,7 @@
 yaml = require 'js-yaml'
 path = require 'path'
 fs = require 'fs'
+yaml = require 'js-yaml'
 
 loadYaml = (path) ->
 	return yaml.safeLoad fs.readFileSync path
@@ -11,25 +12,15 @@ generateMap = (collection) ->
 		return previous
 	, {}
 
+modelPathObjects = loadYaml path.join(__dirname, './models.yaml')
 
-models = [
-	'cube'
-	'tetrahedron'
-	'tetrahedronIrregular'
-	'tetrahedron-normal-first'
-	'tetrahedrons'
-	'missingFace'
-	'heart'
-].map (model) ->
-	return {
-	name: model
-	filePath: path.join(
+models = modelPathObjects.map (modelPathObject) ->
+	modelPathObject.filePath = path.join(
 		__dirname,
-		'/',
-		model + (if model is 'heart' then '.base64' else '.yaml')
+		modelPathObject.path + '.' + modelPathObject.extension
 	)
-	load: -> loadYaml @filePath
-	}
+	modelPathObject.load = () -> loadYaml modelPathObject.filePath
+	return modelPathObject
 
 modelsMap = generateMap models
 

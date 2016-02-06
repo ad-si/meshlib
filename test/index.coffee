@@ -42,16 +42,6 @@ describe 'Meshlib', ->
 		return expect(modelPromise).to.eventually.be.an.explicitModel
 
 
-	it 'creates a face-vertex mesh', ->
-		jsonModel = models['cube'].load()
-
-		modelPromise = meshlib jsonModel
-		.buildFaceVertexMesh()
-		.done (model) -> model
-
-		return expect(modelPromise).to.eventually.have.faceVertexMesh
-
-
 	it 'builds faces from face vertex mesh', ->
 		jsonModel = models['tetrahedron'].load()
 
@@ -284,7 +274,7 @@ describe 'Meshlib', ->
 
 
 		it 'retrieves the face with the largest xy-projection', ->
-			jsonTetrahedron = models['tetrahedronIrregular'].load()
+			jsonTetrahedron = models['irregular tetrahedron'].load()
 
 			modelPromise = meshlib jsonTetrahedron
 			.getFaceWithLargestProjection()
@@ -550,7 +540,7 @@ describe 'Meshlib', ->
 	describe 'Command Line Interface', ->
 		it 'parses a YAML file', ->
 			command = path.resolve(__dirname, '../cli/index-dev.js') + ' ' +
-				path.resolve(__dirname, 'models/tetrahedron.yaml')
+				models['tetrahedron'].filePath
 			expectedOutput = JSON.stringify({
 				mesh: models['tetrahedron'].load()
 			}) + '\n'
@@ -565,10 +555,9 @@ describe 'Meshlib', ->
 		it 'parses a JSONL stream', ->
 			command =
 				path.resolve(__dirname, '../cli/index-dev.js') +
-				' --json < ' +
-				path.resolve(__dirname, 'models/tetrahedron.jsonl')
+				' --json < ' + models['jsonl tetrahedron'].filePath
 			expectedOutput = JSON.stringify({
-				mesh: models['tetrahedron-normal-first'].load()
+				mesh: models['normal first tetrahedron'].load()
 			}) + '\n'
 
 			actualOutput = JSON.parse(
@@ -591,8 +580,7 @@ describe 'Meshlib', ->
 
 		it 'parses a base64 file and emits a JSONL stream', ->
 			command = path.resolve(__dirname, '../cli/index-dev.js') +
-				' --input base64 ' +
-				path.resolve(__dirname, 'models/heart.base64')
+				' --input base64 ' + models['heart'].filePath
 
 			actualOutput = child_process
 				.execSync(command, {stdio: [0]})

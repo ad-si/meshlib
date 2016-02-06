@@ -1,0 +1,43 @@
+- name: 'cube'
+  extension: 'yaml'
+  path: './faces/cube'
+
+- name: 'face-vertex cube'
+  extension: 'yaml'
+  path: './face-vertex/cube'
+
+- name: 'tetrahedron'
+  extension: 'yaml'
+  path: './faces/tetrahedron'
+
+- name: 'jsonl tetrahedron'
+  extension: 'jsonl'
+  path: './faces/tetrahedron'
+
+- name: 'face-vertex tetrahedron'
+  extension: 'yaml'
+  path: './face-vertex/tetrahedron'
+
+- name: 'irregular tetrahedron'
+  extension: 'yaml'
+  path: './faces/tetrahedronIrregular'
+
+- name: 'face-vertex irregular tetrahedron'
+  extension: 'yaml'
+  path: './face-vertex/tetrahedronIrregular'
+
+- name: 'normal first tetrahedron'
+  extension: 'yaml'
+  path: './faces/tetrahedron-normal-first'
+
+- name: 'tetrahedrons'
+  extension: 'yaml'
+  path: './faces/tetrahedrons'
+
+- name: 'missingFace'
+  extension: 'yaml'
+  path: './faces/missingFace'
+
+- name: 'heart'
+  extension: 'base64'
+  path: './heart'
