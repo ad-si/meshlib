@@ -15,7 +15,7 @@
     "test": "mocha --compilers coffee:coffee-script/register",
     "testPerformance": "coffee ./test/performance.coffee",
     "checkStyle": "coffeelint .",
-    "build": "rm -r build && coffee -co build source",
+    "build": "rm -rf build && coffee -co build source",
     "prepublish": "npm run build && npm test"
   },
   "keywords": [
