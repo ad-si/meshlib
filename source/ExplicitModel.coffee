@@ -529,13 +529,13 @@ class ExplicitModel
 
 	toObject: () ->
 		return {
-		name: @name
-		fileName: @fileName
-		faceCount: @faceCount
-		mesh: @mesh
+			name: @name
+			fileName: @fileName
+			faceCount: @faceCount
+			mesh: @mesh
 		}
 
-	toJSON: @toObject
+	toJSON: () -> @toObject()
 
 	getStream: (options = {}) =>
 		return new ModelStream {
