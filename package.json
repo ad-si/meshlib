@@ -12,10 +12,10 @@
     "test": "test"
   },
   "scripts": {
-    "test": "./node_modules/.bin/mocha --compilers coffee:coffee-script/register",
+    "test": "mocha --compilers coffee:coffee-script/register",
     "testPerformance": "coffee ./test/performance.coffee",
-    "checkStyle": "./node_modules/.bin/coffeelint .",
-    "build": "rm -r build && ./node_modules/.bin/coffee -co build source",
+    "checkStyle": "coffeelint .",
+    "build": "rm -r build && coffee -co build source",
     "prepublish": "npm run build && npm test"
   },
   "keywords": [
