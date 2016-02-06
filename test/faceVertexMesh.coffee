@@ -3,21 +3,11 @@ expect = chai.expect
 
 models = require './models/models'
 meshlib = require '../source/index'
+buildFacesFromFaceVertexMesh = \
+	require '../source/helpers/buildFacesFromFaceVertexMesh'
 
 
 describe 'Mesh Transformation', ->
-
-	it 'creates a face-vertex mesh from the list of faces of a cube', ->
-		cubeFaces = models['cube'].load()
-		cubeFaceVertexMesh = models['face-vertex cube'].load()
-
-		modelPromise = meshlib cubeFaces
-			.buildFaceVertexMesh()
-			.done (model) -> model.mesh.faceVertex
-
-		return expect modelPromise
-			.to.eventually.deep.equal cubeFaceVertexMesh
-
 
 	it 'creates a face-vertex mesh from the list of faces of a tetrahedron', ->
 		tetrahedronFaces = models['tetrahedron'].load()
@@ -25,10 +15,11 @@ describe 'Mesh Transformation', ->
 
 		modelPromise = meshlib tetrahedronFaces
 			.buildFaceVertexMesh()
-			.done (model) -> model.mesh.faceVertex
+			.done (model) -> buildFacesFromFaceVertexMesh model.mesh.faceVertex
 
 		return expect modelPromise
-			.to.eventually.deep.equal tetrahedronFaceVertexMesh
+			.to.eventually
+			.deep.equal buildFacesFromFaceVertexMesh tetrahedronFaceVertexMesh
 
 
 	it 'creates a face-vertex mesh from the list of faces \
@@ -39,7 +30,22 @@ describe 'Mesh Transformation', ->
 
 		modelPromise = meshlib tetrahedronFaces
 			.buildFaceVertexMesh()
-			.done (model) -> model.mesh.faceVertex
+			.done (model) -> buildFacesFromFaceVertexMesh model.mesh.faceVertex
 
 		return expect modelPromise
-			.to.eventually.deep.equal tetrahedronFaceVertexMesh
+			.to.eventually
+			.deep.equal buildFacesFromFaceVertexMesh tetrahedronFaceVertexMesh
+
+
+	it 'creates a face-vertex mesh from the list of faces of a cube', ->
+		cubeFaces = models['cube'].load()
+		cubeFaceVertexMesh = models['face-vertex cube'].load()
+
+		modelPromise = meshlib cubeFaces
+			.buildFaceVertexMesh()
+			.done (model) ->
+				buildFacesFromFaceVertexMesh model.mesh.faceVertex
+
+		return expect modelPromise
+			.to.eventually
+			.deep.equal buildFacesFromFaceVertexMesh cubeFaceVertexMesh

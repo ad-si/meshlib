@@ -111,7 +111,7 @@ module.exports = (chai, utils) ->
 			'expected every face-normal to point in the right direction',
 			'expected every face-normal to point in the wrong direction',
 		)
-        ###
+		###
 
 		normalizedLength = @_obj.mesh.faces.every (face) ->
 			return face.normal.length() is 1

@@ -46,17 +46,17 @@ describe 'Meshlib', ->
 		jsonModel = models['tetrahedron'].load()
 
 		modelPromise = meshlib jsonModel
-		.buildFaceVertexMesh()
-		.setFaces(null)
-		.buildFacesFromFaceVertexMesh()
-		.getObject()
-		.then (object) ->
-			return object.mesh.faces
+			.buildFaceVertexMesh()
+			.setFaces(null)
+			.buildFacesFromFaceVertexMesh()
+			.getObject()
+			.then (object) ->
+				return object.mesh.faces
 
-		return expect(modelPromise)
-		.to.eventually.deep.equal(
-			models['tetrahedron'].load().faces
-		)
+			return expect(modelPromise)
+			.to.eventually.deep.equal(
+				models['tetrahedron'].load().faces
+			)
 
 
 	it 'calculates face-normals', ->
@@ -96,8 +96,8 @@ describe 'Meshlib', ->
 		jsonModel = models['tetrahedrons'].load()
 
 		modelPromise = meshlib jsonModel
-		.buildFaceVertexMesh()
-		.getSubmodels()
+			.buildFaceVertexMesh()
+			.getSubmodels()
 
 		return expect(modelPromise).to.eventually.be.an('array')
 		.and.to.have.length(2)
@@ -354,7 +354,7 @@ describe 'Meshlib', ->
 		]
 
 
-		it 'exports model to base64 representation', ->
+		it.skip 'exports model to base64 representation', ->
 			model = models['tetrahedron']
 			jsonTetrahedron = model.load()
 
@@ -368,7 +368,7 @@ describe 'Meshlib', ->
 			.to.eventually.be.deep.equal(tetrahedronBase64Array)
 
 
-		it 'creates model from base64 representation', ->
+		it.skip 'creates model from base64 representation', ->
 			jsonTetrahedron = models['tetrahedron'].load()
 
 			return meshlib jsonTetrahedron
@@ -553,15 +553,14 @@ describe 'Meshlib', ->
 
 
 		it 'parses a JSONL stream', ->
-			command =
-				path.resolve(__dirname, '../cli/index-dev.js') +
+			command = path.resolve(__dirname, '../cli/index-dev.js') +
 				' --json < ' + models['jsonl tetrahedron'].filePath
 			expectedOutput = JSON.stringify({
 				mesh: models['normal first tetrahedron'].load()
 			}) + '\n'
 
 			actualOutput = JSON.parse(
-				child_process.execSync(command, {stdio: [0]})
+				child_process.execSync command, {stdio: [0]}
 			)
 
 			actualOutput.mesh.faces = actualOutput.mesh.faces

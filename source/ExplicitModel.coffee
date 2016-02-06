@@ -100,13 +100,13 @@ applyMatrixToPoint = (matrix, point) ->
 
 
 calculateGridAlignRotationAngle = (
-	{
-		faces
-		rotationAxis
-		unit
-		histogram
-	} = {}
-) ->
+		{
+			faces
+			rotationAxis
+			unit
+			histogram
+		} = {}
+	) ->
 	unit ?= 'radian'
 	rotationAxis ?= 'z'
 
@@ -240,6 +240,7 @@ class ExplicitModel
 		@name = ''
 		@fileName = ''
 		@faceCount = ''
+		@normalsAreInvalid = false
 
 
 	@fromBase64: (base64String) ->
@@ -317,6 +318,9 @@ class ExplicitModel
 
 
 	getFaces: (options = {}) =>
+		if @normalsAreInvalid
+			@calculateNormals()
+
 		if options.filter and typeof options.filter is 'function'
 			return @mesh.faces.filter(options.filter)
 
@@ -461,6 +465,7 @@ class ExplicitModel
 			[0, 0, 1, -boundingBox.min.z]
 			[0, 0, 0, 1]
 		]
+
 
 	center: () =>
 		@applyMatrix @getCenteringMatrix()

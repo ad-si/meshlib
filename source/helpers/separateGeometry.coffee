@@ -55,10 +55,10 @@ labelVertices = ({vertexCoordinates, faceVertexIndices}) ->
 
 buildMeshes = (faceVertexMesh, vertexLabels) ->
 	{
-	vertexCoordinates
-	faceVertexIndices
-	vertexNormalCoordinates
-	faceNormalCoordinates
+		vertexCoordinates
+		faceVertexIndices
+		vertexNormalCoordinates
+		faceNormalCoordinates
 	} = faceVertexMesh
 
 	# For each equivalence class, a new face-vertex-mesh has to be created
@@ -87,14 +87,26 @@ buildMeshes = (faceVertexMesh, vertexLabels) ->
 		mapping[i] = mesh.vertexCoordinates.length / 3
 
 		# Copy the coordinates of the vertex to the new mesh
-		mesh.vertexCoordinates.push vertexCoordinates[i * 3]
-		mesh.vertexCoordinates.push vertexCoordinates[i * 3 + 1]
-		mesh.vertexCoordinates.push vertexCoordinates[i * 3 + 2]
+		if vertexCoordinates[i * 3]?
+			mesh.vertexCoordinates.push vertexCoordinates[i * 3]
+		if vertexCoordinates[i * 3 + 1]?
+			mesh.vertexCoordinates.push vertexCoordinates[i * 3 + 1]
+		if vertexCoordinates[i * 3 + 2]?
+			mesh.vertexCoordinates.push vertexCoordinates[i * 3 + 2]
 
 		# Copy the normal of the vertex to the new mesh
-		mesh.vertexNormalCoordinates.push vertexNormalCoordinates[i * 3]
-		mesh.vertexNormalCoordinates.push vertexNormalCoordinates[i * 3 + 1]
-		mesh.vertexNormalCoordinates.push vertexNormalCoordinates[i * 3 + 2]
+		if vertexNormalCoordinates[i * 3]?
+			mesh.vertexNormalCoordinates.push(
+				vertexNormalCoordinates[i * 3]
+			)
+		if vertexNormalCoordinates?[i * 3 + 1]?
+			mesh.vertexNormalCoordinates.push(
+				vertexNormalCoordinates?[i * 3 + 1]
+			)
+		if vertexNormalCoordinates?[i * 3 + 2]
+			mesh.vertexNormalCoordinates.push(
+				vertexNormalCoordinates?[i * 3 + 2]
+			)
 
 	# Move the faces and their normals to their respective new meshes
 	for faceStart in [0...faceVertexIndices.length] by 3
