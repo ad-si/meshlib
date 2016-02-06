@@ -1,7 +1,7 @@
 deg2rad = require 'deg2rad'
 rad2deg = require 'rad2deg'
 
-Vector = require './primitives/Vector'
+Vector = require '@datatypes/vector'
 Face = require './primitives/Face'
 Matrix = require './primitives/Matrix'
 fastClone = require './helpers/fastClone'
@@ -359,15 +359,15 @@ class ExplicitModel
 
 				delta1 = Vector
 					.fromObject face.vertices[1]
-					.minus Vector.fromObject face.vertices[0]
+					.subtract Vector.fromObject face.vertices[0]
 
 				delta2 = Vector
 					.fromObject face.vertices[2]
-					.minus Vector.fromObject face.vertices[0]
+					.subtract Vector.fromObject face.vertices[0]
 
 				face.normal = delta1
 					.crossProduct delta2
-					.normalized()
+					.normalize()
 
 				return face.toObject()
 		else

@@ -1,5 +1,4 @@
 ExplicitModel = require '../source/ExplicitModel'
-Vector = require '../source/primitives/Vector'
 
 maxCoordinateDelta = 0.00001
 

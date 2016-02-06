@@ -49,6 +49,7 @@
   "bugs": "http://github.com/Lowfab/meshlib/issues",
   "homepage": "https://github.com/Lowfab/meshlib",
   "dependencies": {
+    "@datatypes/vector": "^0.2.2",
     "coffee-script": "^1.9.0",
     "commander": "^2.6.0",
     "deg2rad": "^1.0.0",

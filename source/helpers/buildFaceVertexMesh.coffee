@@ -1,6 +1,4 @@
-Vector = require './../primitives/Vector'
 OctreeHelper = require './OctreeHelper'
-
 
 module.exports = (faces, options = {}) ->
 	pointDistanceEpsilon = options.pointDistanceEpsilon || 0.0001

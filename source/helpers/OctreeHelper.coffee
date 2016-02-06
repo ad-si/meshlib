@@ -1,4 +1,4 @@
-Vector = require '../primitives/Vector'
+Vector = require '@datatypes/vector'
 Octree = require '../primitives/Octree'
 
 class OctreeHelper
@@ -8,7 +8,7 @@ class OctreeHelper
 
 	add: (vertex, normal) ->
 		vertex = Vector.fromObject vertex
-		normal = Vector.fromObject(normal).normalized()
+		normal = Vector.fromObject(normal).normalize()
 		vertexIndex = @tree.add vertex, normal, @lastIndex
 		if vertexIndex > @lastIndex
 			@lastIndex = vertexIndex
@@ -29,7 +29,7 @@ class OctreeHelper
 			avgNormal = new Vector(0, 0, 0)
 			for normal in node.normalList
 				avgNormal = avgNormal.add normal
-			avgNormal = avgNormal.normalized()
+			avgNormal = avgNormal.normalize()
 
 			i = node.index * 3
 			averagedNormalList[i] = avgNormal.x
