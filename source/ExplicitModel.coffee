@@ -2,7 +2,7 @@ deg2rad = require 'deg2rad'
 rad2deg = require 'rad2deg'
 
 Vector = require '@datatypes/vector'
-Face = require './primitives/Face'
+Face = require '@datatypes/face'
 Matrix = require './primitives/Matrix'
 fastClone = require './helpers/fastClone'
 geometrySplitter = require './helpers/separateGeometry'
@@ -121,7 +121,9 @@ calculateGridAlignRotationAngle = (
 		return Math.abs(face.normal[rotationAxis]) < 0.01
 
 	.map (face) ->
-		face.surfaceArea = Face.calculateSurfaceArea face
+		face = Face
+			.fromObject face
+			.calculateSurfaceArea()
 
 		# Get rotation angle
 		rotationAngle = switch

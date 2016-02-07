@@ -1,4 +1,5 @@
 ExplicitModel = require '../source/ExplicitModel'
+Vector = require '@datatypes/vector'
 
 maxCoordinateDelta = 0.00001
 
@@ -114,7 +115,7 @@ module.exports = (chai, utils) ->
 		###
 
 		normalizedLength = @_obj.mesh.faces.every (face) ->
-			return face.normal.length() is 1
+			return Vector.fromObject(face.normal).length() is 1
 
 		@assert(
 			normalizedLength

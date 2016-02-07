@@ -6,7 +6,6 @@ chaiJsonSchema = require 'chai-json-schema'
 
 ExplicitModel = require '../source/ExplicitModel'
 meshlib = require '../source/index'
-Face = require '../source/primitives/Face'
 Matrix = require '../source/primitives/Matrix'
 calculateProjectedFaceArea = require(
 	'../source/helpers/calculateProjectedFaceArea')
@@ -201,18 +200,6 @@ describe 'Meshlib', ->
 
 
 	describe 'Faces', ->
-		it 'calculate the surface area of a face', ->
-			surfaceArea = Face
-			.fromObject {
-				vertices: [
-					{x: 1, y: 0, z: 0},
-					{x: 1, y: 0, z: 1},
-					{x: 0, y: 1, z: 0}
-				]
-			}
-			.getSurfaceArea()
-
-			expect(surfaceArea).to.equal Math.SQRT2 / 2
 
 		it 'returns all faces', ->
 			jsonTetrahedron = models['tetrahedron'].load()
