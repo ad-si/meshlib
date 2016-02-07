@@ -6,13 +6,12 @@ chaiJsonSchema = require 'chai-json-schema'
 
 ExplicitModel = require '../source/ExplicitModel'
 meshlib = require '../source/index'
-Matrix = require '../source/primitives/Matrix'
-calculateProjectedFaceArea = require(
-	'../source/helpers/calculateProjectedFaceArea')
-calculateProjectionCentroid = require(
-	'../source/helpers/calculateProjectionCentroid')
-buildFacesFromFaceVertexMesh = require(
-	'../source/helpers/buildFacesFromFaceVertexMesh')
+calculateProjectedFaceArea =
+	require('../source/helpers/calculateProjectedFaceArea')
+calculateProjectionCentroid =
+	require('../source/helpers/calculateProjectionCentroid')
+buildFacesFromFaceVertexMesh =
+	require('../source/helpers/buildFacesFromFaceVertexMesh')
 chaiHelper = require './chaiHelper'
 models = require './models/models'
 
@@ -399,90 +398,6 @@ describe 'Meshlib', ->
 					return expect(object).to.be.jsonSchema(modelSchema)
 
 			return expect(modelPromise).to.eventually.be.ok
-
-
-	describe 'Matrix', ->
-		it 'builds a Matrix from colum-major arrays', ->
-			matrix = Matrix.fromColums [
-				[1, 2, 3]
-				[4, 5, 6]
-				[7, 8, 9]
-			]
-
-			expect matrix.toRows()
-			.to.deep.equal [
-				[1, 4, 7]
-				[2, 5, 8]
-				[3, 6, 9]
-			]
-
-		it 'multiplies a 3x2 Matrix by a 2x3 Matrix', ->
-			matrix = Matrix.fromRows [
-				[1, 2, 3]
-				[4, 5, 6]
-			]
-
-			expect matrix.multiply [
-				[7, 8]
-				[9, 10]
-				[11, 12]
-			]
-			.to.deep.equal [
-				[58, 64]
-				[139, 154]
-			]
-
-
-		it 'multiplies a 3x1 Matrix by a 4x3 Matrix', ->
-			matrix = Matrix.fromRows [
-				[3, 4, 2]
-			]
-
-			expect matrix.multiply [
-				[13, 9, 7, 15]
-				[8, 7, 4, 6]
-				[6, 4, 0, 3]
-			]
-			.to.deep.equal [
-				[83, 63, 37, 75]
-			]
-
-
-		it 'multiplies a 1x3 Matrix by a 4x4 Matrix', ->
-			matrix = Matrix.fromRows [
-				[1, 0, 0, 7]
-				[0, 1, 0, 6]
-				[0, 0, 1, 8]
-				[0, 0, 0, 1]
-			]
-
-			expect matrix.multiply [
-				[3]
-				[4]
-				[2]
-				[1]
-			]
-			.to.deep.equal [
-				[10]
-				[10]
-				[10]
-				[1]
-			]
-
-
-		it 'creates a Matrix from a continuous Array', ->
-			matrix = Matrix.fromValues [1, 0, 0, 0,
-										0, 1, 0, 0,
-										0, 0, 1, 0,
-										0, 0, 0, 1]
-
-			expect matrix.toRows()
-			.to.deep.equal [
-				[1, 0, 0, 0]
-				[0, 1, 0, 0]
-				[0, 0, 1, 0]
-				[0, 0, 0, 1]
-			]
 
 
 	describe 'Transformations', ->

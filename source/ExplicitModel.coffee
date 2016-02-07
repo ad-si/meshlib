@@ -3,7 +3,7 @@ rad2deg = require 'rad2deg'
 
 Vector = require '@datatypes/vector'
 Face = require '@datatypes/face'
-Matrix = require './primitives/Matrix'
+Matrix = require '@datatypes/matrix'
 fastClone = require './helpers/fastClone'
 geometrySplitter = require './helpers/separateGeometry'
 buildFaceVertexMesh = require './helpers/buildFaceVertexMesh'

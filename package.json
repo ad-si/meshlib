@@ -50,6 +50,7 @@
   "homepage": "https://github.com/Lowfab/meshlib",
   "dependencies": {
     "@datatypes/face": "^0.2.0",
+    "@datatypes/matrix": "^0.1.0",
     "@datatypes/point": "^0.2.1",
     "@datatypes/vector": "^0.2.2",
     "coffee-script": "^1.9.0",
