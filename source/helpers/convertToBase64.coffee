@@ -6,7 +6,7 @@ arrayBufferToBase64 = (buffer) ->
 		binary += String.fromCharCode(bytes[i])
 
 	if Buffer
-		return new Buffer(binary, 'binary').toString('base64')
+		return new Buffer.from(binary, 'binary').toString('base64')
 
 	else if window
 		return window.btoa binary

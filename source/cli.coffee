@@ -253,7 +253,7 @@ module.exports = (commandLineArguments) ->
 		)
 		.usage "<input-file> [options] [output-file]
 				\n         <jsonl-stream>
-				| #{path.basename(commandLineArguments)}"
+				| #{path.basename(commandLineArguments[0])}"
 		.arguments '<input-file> [output-file]'
 		.parse commandLineArguments
 

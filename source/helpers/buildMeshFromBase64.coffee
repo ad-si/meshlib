@@ -1,6 +1,6 @@
 atob = (str) ->
 	if Buffer
-		return new Buffer(str, 'base64').toString('binary')
+		return new Buffer.from(str, 'base64').toString('binary')
 	else if window
 		return window.atob str
 	else
