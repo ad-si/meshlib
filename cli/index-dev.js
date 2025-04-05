@@ -1,7 +1,5 @@
 #! /usr/bin/env node
 
-require('coffee-script/register')
-
-const cli = require('../source/cli')
+import cli from '../source/cli.js'
 
 cli(process.argv)
