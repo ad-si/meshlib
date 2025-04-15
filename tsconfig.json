@@ -1,0 +1,60 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "target": "ES2022",
+    "resolveJsonModule": true,
+    "moduleDetection": "force",
+    "isolatedModules": true,
+    "strict": false,
+    "noUncheckedIndexedAccess": false,
+    "noImplicitAny": false,
+    "strictPropertyInitialization": false,
+    "strictNullChecks": false,
+    "strictFunctionTypes": false,
+    "strictBindCallApply": false,
+    "ignoreDeprecations": "5.0",
+    "allowJs": true,
+    "checkJs": false,
+    "noPropertyAccessFromIndexSignature": false,
+    "exactOptionalPropertyTypes": false,
+    "skipDefaultLibCheck": true,
+    "skipLibCheck": true,
+    "noEmitOnError": false,
+    "module": "NodeNext",
+    "noEmit": false,
+    "outDir": "build",
+    "sourceMap": true,
+    "lib": [
+      "ES2022",
+      "DOM"
+    ],
+    "moduleResolution": "NodeNext",
+    "declaration": true,
+    "declarationMap": true,
+    "rootDir": ".",
+    "baseUrl": ".",
+    "paths": {
+      "meshlib": [
+        "./source/index.ts"
+      ],
+      "meshlib/*": [
+        "./source/*"
+      ],
+    },
+    "typeRoots": [ // Add typeRoots to ensure our custom types are found
+      "./node_modules/@types",
+      "./types"
+    ]
+  },
+  "include": [
+    "source/**/*.ts",
+    "cli/**/*.ts",
+    "test/**/*.ts",
+    "package.json"
+  ],
+  "exclude": [
+    "node_modules",
+    "build"
+  ]
+}

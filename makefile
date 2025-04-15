@@ -1,13 +1,17 @@
+.PHONY: typecheck
+typecheck:
+	npx tsc --noEmit
+
+
 .PHONY: test
 test:
-	npx mocha test/index.js
+	-npx tsc --noEmit
+	npx tsx ./node_modules/.bin/mocha test/index.ts
+
+.PHONY: test-only
+test-only:
+	npx tsx ./node_modules/.bin/mocha test/index.ts
 
 
 .PHONY: build
 build: test
-	echo "todo"
-
-
-.PHONY: testPerformance
-testPerformance:
-	node ./test/performance.js
