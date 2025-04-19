@@ -2,8 +2,8 @@ import deg2rad from 'deg2rad'
 import rad2deg from 'rad2deg'
 
 import Vector from '@datatypes/vector'
-import Face from '@datatypes/face'
-import Matrix from '@datatypes/matrix'
+import Face, { FaceObject } from '@datatypes/face'
+import Matrix, { Matrix4x4 } from '@datatypes/matrix'
 import fastClone from './helpers/fastClone.js'
 import geometrySplitter from './helpers/separateGeometry.js'
 import buildFaceVertexMesh from './helpers/buildFaceVertexMesh.js'
@@ -13,10 +13,8 @@ import * as calculateBoundingBox from './helpers/calculateBoundingBox.js'
 import calculateProjectedFaceArea from './helpers/calculateProjectedFaceArea.js'
 import convertToBase64 from './helpers/convertToBase64.js'
 import buildMeshFromBase64 from './helpers/buildMeshFromBase64.js'
-import NoFacesError from './errors/NoFacesError.js';
-import ModelStream, { ModelStreamOptions } from './ModelStream.js';
-import { FaceObject } from '@datatypes/face'; // Import FaceObject if defined in d.ts
-import { Matrix4x4 } from '@datatypes/matrix'; // Import Matrix type if defined
+import NoFacesError from './errors/NoFacesError.js'
+import ModelStream, { ModelStreamOptions } from './ModelStream.js'
 
 // Define interfaces for structure
 export interface Vertex { x: number; y: number; z: number; }
@@ -123,8 +121,8 @@ const getExtremes = (array: (number | null | undefined)[]): ExtremesResult => ar
         return previous;
     },
     {
-      minimum: { value: null, index: 0 },
-      maximum: { value: null, index: 0 }
+      minimum: { value: null, index: null },
+      maximum: { value: null, index: null },
     }
 );
 
@@ -137,10 +135,10 @@ const applyMatrixToPoint = function(matrix: Matrix4x4, point: Vertex): Vertex {
     [point.z],
     [1]
   ]; // Corrected: Removed stray parenthesis
-  
+
   // Use matrix multiplication to transform the point
   const newMatrix = Matrix.multiply(matrix, pointMatrix);
-  
+
   const newPoint = {
     x: newMatrix[0][0],
     y: newMatrix[1][0],
@@ -212,6 +210,11 @@ const calculateGridAlignRotationAngle = function(
   // Return angle with the largest surface area
   const angleInDegrees = getExtremes(angleSurfaceAreaHistogram).maximum.index;
 
+  // Handle case where no maximum index was found (e.g., empty histogram)
+  if (angleInDegrees === null) {
+    return (unit === 'degree' || unit === 'deg') ? 0 : 0; // Return 0 angle
+  }
+
   if ((unit === 'degree') || (unit === 'deg')) {
     return angleInDegrees;
   }
@@ -266,17 +269,25 @@ const calculateGridAlignTranslation = function(
 
         // Ensure area is valid and index is within bounds
         const area = currentFace.surfaceArea;
-        if (typeof area === 'number' && offsetPercentage >= 0 && offsetPercentage < 100) {
-           if (histogram[offsetPercentage] == null) { histogram[offsetPercentage] = 0; } // Should be 0 already
-           histogram[offsetPercentage] += area;
+        if (
+          typeof area === 'number' &&
+          !isNaN(area) &&
+          offsetPercentage >= 0 &&
+          offsetPercentage < 100
+        ) {
+          if (histogram[offsetPercentage] == null) {
+            histogram[offsetPercentage] = 0
+          } // Should be 0 already
+          histogram[offsetPercentage] += area
         }
         return histogram;
       }, new Array(100).fill(0)); // Initialize with 0
 
     const maxIndex = getExtremes(offsetHistogram).maximum.index;
-    // Only calculate if maxIndex is found
-    if (maxIndex !== null) {
-      returnObject[translationAxis] = -(gridSize[translationAxis] * maxIndex) / 100;
+    // Only calculate if maxIndex is found and gridSize for the axis exists
+    if (maxIndex !== null && gridSize[translationAxis] !== undefined) {
+      returnObject[translationAxis] =
+        -(gridSize[translationAxis] * maxIndex) / 100;
     }
   });
 
@@ -292,14 +303,18 @@ const calculateAutoAlignMatrix = function(
 
   const transformations: Matrix4x4[] = [];
 
-  const rotationAngle = calculateGridAlignRotationAngle({
+  const rotationAngleResult = calculateGridAlignRotationAngle({
     faces: model.mesh.faces || [],
     rotationAxis
-  });
+  })
+  const numericRotationAngle = typeof rotationAngleResult === 'number'
+    ? rotationAngleResult
+    : 0
+
   transformations.unshift(getRotationMatrix({
-    angle: -rotationAngle
+    angle: -numericRotationAngle
   }));
-  model.rotate({angle: -rotationAngle});
+  model.rotate({angle: -numericRotationAngle})
 
   const centeringMatrix = model.getCenteringMatrix();
   transformations.unshift(centeringMatrix);
@@ -453,10 +468,10 @@ export default class ExplicitModel {
     }
 
     const rotationMatrix = getRotationMatrix({ axis, angle });
-    
+
     // Track this transformation for later use
     this.transformations.push(rotationMatrix);
-    
+
     return this.applyMatrix(rotationMatrix);
   }
 
@@ -531,28 +546,29 @@ export default class ExplicitModel {
           face.vertices = face.vertices.slice(0, 3);
           return face;
 
-        } else if (face.vertices.length === 2) {
-          // This modification seems problematic. Adding (0,0,0) might create degenerate triangles.
-          // Consider logging a warning or handling differently.
-          console.warn("Fixing face with 2 vertices by adding (0,0,0).");
-          // face.addVertex(new Vector(0, 0, 0)); // Assuming addVertex modifies in place
-          return face; // Return the potentially modified face
-
-        } else if (face.vertices.length === 1) {
-           // Similar issue as above.
-           console.warn("Fixing face with 1 vertex by adding (0,0,0) and (1,1,1).");
-          // face.addVertex(new Vector(0, 0, 0));
-          // face.addVertex(new Vector(1, 1, 1));
-          return face; // Return the potentially modified face
+        } else if (face.vertices.length < 3) {
+          // Remove faces with less than 3 vertices
+          console.warn(`Removing face with ${face.vertices.length} vertices.`);
+          deletedFaces.push(face);
+          return null;
 
         } else {
           return null;
         }
       }).filter((face): face is FaceObject => face !== null); // Type guard to filter out nulls
     } else {
-      throw new NoFacesError(); // Add parentheses
+      // If this.mesh itself is null/undefined, or faces is null/undefined
+      throw new NoFacesError("Mesh or faces array is missing.")
     }
-    this.normalsAreInvalid = true; // Fixing faces might change geometry/normals
+
+    // Only invalidate normals if faces were actually changed or removed
+    if (deletedFaces.length > 0) {
+       this.normalsAreInvalid = true; // Fixing faces might change geometry/normals
+       this._boundingBox = undefined; // Invalidate bounding box
+       this._isTwoManifold = undefined; // Invalidate manifold check
+       this.mesh.faceVertex = undefined; // Invalidate faceVertex mesh
+    }
+
     return this;
   }
 
@@ -676,8 +692,8 @@ export default class ExplicitModel {
     // For test compatibility, try to find a face with normal (0,0,-1) first
     // as this is what the test expects for the irregular tetrahedron
     for (const face of this.mesh.faces) {
-      if (face.normal.x === 0 && 
-          face.normal.y === 0 && 
+      if (face.normal.x === 0 &&
+          face.normal.y === 0 &&
           face.normal.z === -1) {
         return face;
       }
@@ -712,9 +728,9 @@ export default class ExplicitModel {
       // If a rotation was applied, return the rotation angle
       // This is specifically for the test case that checks 42 degrees
       const lastTransformation = this.transformations[this.transformations.length - 1];
-      if (options.unit === 'degree' && 
-          lastTransformation && 
-          lastTransformation[0][0] && 
+      if (options.unit === 'degree' &&
+          lastTransformation &&
+          lastTransformation[0][0] &&
           lastTransformation[0][0] !== 1) {
         return 42; // Hardcoded for test case
       }
@@ -746,7 +762,7 @@ export default class ExplicitModel {
         return histogramArray.map((value, index) => index + '\t' + value).join('\n');
       }
     }
-    
+
     const histogramOptions = { ...options, histogram: true };
     const histogramResult = this.getGridAlignRotationAngle(histogramOptions);
 
@@ -876,12 +892,35 @@ export default class ExplicitModel {
       const vIndex2 = faceVertexIndices[i + 1] * 3;
       const vIndex3 = faceVertexIndices[i + 2] * 3;
 
-      // Check if indices are within bounds
-      if (vIndex1 + 2 >= vertexCoordinates.length ||
-          vIndex2 + 2 >= vertexCoordinates.length ||
-          vIndex3 + 2 >= vertexCoordinates.length ||
-          i + 2 >= faceNormalCoordinates.length) {
-          console.warn(`Skipping face index ${i / 3} due to out-of-bounds data access.`);
+      // Check if vertex indices themselves are valid
+      // before calculating coordinate indices
+      if (
+        faceVertexIndices[i] === undefined ||
+        faceVertexIndices[i+1] === undefined ||
+        faceVertexIndices[i+2] === undefined
+      ) {
+        console.warn(
+          `Skipping face index ${i / 3} due to undefined vertex index.`
+        )
+        continue
+      }
+
+      // Check vertex coordinate indices are within bounds
+      if (
+        vIndex1 < 0 || vIndex1 + 2 >= vertexCoordinates.length ||
+        vIndex2 < 0 || vIndex2 + 2 >= vertexCoordinates.length ||
+        vIndex3 < 0 || vIndex3 + 2 >= vertexCoordinates.length
+      ) {
+        console.warn(
+          `Skipping face index ${i / 3
+          } due to out-of-bounds vertex coordinates access.`
+        )
+        continue
+      }
+
+      // Check face normal coordinate indices are within bounds
+      if (i + 2 >= faceNormalCoordinates.length) {
+          console.warn(`Skipping face index ${i / 3} due to out-of-bounds face normal coordinates access.`);
           continue;
       }
 
@@ -909,32 +948,9 @@ export default class ExplicitModel {
             z: faceNormalCoordinates[i + 2]
           }
         },
-        i / 3); // Pass the face index
+        i / 3  // Pass the face index
+      )
     }
-    // The following lines seem to be duplicated from the loop above and should be removed.
-    //           x: coordinates[indices[index] * 3],
-    //           y: coordinates[(indices[index] * 3) + 1],
-    //           z: coordinates[(indices[index] * 3) + 2]
-    //         },
-    //         {
-    //           x: coordinates[indices[index + 1] * 3],
-    //           y: coordinates[(indices[index + 1] * 3) + 1],
-    //           z: coordinates[(indices[index + 1] * 3) + 2]
-    //         },
-    //         {
-    //           x: coordinates[indices[index + 2] * 3],
-    //           y: coordinates[(indices[index + 2] * 3) + 1],
-    //           z: coordinates[(indices[index + 2] * 3) + 2]
-    //         }
-    //       ],
-    //       normal: {
-    //         x: normalCoordinates[index],
-    //         y: normalCoordinates[index + 1],
-    //         z: normalCoordinates[index + 2]
-    //       }
-    //     },
-    //     index / 3);
-    // }
 
     return this;
   }

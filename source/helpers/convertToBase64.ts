@@ -56,27 +56,40 @@ export default function convertToBase64(mesh: FaceVertexData): string {
   ) {
     indA[i] = faceVertexIndices[i]
   }
-  const vnA = new Float32Array(vertexNormalCoordinates.length)
+  const vnA = new Float32Array(vertexNormalCoordinates?.length || 1)
 
-  for (
-    let i = 0,
-      end = vertexNormalCoordinates.length - 1,
-      asc = 0 <= end;
-    asc ? i <= end : i >= end;
-    asc ? i++ : i--
-  ) {
-    vnA[i] = vertexNormalCoordinates[i]
+  if (vertexNormalCoordinates?.length) {
+    for (
+      let i = 0,
+        end = vertexNormalCoordinates.length - 1,
+        asc = 0 <= end;
+      asc ? i <= end : i >= end;
+      asc ? i++ : i--
+    ) {
+      vnA[i] = vertexNormalCoordinates[i]
+    }
   }
-  const fnA = new Float32Array(faceNormalCoordinates.length)
+  else {
+    // Add at least one value to prevent empty buffer issues
+    vnA[0] = 0
+  }
 
-  for (
-    let i = 0,
-      end = faceNormalCoordinates.length - 1,
-      asc = 0 <= end;
-    asc ? i <= end : i >= end;
-    asc ? i++ : i--
-  ) {
-    fnA[i] = faceNormalCoordinates[i]
+  const fnA = new Float32Array(faceNormalCoordinates?.length || 1)
+
+  if (faceNormalCoordinates?.length) {
+    for (
+      let i = 0,
+        end = faceNormalCoordinates.length - 1,
+        asc = 0 <= end;
+      asc ? i <= end : i >= end;
+      asc ? i++ : i--
+    ) {
+      fnA[i] = faceNormalCoordinates[i]
+    }
+  }
+  else {
+    // Add at least one value to prevent empty buffer issues
+    fnA[0] = 0
   }
 
   const posBase = arrayBufferToBase64(posA.buffer)

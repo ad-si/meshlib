@@ -54,12 +54,15 @@ export default class ModelStream extends stream.Readable {
 
 
     // Push faces one by one or in chunks
-    const faces = this.modelObject.mesh.faces;
+    const faces = this.modelObject?.mesh?.faces
     // Check if faceIndex is within bounds before accessing faces array
-    if (this.faceIndex >= 0 && this.faceIndex < faces.length) {
-        while (this.faceIndex < faces.length) {
+    const faceCount = faces ? faces.length : 0
+    if (faces && this.faceIndex >= 0 && this.faceIndex < faceCount) {
+        while (this.faceIndex < faceCount) {
             const face = faces[this.faceIndex];
-            const faceData = this.options.objectMode ? face : JSON.stringify(face) + '\n';
+            const faceData = this.options.objectMode
+              ? face
+              : JSON.stringify(face) + '\n'
             this.faceIndex++;
             if (!this.push(faceData)) {
                 return; // Stop reading if buffer is full
@@ -68,7 +71,11 @@ export default class ModelStream extends stream.Readable {
     }
 
     // If all faces are pushed (or if there were no faces), signal the end
-    if (this.faceIndex >= faces.length || this.faceIndex === -1) { // Check >= for empty faces case
+    const finalFaceCount = this.modelObject?.mesh?.faces?.length ?? 0
+    if (
+      this.faceIndex >= finalFaceCount ||
+      (this.faceIndex === -1 && finalFaceCount === 0)
+    ) { // Check >= for empty faces case
         this.push(null);
     }
   }

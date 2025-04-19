@@ -4,8 +4,17 @@ function calculateLocalitySensitiveHash (point: Vertex) {
   return point.x + point.y + point.z
 }
 
-function isCloserThan (distance: number, numA: number, numB: number) {
-  return (numA - numB) < distance
+function isCloserThan (
+  distance: number,
+  numA: number | undefined,
+  numB: number | undefined,
+): boolean {
+  // Ensure both numbers are valid before comparison
+  if (typeof numA !== 'number' || typeof numB !== 'number') {
+    return false; // Cannot compare if one is not a number
+  }
+  // Use Math.abs for distance comparison
+  return Math.abs(numA - numB) < distance;
 }
 
 export default function(
@@ -14,13 +23,9 @@ export default function(
 ) {
   if (options == null) { options = {}; }
   const maximumMergeDistance = options.maximumMergeDistance || 0.0001
-
-  const vertices = []
-  const currentBucket = []
   let vertexCoordinates = []
   let faceVertexIndices = []
   const faceNormalCoordinates = []
-  const maximumIndex = 0
 
   const sortedVertices = faces
     .map(function(face, faceIndex) {
@@ -131,10 +136,38 @@ export default function(
     }
     , [])
 
+  // Calculate vertex normals
+  // Use the normalized sum of face normals for each vertex (classic vertex normal)
+  const vertexNormalCoordinates = new Array(cleanedVertices.length * 3).fill(0)
+  const vertexFaceCount = new Array(cleanedVertices.length).fill(0)
+
+  cleanedVertices.forEach((vertex, vIndex) => {
+    if (!vertex) return
+    vertex.usedIn.forEach(({ face }) => {
+      vertexNormalCoordinates[vIndex * 3]     += faceNormalCoordinates[face * 3]
+      vertexNormalCoordinates[vIndex * 3 + 1] += faceNormalCoordinates[face * 3 + 1]
+      vertexNormalCoordinates[vIndex * 3 + 2] += faceNormalCoordinates[face * 3 + 2]
+      vertexFaceCount[vIndex]++
+    })
+  })
+
+  // Normalize each vertex normal vector
+  for (let v = 0; v < cleanedVertices.length; v++) {
+    const x = vertexNormalCoordinates[v * 3]
+    const y = vertexNormalCoordinates[v * 3 + 1]
+    const z = vertexNormalCoordinates[v * 3 + 2]
+    const len = Math.sqrt(x * x + y * y + z * z)
+    if (len > 0) {
+      vertexNormalCoordinates[v * 3]     = x / len
+      vertexNormalCoordinates[v * 3 + 1] = y / len
+      vertexNormalCoordinates[v * 3 + 2] = z / len
+    }
+  }
+
   return {
-    vertexCoordinates, // vertexCoordinates
-    faceVertexIndices, // faceVertexIndices
-    faceNormalCoordinates, // faceNormals
-    vertexNormalCoordinates: [] // TODO: vertexNormals
+    vertexCoordinates,
+    faceVertexIndices,
+    faceNormalCoordinates,
+    vertexNormalCoordinates
   }
 }

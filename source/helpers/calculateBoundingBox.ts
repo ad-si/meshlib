@@ -1,5 +1,18 @@
-export function forFaceVertexMesh (faceVertexMesh) {
-  let maxX, maxY, maxZ;
+export function forFaceVertexMesh (
+  faceVertexMesh: { vertexCoordinates: number[] },
+) {
+  if (
+    !faceVertexMesh ||
+    !faceVertexMesh.vertexCoordinates ||
+    faceVertexMesh.vertexCoordinates.length < 3
+  ) {
+    console.warn(
+      "Cannot calculate bounding box for invalid/empty face-vertex mesh."
+    )
+    return undefined
+  }
+
+  let maxX: number, maxY: number, maxZ: number;
   let minX = (maxX = faceVertexMesh.vertexCoordinates[0]);
   let minY = (maxY = faceVertexMesh.vertexCoordinates[1]);
   let minZ = (maxZ = faceVertexMesh.vertexCoordinates[2]);
@@ -38,8 +51,23 @@ export function forFaceVertexMesh (faceVertexMesh) {
   };
 };
 
-export function forFaces (faces) {
-  let maxX, maxY, maxZ;
+export function forFaces (
+  faces: { vertices: { x: number; y: number; z: number }[] }[]
+) {
+  if (
+    !faces ||
+    faces.length === 0 ||
+    !faces[0] ||
+    !faces[0].vertices ||
+    faces[0].vertices.length === 0
+  ) {
+    console.warn(
+      "Cannot calculate bounding box for invalid/empty faces array."
+    )
+    return undefined
+  }
+
+  let maxX: number, maxY: number, maxZ: number
   let minX = (maxX = faces[0].vertices[0].x);
   let minY = (maxY = faces[0].vertices[0].y);
   let minZ = (maxZ = faces[0].vertices[0].z);
@@ -58,9 +86,9 @@ export function forFaces (faces) {
         }
 
         if (vertex.z < minZ) {
-            return minZ = vertex.z;
+            minZ = vertex.z
         } else if (vertex.z > maxZ) {
-            return maxZ = vertex.z;
+            maxZ = vertex.z
         }
     }));
 

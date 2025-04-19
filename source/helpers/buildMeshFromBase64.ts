@@ -17,6 +17,8 @@ function base64ByteLength (base64Length: number): number {
 
 
 function base64ToArray (b64: string): number[] {
+  if (!b64) return []
+
   const numFloats = (base64ByteLength(b64.length)) / 4
   const result = []
   const decoded = stringToUint8Array(atob(b64))
@@ -28,19 +30,9 @@ function base64ToArray (b64: string): number[] {
 }
 
 
-// function base64ToFloat32Array (b64) {
-//  const numFloats = (base64ByteLength(b64.length)) / 4
-// //  const result = new Float32Array(numFloats)
-// //  const decoded = stringToUint8Array(atob(b64))
-// //  const pview = new DataView(decoded.buffer)
-// //  for (let i = 0, end = numFloats - 1, asc = 0 <= end; asc ? i <= end : i >= end; asc ? i++ : i--) {
-//    result[i] = pview.getFloat32(i * 4, true)
-// //  }
-//  return result
-// // }
-
-
 function base64ToInt32Array(b64: string): Int32Array {
+  if (!b64) return new Int32Array(0)
+
   const numInts = (base64ByteLength(b64.length)) / 4
   const result = new Int32Array(numInts)
   const decoded = stringToUint8Array(atob(b64))
