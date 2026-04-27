@@ -7,13 +7,16 @@
   "bin": {
     "meshlib": "./build/cli/index.js"
   },
-  "directories": {
-    "test": "test"
-  },
   "keywords": [
     "3d",
     "stl",
     "mesh"
+  ],
+  "directories": {
+    "test": "test"
+  },
+  "files": [
+    "build"
   ],
   "repository": {
     "type": "git",
