@@ -18,8 +18,22 @@ function processModel (model: ReturnType<typeof meshlib>) {
   indent = ''
 
   if (program.transform) {
-    program.transform.forEach((transformation: { type: string; values: unknown }) =>
-      modelChain = modelChain[transformation.type](transformation.values)
+    program.transform.forEach(
+      (transformation: { type: string; values: unknown }) => {
+        const fn = (modelChain as unknown as Record<string, unknown>)[
+          transformation.type
+        ]
+        if (typeof fn !== 'function') {
+          throw new Error(
+            `Unsupported transformation "${transformation.type}". ` +
+              'Supported transformations are: translate, rotate, scale.'
+          )
+        }
+        modelChain = (fn as (values: unknown) => typeof modelChain).call(
+          modelChain,
+          transformation.values
+        )
+      }
     )
   }
 
@@ -191,14 +205,16 @@ or a specified string`
     .option(
       '--transform <transformations>',
       'Transform model with translate(x y z), ' +
-        'rotate(angleInDegrees) & scale(x y)',
+        'rotate(angleInDegrees) & scale(x y z)',
       string => string
         .split(')')
         .slice(0, -1)
         .map((transformationString: string) => {
             const subStrings = transformationString.split('(')
             const transformation = subStrings[0].trim()
-            const values = subStrings[1].split(' ')
+            const values = subStrings[1]
+              .split(' ')
+              .filter((value: string) => value.length > 0)
 
             if (transformation === 'rotate') {
                 return {
@@ -209,11 +225,20 @@ or a specified string`
                   }
                 }
             }
-            else {
+            else if (
+              transformation === 'translate' ||
+              transformation === 'scale'
+            ) {
               return {
-                  type: transformation,
-                  values
+                type: transformation,
+                values: values.map(Number),
               }
+            }
+            else {
+              throw new Error(
+                `Unsupported transformation "${transformation}". ` +
+                  'Supported transformations are: translate, rotate, scale.'
+              )
             }
           })
     )

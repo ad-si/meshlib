@@ -41,7 +41,7 @@ Options:
   --jsonl                          Print model as a newline seperated JSON stream (jsonl)
   --translate <"x y z">            Translate model in x, y, z direction
   --rotate <angleInDegrees>        Rotate model <angleInDegrees>˚ around 0,0
-  --transform <transformations>    Transform model with translate(x y z), rotate(angleInDegrees) & scale(x y)
+  --transform <transformations>    Transform model with translate(x y z), rotate(angleInDegrees) & scale(x y z)
   --apply-matrix <matrix>          Applies 4x4 matrix (provided as list of 16 row-major values)
   --build-face-vertex-mesh         Build a face vertex mesh from faces
   --centering-matrix               Print matrix to center object in x and y direction

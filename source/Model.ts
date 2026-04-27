@@ -1,5 +1,5 @@
 import ExplicitModel, {
-  MeshData, RotationOptions, TranslateVector,
+  MeshData, RotationOptions, TranslateVector, ScaleVector,
   GetBoundingBoxOptions, GridAlignRotationOptions, GridAlignTranslationOptions,
   FaceVertexData, BoundingBox
   } from './ExplicitModel.js'
@@ -18,6 +18,7 @@ export default class Model {
     this.applyMatrix = this.applyMatrix.bind(this)
     this.getClone = this.getClone.bind(this)
     this.translate = this.translate.bind(this)
+    this.scale = this.scale.bind(this)
     this.rotate = this.rotate.bind(this)
     this.setName = this.setName.bind(this)
     this.setFileName = this.setFileName.bind(this)
@@ -110,6 +111,10 @@ export default class Model {
 
   translate(vector: TranslateVector | [number, number, number]): this {
     return this.next(() => this.model.translate(vector))
+  }
+
+  scale(factors: ScaleVector | (number | string)[] | number): this {
+    return this.next(() => this.model.scale(factors))
   }
 
   rotate(options: RotationOptions): this {

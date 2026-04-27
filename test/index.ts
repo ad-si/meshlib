@@ -465,7 +465,7 @@ with the surface area for each rotation angle`, () => {
       ])
     })
 
-    return it('can be rotated', () => {
+    it('can be rotated', () => {
       const jsonModel = models['tetrahedron'].load() as MeshData
 
       const modelPromise = meshlib(jsonModel)
@@ -477,6 +477,51 @@ with the surface area for each rotation angle`, () => {
       .to.eventually.deep.equal([
         {x: 0.7071067811865476, y: 0.7071067811865475, z: 0},
         {x: -0.7071067811865475, y: 0.7071067811865476, z: 0},
+        {x: 0, y: 0, z: 1}
+      ])
+    })
+
+    it('can be scaled non-uniformly with an x/y/z object', () => {
+      const jsonModel = models['tetrahedron'].load() as MeshData
+
+      const modelPromise = meshlib(jsonModel)
+        .scale({x: 2, y: 3, z: 4})
+        .getFaces()
+        .then(faces => faces[0].vertices)
+
+      return expect(modelPromise).to.eventually.deep.equal([
+        {x: 2, y: 0, z: 0},
+        {x: 0, y: 3, z: 0},
+        {x: 0, y: 0, z: 4}
+      ])
+    })
+
+    it('can be scaled uniformly with a single number', () => {
+      const jsonModel = models['tetrahedron'].load() as MeshData
+
+      const modelPromise = meshlib(jsonModel)
+        .scale(2)
+        .getFaces()
+        .then(faces => faces[0].vertices)
+
+      return expect(modelPromise).to.eventually.deep.equal([
+        {x: 2, y: 0, z: 0},
+        {x: 0, y: 2, z: 0},
+        {x: 0, y: 0, z: 2}
+      ])
+    })
+
+    return it('defaults z to 1 when scaled with a 2-element array', () => {
+      const jsonModel = models['tetrahedron'].load() as MeshData
+
+      const modelPromise = meshlib(jsonModel)
+        .scale([2, 3])
+        .getFaces()
+        .then(faces => faces[0].vertices)
+
+      return expect(modelPromise).to.eventually.deep.equal([
+        {x: 2, y: 0, z: 0},
+        {x: 0, y: 3, z: 0},
         {x: 0, y: 0, z: 1}
       ])
     })
@@ -529,7 +574,7 @@ with the surface area for each rotation angle`, () => {
     })
 
 
-    return it('parses a base64 file and emits a JSONL stream', () => {
+    it('parses a base64 file and emits a JSONL stream', () => {
       const cliScriptPath = path.resolve(__dirname, '../cli/index.ts')
       const command = `npx tsx ${cliScriptPath} --input base64 ${models['heart'].filePath}`
 
@@ -539,5 +584,50 @@ with the surface area for each rotation angle`, () => {
 
       return expect(actualOutput).to.match(/^\{.*\}$/gm)
     })
+
+
+    it('applies --transform scale(x y z) to a JSONL stream', () => {
+      const cliScriptPath = path.resolve(__dirname, '../cli/index.ts')
+      const command = `npx tsx ${cliScriptPath} ` +
+        `--transform 'scale(2 3 4)' ` +
+        `< ${models['jsonl tetrahedron'].filePath}`
+
+      const actualOutput = child_process
+        .execSync(command)
+        .toString()
+
+      const parsed = JSON.parse(actualOutput)
+
+      return expect(parsed.mesh.faces[0].vertices).to.deep.equal([
+        {x: 2, y: 0, z: 0},
+        {x: 0, y: 3, z: 0},
+        {x: 0, y: 0, z: 4}
+      ])
+    })
+
+
+    return it(
+      'fails with a clear error for an unsupported --transform',
+      () => {
+        const cliScriptPath = path.resolve(__dirname, '../cli/index.ts')
+        const command = `npx tsx ${cliScriptPath} ` +
+          `--transform 'shear(2 3)' ` +
+          `${models['tetrahedron'].filePath}`
+
+        let stderr = ''
+        let exitCode = 0
+        try {
+          child_process.execSync(command, {stdio: ['pipe', 'pipe', 'pipe']})
+        } catch (error: any) {
+          exitCode = error.status
+          stderr = error.stderr.toString()
+        }
+
+        expect(exitCode).to.not.equal(0)
+        return expect(stderr).to.match(
+          /Unsupported transformation "shear"/
+        )
+      }
+    )
   })
 })

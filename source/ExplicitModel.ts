@@ -42,6 +42,7 @@ export interface RotationOptions {
   unit?: AngleUnit;
 }
 export interface TranslateVector { x?: number; y?: number; z?: number; }
+export interface ScaleVector { x?: number; y?: number; z?: number; }
 export interface GridAlignTranslationOptions {
   faces?: FaceObject[];
   translationAxes?: ('x' | 'y' | 'z')[];
@@ -449,6 +450,45 @@ export default class ExplicitModel {
     this._boundingBox = undefined; // Invalidate bounding box cache
 
     return this;
+  }
+
+
+  scale(factors: ScaleVector | (number | string)[] | number): this {
+    let sx: number;
+    let sy: number;
+    let sz: number;
+
+    if (typeof factors === 'number') {
+      sx = sy = sz = factors;
+    } else if (Array.isArray(factors)) {
+      sx = Number(factors[0]);
+      // scale(x) → uniform scaling; scale(x y) → z = 1; scale(x y z) → as given
+      sy = factors.length > 1 ? Number(factors[1]) : sx;
+      sz = factors.length > 2 ? Number(factors[2]) : 1;
+    } else {
+      sx = factors.x ?? 1;
+      sy = factors.y ?? 1;
+      sz = factors.z ?? 1;
+    }
+
+    if (
+      !Number.isFinite(sx) ||
+      !Number.isFinite(sy) ||
+      !Number.isFinite(sz)
+    ) {
+      throw new Error(
+        `Invalid scale factors: ${JSON.stringify(factors)}`
+      );
+    }
+
+    const scalingMatrix: Matrix4x4 = [
+      [sx, 0,  0,  0],
+      [0,  sy, 0,  0],
+      [0,  0,  sz, 0],
+      [0,  0,  0,  1]
+    ];
+
+    return this.applyMatrix(scalingMatrix);
   }
 
 
