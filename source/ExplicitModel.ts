@@ -3,7 +3,7 @@ import rad2deg from 'rad2deg'
 
 import Vector from '@datatypes/vector'
 import Face, { FaceObject } from '@datatypes/face'
-import Matrix, { Matrix4x4 } from '@datatypes/matrix'
+import { Matrix4x4, multiplyMatrices } from './helpers/matrix.js'
 import fastClone from './helpers/fastClone.js'
 import geometrySplitter from './helpers/separateGeometry.js'
 import buildFaceVertexMesh from './helpers/buildFaceVertexMesh.js'
@@ -11,7 +11,7 @@ import buildFacesFromFaceVertexMesh from './helpers/buildFacesFromFaceVertexMesh
 import testTwoManifoldness from './helpers/testTwoManifoldness.js'
 import * as calculateBoundingBox from './helpers/calculateBoundingBox.js'
 import calculateProjectedFaceArea from './helpers/calculateProjectedFaceArea.js'
-import convertToBase64 from './helpers/convertToBase64.js'
+import { convertModelToBase64 } from './helpers/convertToBase64.js'
 import buildMeshFromBase64 from './helpers/buildMeshFromBase64.js'
 import NoFacesError from './errors/NoFacesError.js'
 import ModelStream, { ModelStreamOptions } from './ModelStream.js'
@@ -128,26 +128,15 @@ const getExtremes = (array: (number | null | undefined)[]): ExtremesResult => ar
 );
 
 
-const applyMatrixToPoint = function(matrix: Matrix4x4, point: Vertex): Vertex {
-  // Ensure Matrix.multiply handles the types correctly based on its definition
-  const pointMatrix: [[number], [number], [number], [number]] = [
-    [point.x],
-    [point.y],
-    [point.z],
-    [1]
-  ]; // Corrected: Removed stray parenthesis
-
-  // Use matrix multiplication to transform the point
-  const newMatrix = Matrix.multiply(matrix, pointMatrix);
-
-  const newPoint = {
-    x: newMatrix[0][0],
-    y: newMatrix[1][0],
-    z: newMatrix[2][0]
-  };
-
-  return newPoint;
-};
+// Applies an affine transformation matrix to a point
+const applyMatrixToPoint = (matrix: Matrix4x4, point: Vertex): Vertex => ({
+  x: (matrix[0][0] * point.x) + (matrix[0][1] * point.y) +
+    (matrix[0][2] * point.z) + matrix[0][3],
+  y: (matrix[1][0] * point.x) + (matrix[1][1] * point.y) +
+    (matrix[1][2] * point.z) + matrix[1][3],
+  z: (matrix[2][0] * point.x) + (matrix[2][1] * point.y) +
+    (matrix[2][2] * point.z) + matrix[2][3],
+})
 
 
 const calculateGridAlignRotationAngle = function(
@@ -252,12 +241,9 @@ const calculateGridAlignTranslation = function(
       //   // face.normal[invariantAxes[0]] = modulo(face.normal[translationAxis], gridSize[translationAxis]);
       //   return face;
       // })
-      .map(function(face): FaceObject { // Add return type
-        // Calculate surface area on a copy or ensure method doesn't mutate
-        const faceWithArea = Face.fromObject(face);
-        faceWithArea.surfaceArea = Face.calculateSurfaceArea(face); // Assuming static method
-        return faceWithArea.toObject();
-      })
+      .map((face): FaceObject =>
+        Face.fromObject(face).calculateSurfaceArea().toObject()
+      )
       .reduce(function(histogram: number[], currentFace: FaceObject): number[] {
         // Get offset in percentage of grid-size rounded to 1%
 
@@ -324,7 +310,7 @@ const calculateAutoAlignMatrix = function(
   const gridAlignTranslationMatrix = model.getGridAlignTranslationMatrix(options);
   transformations.unshift(gridAlignTranslationMatrix);
 
-  return transformations.reduce((previous, current) => Matrix.multiply(previous, current));
+  return transformations.reduce(multiplyMatrices);
 };
 
 
@@ -907,8 +893,15 @@ export default class ExplicitModel {
     }
     if (this.normalsAreInvalid) this.calculateNormals();
 
-    // Pass necessary options to calculateAutoAlignMatrix
-    return calculateAutoAlignMatrix(this.clone(), { ...options, faces: this.mesh.faces || [] });
+    // The alignment transforms its own copy of the model.
+    // Deep cloning is not necessary, as all used transformations
+    // (applyMatrix, calculateNormals) create new face objects
+    // instead of modifying the existing ones.
+    const workingCopy = new ExplicitModel(
+      { faces: this.mesh.faces.slice() },
+      this.options,
+    )
+    return calculateAutoAlignMatrix(workingCopy, { ...options, faces: this.mesh.faces });
   }
 
 
@@ -1002,7 +995,7 @@ export default class ExplicitModel {
        this.buildFaceVertexMesh();
        if (!this.mesh.faceVertex) return ""; // Return empty string if still unavailable
     }
-    return convertToBase64(this.mesh.faceVertex) + '|' + this.name;
+    return convertModelToBase64(this.mesh.faceVertex, this.name);
   }
 
 

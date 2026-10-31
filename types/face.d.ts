@@ -37,7 +37,6 @@ declare module '@datatypes/face' {
     })
     static fromObject(obj: FaceObject): Face
     static fromVertexArray(vertices: Vertex[]): Face
-    static calculateSurfaceArea(face: FaceObject): number
     calculateSurfaceArea(): Face
     toObject(): FaceObject
     addVertex(vertex: Vector): void

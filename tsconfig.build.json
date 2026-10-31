@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmitOnError": true
+  },
+  "include": [
+    "source/**/*.ts",
+    "cli/**/*.ts"
+  ]
+}

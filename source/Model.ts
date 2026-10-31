@@ -5,7 +5,7 @@ import ExplicitModel, {
   } from './ExplicitModel.js'
 import ModelStream, { ModelStreamOptions } from './ModelStream.js'
 import { FaceObject } from '@datatypes/face'
-import { Matrix4x4 } from '@datatypes/matrix'
+import { Matrix4x4 } from './helpers/matrix.js'
 import { GetFacesOptions, ModelObjectData, ModelOptions } from './types.js'
 
 
@@ -52,9 +52,10 @@ export default class Model {
     this.next = this.next.bind(this)
     this.done = this.done.bind(this)
     this.catch = this.catch.bind(this)
-    this.ready = Promise.resolve().then(() => {
-      return this.model = new ExplicitModel(mesh, options)
-    })
+    // Create the explicit model synchronously,
+    // so that it can be replaced right away (e.g. by getClone)
+    this.model = new ExplicitModel(mesh, options)
+    this.ready = Promise.resolve(this.model)
     return this
   }
 
@@ -73,24 +74,10 @@ export default class Model {
   }
 
   static fromBase64(base64String: string): Model {
-    try {
-      // Create explicit model first
-      const explicitModel = ExplicitModel.fromBase64(base64String)
-
-      // Create a model with null mesh first (we'll set it manually)
-      const model = new Model(null, {})
-
-      // Set the model's internal ExplicitModel and resolve the ready promise
-      model.model = explicitModel
-      model.ready = Promise.resolve(explicitModel)
-
-      return model
-    } catch (error) {
-      console.error("Error creating model from base64:", error)
-      // Return empty model instead of throwing
-      return new Model({ faces: [] }, {})
-    }
+    const { mesh, name } = ExplicitModel.fromBase64(base64String)
+    return Model.fromObject({ mesh, name })
   }
+
 
   applyMatrix(matrix: Matrix4x4): this {
     return this.next(() => this.model.applyMatrix(matrix))
@@ -122,11 +109,17 @@ export default class Model {
   }
 
   setName(name: string): this {
-    return this.next(() => { this.model.name = name; })
+    return this.next(() => {
+      this.model.name = name
+      return this.model
+    })
   }
 
   setFileName(fileName: string): this {
-    return this.next(() => { this.model.fileName = fileName; })
+    return this.next(() => {
+      this.model.fileName = fileName
+      return this.model
+    })
   }
 
   setFaces(faces: FaceObject[] | null): this {
@@ -138,7 +131,10 @@ export default class Model {
   }
 
   setFaceCount(numberOfFaces: number | string): this {
-    return this.next(() => { this.model.faceCount = numberOfFaces; })
+    return this.next(() => {
+      this.model.faceCount = numberOfFaces
+      return this.model
+    })
   }
 
   getFaceVertexMesh(): Promise<FaceVertexData | undefined> { // Use FaceVertexData type

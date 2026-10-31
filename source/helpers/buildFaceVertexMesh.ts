@@ -1,173 +1,176 @@
-import { FaceObject, Vertex} from '@datatypes/face'
+import { FaceObject } from '@datatypes/face'
 
-function calculateLocalitySensitiveHash (point: Vertex) {
-  return point.x + point.y + point.z
+import type { FaceVertexData } from '../ExplicitModel.js'
+
+export interface BuildFaceVertexMeshOptions {
+  // Vertices closer than this distance (on every axis) are merged
+  maximumMergeDistance?: number
 }
 
-function isCloserThan (
-  distance: number,
-  numA: number | undefined,
-  numB: number | undefined,
-): boolean {
-  // Ensure both numbers are valid before comparison
-  if (typeof numA !== 'number' || typeof numB !== 'number') {
-    return false; // Cannot compare if one is not a number
-  }
-  // Use Math.abs for distance comparison
-  return Math.abs(numA - numB) < distance;
-}
+// Spatial hash over integer grid cells
+const hashCell = (ix: number, iy: number, iz: number): number =>
+  Math.imul(ix, 73856093) ^ Math.imul(iy, 19349663) ^ Math.imul(iz, 83492791)
 
-export default function(
-  faces: FaceObject[],
-  options: {maximumMergeDistance?: number},
-) {
-  if (options == null) { options = {}; }
+
+/**
+ * Merges the vertices of a triangle soup into a face-vertex mesh.
+ *
+ * `triangleCoordinates` contains 9 values (3 vertices × x, y, z) per face and
+ * `faceNormalCoordinates` 3 values per face.
+ *
+ * A vertex is merged into the first previously seen vertex
+ * which is closer than `maximumMergeDistance` on every axis.
+ * Vertices are therefore ordered by their first occurrence.
+ *
+ * Runs in linear time by bucketing vertices into grid cells
+ * which are twice as large as the merge distance.
+ * A matching vertex must then lie either in the vertex's own cell
+ * or in the neighboring cell on the side the vertex is closer to,
+ * so only 2 × 2 × 2 cells must be searched.
+ */
+export function buildFaceVertexMeshFromTriangles (
+  triangleCoordinates: ArrayLike<number>,
+  faceNormalCoordinates: ArrayLike<number>,
+  options: BuildFaceVertexMeshOptions = {},
+): FaceVertexData {
   const maximumMergeDistance = options.maximumMergeDistance || 0.0001
-  let vertexCoordinates = []
-  let faceVertexIndices = []
-  const faceNormalCoordinates = []
+  const cellSize = 2 * maximumMergeDistance
+  const faceCount = Math.floor(triangleCoordinates.length / 9)
 
-  const sortedVertices = faces
-    .map(function(face, faceIndex) {
-      faceNormalCoordinates.push(
-        face.normal.x,
-        face.normal.y,
-        face.normal.z
-      )
+  const vertexCoordinates: number[] = []
+  const faceVertexIndices: number[] = new Array(faceCount * 3)
+  const buckets = new Map<number, number[]>()
 
-      face.vertices
-        .forEach((vertex, vertexIndex) => {
-          vertex.hash = calculateLocalitySensitiveHash(vertex)
-          vertex.originalFaceIndex = faceIndex
-          return vertex.originalVertexIndex = vertexIndex
-        })
+  const isCloseTo = (index: number, x: number, y: number, z: number) =>
+    Math.abs(vertexCoordinates[index * 3] - x) < maximumMergeDistance &&
+    Math.abs(vertexCoordinates[(index * 3) + 1] - y) < maximumMergeDistance &&
+    Math.abs(vertexCoordinates[(index * 3) + 2] - z) < maximumMergeDistance
 
-      return face;})
-        .reduce((verticesArray, face) => verticesArray.concat(face.vertices)
-      , [])
+  const findOrAddVertex = (x: number, y: number, z: number): number => {
+    const cellX = x / cellSize
+    const cellY = y / cellSize
+    const cellZ = z / cellSize
+    const ix = Math.floor(cellX)
+    const iy = Math.floor(cellY)
+    const iz = Math.floor(cellZ)
+    const ownKey = hashCell(ix, iy, iz)
 
-    // TODO: Insert into Binary tree to get sorted array
-    .sort((vertexA, vertexB) => vertexB.hash - vertexA.hash)
-
-
-  // Iterate over vertices and remove duplicates
-  let vertexIndex = 0
-  while (vertexIndex < sortedVertices.length) {
-    var currentVertex = sortedVertices[vertexIndex]
-
-    if (currentVertex === null) {
-      vertexIndex++
-      continue
-    }
-
-    if ((currentVertex.usedIn == null)) {
-      currentVertex.usedIn = [{
-        face: currentVertex.originalFaceIndex,
-        vertex: currentVertex.originalVertexIndex,
-      }]
-      delete currentVertex.originalFaceIndex
-      delete currentVertex.originalVertexIndex
-    }
-
-    var lookAheadIndex = vertexIndex + 1
-    while(
-      (lookAheadIndex <= sortedVertices.length) &&
-      ((sortedVertices[lookAheadIndex] === null) ||
-      isCloserThan(
-        2 * maximumMergeDistance,
-        currentVertex.hash,
-        sortedVertices[lookAheadIndex] != null ? sortedVertices[lookAheadIndex].hash : undefined
-      ))
-    ) {
-      if (sortedVertices[lookAheadIndex] === null) {
-        lookAheadIndex++
-        continue
+    // Fast path for the common case of an exactly identical vertex.
+    // If one exists, it is the only vertex within the merge distance,
+    // as no other vertex closer than the merge distance could have been added.
+    const ownBucket = buckets.get(ownKey)
+    if (ownBucket) {
+      for (const index of ownBucket) {
+        if (
+          vertexCoordinates[index * 3] === x &&
+          vertexCoordinates[(index * 3) + 1] === y &&
+          vertexCoordinates[(index * 3) + 2] === z
+        ) {
+          return index
+        }
       }
-
-      if (isCloserThan(
-          maximumMergeDistance,
-          currentVertex.x,
-          sortedVertices[lookAheadIndex].x
-        ) &&
-        isCloserThan(
-          maximumMergeDistance,
-          currentVertex.y,
-          sortedVertices[lookAheadIndex].y
-        ) &&
-        isCloserThan(
-          maximumMergeDistance,
-          currentVertex.z,
-          sortedVertices[lookAheadIndex].z
-        )
-      ) {
-        currentVertex.usedIn.push({
-          face: sortedVertices[lookAheadIndex].originalFaceIndex,
-          vertex: sortedVertices[lookAheadIndex].originalVertexIndex,
-        })
-        sortedVertices[lookAheadIndex] = null
-      }
-
-      lookAheadIndex++
     }
 
-    vertexIndex++
+    const neighborX = cellX - ix < 0.5 ? ix - 1 : ix + 1
+    const neighborY = cellY - iy < 0.5 ? iy - 1 : iy + 1
+    const neighborZ = cellZ - iz < 0.5 ? iz - 1 : iz + 1
+
+    let match = -1
+    for (let dx = 0; dx < 2; dx++) {
+      const cx = dx === 0 ? ix : neighborX
+      for (let dy = 0; dy < 2; dy++) {
+        const cy = dy === 0 ? iy : neighborY
+        for (let dz = 0; dz < 2; dz++) {
+          const cz = dz === 0 ? iz : neighborZ
+          const bucket = buckets.get(hashCell(cx, cy, cz))
+          if (!bucket) continue
+          for (const index of bucket) {
+            if ((match === -1 || index < match) && isCloseTo(index, x, y, z)) {
+              match = index
+            }
+          }
+        }
+      }
+    }
+    if (match !== -1) return match
+
+    const index = vertexCoordinates.length / 3
+    vertexCoordinates.push(x, y, z)
+    if (ownBucket) ownBucket.push(index)
+    else buckets.set(ownKey, [index])
+    return index
   }
 
+  for (let i = 0; i < faceCount * 3; i++) {
+    faceVertexIndices[i] = findOrAddVertex(
+      triangleCoordinates[i * 3],
+      triangleCoordinates[(i * 3) + 1],
+      triangleCoordinates[(i * 3) + 2],
+    )
+  }
 
-  const cleanedVertices = sortedVertices.filter(vertex => vertex != null)
+  const faceNormals: number[] = Array.from(
+    { length: faceCount * 3 },
+    (_, i) => faceNormalCoordinates[i] ?? 0,
+  )
 
-  vertexCoordinates = cleanedVertices.reduce(function(array, vertex) {
-      if (vertex != null) {
-        array.push(vertex.x, vertex.y, vertex.z)
-      }
-      return array
-    }
-    , [])
+  // Vertex normal = normalized sum of the normals of all adjacent faces
+  const vertexNormalCoordinates: number[] =
+    new Array(vertexCoordinates.length).fill(0)
 
-  faceVertexIndices =
-    cleanedVertices.reduce(function(faceVertexIndices, vertex, vertexIndex) {
-      if (vertex != null) {
-        vertex.usedIn.forEach(function(vertexReference) {
-          const index = (vertexReference.face * 3) + vertexReference.vertex
-          return faceVertexIndices[index] = vertexIndex
-        })
-      }
-      return faceVertexIndices
-    }
-    , [])
+  for (let i = 0; i < faceCount * 3; i++) {
+    const vertex = faceVertexIndices[i] * 3
+    const face = Math.floor(i / 3) * 3
+    vertexNormalCoordinates[vertex] += faceNormals[face]
+    vertexNormalCoordinates[vertex + 1] += faceNormals[face + 1]
+    vertexNormalCoordinates[vertex + 2] += faceNormals[face + 2]
+  }
 
-  // Calculate vertex normals
-  // Use the normalized sum of face normals for each vertex (classic vertex normal)
-  const vertexNormalCoordinates = new Array(cleanedVertices.length * 3).fill(0)
-  const vertexFaceCount = new Array(cleanedVertices.length).fill(0)
-
-  cleanedVertices.forEach((vertex, vIndex) => {
-    if (!vertex) return
-    vertex.usedIn.forEach(({ face }) => {
-      vertexNormalCoordinates[vIndex * 3]     += faceNormalCoordinates[face * 3]
-      vertexNormalCoordinates[vIndex * 3 + 1] += faceNormalCoordinates[face * 3 + 1]
-      vertexNormalCoordinates[vIndex * 3 + 2] += faceNormalCoordinates[face * 3 + 2]
-      vertexFaceCount[vIndex]++
-    })
-  })
-
-  // Normalize each vertex normal vector
-  for (let v = 0; v < cleanedVertices.length; v++) {
-    const x = vertexNormalCoordinates[v * 3]
-    const y = vertexNormalCoordinates[v * 3 + 1]
-    const z = vertexNormalCoordinates[v * 3 + 2]
-    const len = Math.sqrt(x * x + y * y + z * z)
-    if (len > 0) {
-      vertexNormalCoordinates[v * 3]     = x / len
-      vertexNormalCoordinates[v * 3 + 1] = y / len
-      vertexNormalCoordinates[v * 3 + 2] = z / len
+  for (let v = 0; v < vertexNormalCoordinates.length; v += 3) {
+    const x = vertexNormalCoordinates[v]
+    const y = vertexNormalCoordinates[v + 1]
+    const z = vertexNormalCoordinates[v + 2]
+    const length = Math.sqrt((x * x) + (y * y) + (z * z))
+    if (length > 0) {
+      vertexNormalCoordinates[v] = x / length
+      vertexNormalCoordinates[v + 1] = y / length
+      vertexNormalCoordinates[v + 2] = z / length
     }
   }
 
   return {
     vertexCoordinates,
     faceVertexIndices,
-    faceNormalCoordinates,
-    vertexNormalCoordinates
+    faceNormalCoordinates: faceNormals,
+    vertexNormalCoordinates,
   }
+}
+
+
+export default function buildFaceVertexMesh (
+  faces: FaceObject[],
+  options?: BuildFaceVertexMeshOptions | null,
+): FaceVertexData {
+  const triangleCoordinates = new Float64Array(faces.length * 9)
+  const faceNormalCoordinates = new Float64Array(faces.length * 3)
+
+  faces.forEach((face, faceIndex) => {
+    face.vertices.forEach((vertex, vertexIndex) => {
+      const offset = (faceIndex * 9) + (vertexIndex * 3)
+      triangleCoordinates[offset] = vertex.x
+      triangleCoordinates[offset + 1] = vertex.y
+      triangleCoordinates[offset + 2] = vertex.z
+    })
+    if (face.normal) {
+      faceNormalCoordinates[faceIndex * 3] = face.normal.x
+      faceNormalCoordinates[(faceIndex * 3) + 1] = face.normal.y
+      faceNormalCoordinates[(faceIndex * 3) + 2] = face.normal.z
+    }
+  })
+
+  return buildFaceVertexMeshFromTriangles(
+    triangleCoordinates,
+    faceNormalCoordinates,
+    options ?? {},
+  )
 }

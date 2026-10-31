@@ -3,6 +3,7 @@ import path from 'path'
 import program from 'commander'
 import ndjson from 'ndjson'
 import meshlib from './index.js'
+import { Matrix4x4 } from './helpers/matrix.js'
 import packageData from '../package.json' with { type: 'json' }
 import yaml from 'js-yaml'
 import stream from 'stream'
@@ -49,19 +50,25 @@ function processModel (model: ReturnType<typeof meshlib>) {
   }
 
   if (program.applyMatrix) {
-    const listMatrix = program
+    const listMatrix: number[] = program
       .applyMatrix
-      .split(/\s/)
+      .trim()
+      .split(/\s+/)
       .map(Number)
-      .filter(Boolean)
 
-    const matrix = [
-      listMatrix.slice(0, 4),
-      listMatrix.slice(4, 8),
-      listMatrix.slice(8, 12),
-      listMatrix.slice(12, 16)
+    if (listMatrix.length !== 16 || !listMatrix.every(Number.isFinite)) {
+      throw new Error(
+        `--apply-matrix expects 16 numbers, but got "${program.applyMatrix}"`
+      )
+    }
+
+    const row = (index: number): Matrix4x4[number] => [
+      listMatrix[index * 4],
+      listMatrix[(index * 4) + 1],
+      listMatrix[(index * 4) + 2],
+      listMatrix[(index * 4) + 3],
     ]
-    modelChain = modelChain.applyMatrix(matrix)
+    modelChain = modelChain.applyMatrix([row(0), row(1), row(2), row(3)])
   }
 
   if (program.buildFaceVertexMesh) {

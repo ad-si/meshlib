@@ -10,7 +10,6 @@ import calculateProjectionCentroid from '../source/helpers/calculateProjectionCe
 import chaiHelper from './chaiHelper.js'
 import models from './models/models.js'
 import { MeshData } from 'meshlib/ExplicitModel.js'
-import { depth } from 'three/examples/jsm/nodes/Nodes.js'
 
 const { expect } = chai
 
@@ -53,6 +52,21 @@ describe('Meshlib', () => {
   it('returns a model object', async () => {
     const jsonModel = models['cube'].load() as MeshData
     const modelPromise = meshlib(jsonModel).done()
+    return expect(modelPromise).to.eventually.be.an.explicitModel
+  })
+
+
+  it('can be chained after setting name, file name and face count', () => {
+    const jsonModel = models['cube'].load() as MeshData
+    const modelPromise = meshlib
+      .Model
+      .fromObject({
+        name: 'cube',
+        fileName: 'cube.stl',
+        faceCount: jsonModel.faces.length,
+        mesh: jsonModel,
+      })
+      .done()
     return expect(modelPromise).to.eventually.be.an.explicitModel
   })
 
@@ -137,6 +151,72 @@ describe('Meshlib', () => {
 
     return expect(modelPromise).to.eventually.be.an('object')
     .and.to.have.any.keys('name', 'fileName', 'mesh')
+  })
+
+
+  it('calculates a translation matrix to align a model to the grid', () => {
+    const jsonModel = models['cube'].load() as MeshData
+
+    // Cube spans from -1 to 1 → after translation x faces are at -0.5 and 1.5
+    // which are both at an offset of 1.5 to the grid
+    const matrixPromise = meshlib(jsonModel)
+      .translate({x: 0.5, y: 0, z: 0})
+      .getGridAlignTranslationMatrix({gridSize: {x: 2, y: 2, z: 2}})
+      .then(matrix => [matrix[0][3], matrix[1][3]])
+
+    return expect(matrixPromise).to.eventually.deep.equal([-1.5, -1])
+  })
+
+
+  it('does not modify the model when calculating an auto align matrix', async () => {
+    const jsonModel = models['tetrahedron'].load() as MeshData
+    const model = meshlib(jsonModel)
+      .rotate({angle: 30, unit: 'degree'})
+      .translate({x: 3.3, y: 1.7, z: 2})
+      // Otherwise getAutoAlignMatrix recalculates the outdated normals
+      .calculateNormals()
+    const before = JSON.stringify((await model.getObject()).mesh.faces)
+
+    await model.getAutoAlignMatrix()
+
+    expect(JSON.stringify((await model.getObject()).mesh.faces))
+      .to.equal(before)
+  })
+
+
+  it('calculates an auto align matrix', () => {
+    const jsonModel = models['cube'].load() as MeshData
+
+    return meshlib(jsonModel)
+      .getAutoAlignMatrix()
+      .then(matrix => {
+        expect(matrix).to.have.length(4)
+        matrix.forEach(row => {
+          expect(row).to.have.length(4)
+          row.forEach(value => expect(value).to.be.finite)
+        })
+      })
+  })
+
+
+  it('creates an independent clone which can be transformed', () => {
+    const jsonModel = models['tetrahedron'].load() as MeshData
+    const model = meshlib(jsonModel)
+
+    const verticesPromise = model
+      .getClone()
+      .then(clone => clone
+        .translate({x: 1, y: 0, z: 0})
+        .getObject())
+      .then(async object => [
+        object.mesh.faces[0].vertices[0],
+        (await model.getObject()).mesh.faces[0].vertices[0],
+      ])
+
+    return expect(verticesPromise).to.eventually.deep.equal([
+      {x: 2, y: 0, z: 0},
+      {x: 1, y: 0, z: 0},
+    ])
   })
 
 
@@ -406,6 +486,18 @@ with the surface area for each rotation angle`, () => {
         })
     })
 
+    it('builds faces of a model created from base64 representation', () => {
+      const facesPromise = meshlib
+        .Model
+        .fromBase64(tetrahedronBase64Array.join('|'))
+        .buildFacesFromFaceVertexMesh()
+        .getObject()
+        .then(object => [object.name, object.mesh.faces.length])
+
+      return expect(facesPromise)
+        .to.eventually.deep.equal(['tetrahedron', 4])
+    })
+
     it('parses a complex base64 encoded model', () => {
       const base64Model = models['heart'].load() as MeshData
       const modelSchema = {
@@ -528,7 +620,10 @@ with the surface area for each rotation angle`, () => {
 })
 
 
-  return describe('Command Line Interface', () => {
+  return describe('Command Line Interface', function () {
+    // Each test spawns a new tsx process, which can be slow on a cold start
+    this.timeout(15000)
+
     it('parses a YAML file', () => {
       const cliScriptPath = path.resolve(__dirname, '../cli/index.ts')
       const command = `npx tsx ${cliScriptPath} ${models['tetrahedron'].filePath}`
@@ -583,6 +678,22 @@ with the surface area for each rotation angle`, () => {
         .toString()
 
       return expect(actualOutput).to.match(/^\{.*\}$/gm)
+    })
+
+
+    it('applies --apply-matrix to a JSONL stream', () => {
+      const cliScriptPath = path.resolve(__dirname, '../cli/index.ts')
+      const command = `npx tsx ${cliScriptPath} ` +
+        `--apply-matrix '1 0 0 5  0 1 0 0  0 0 1 0  0 0 0 1' ` +
+        `< ${models['jsonl tetrahedron'].filePath}`
+
+      const parsed = JSON.parse(child_process.execSync(command).toString())
+
+      return expect(parsed.mesh.faces[0].vertices).to.deep.equal([
+        {x: 6, y: 0, z: 0},
+        {x: 5, y: 1, z: 0},
+        {x: 5, y: 0, z: 1}
+      ])
     })
 
 

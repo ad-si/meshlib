@@ -1,25 +1,21 @@
 import { FaceVertexData } from "../ExplicitModel.js"
 
 function arrayBufferToBase64 (buffer: ArrayBuffer): string {
-  let binary = ''
   const bytes = new Uint8Array(buffer)
-  const len = bytes.byteLength
-
-  for (
-    let i = 0,
-      end = len - 1,
-      asc = 0 <= end;
-    asc ? i <= end : i >= end;
-    asc ? i++ : i--
-  ) {
-    binary += String.fromCharCode(bytes[i])
-  }
 
   if (typeof Buffer !== 'undefined') {
-    return Buffer.from(binary, 'binary').toString('base64')
+    return Buffer.from(bytes).toString('base64')
   }
-  else if (typeof window !== 'undefined') {
-    return window.btoa(binary)
+
+  if (typeof btoa !== 'undefined') {
+    // Convert in chunks, as String.fromCharCode
+    // can only handle a limited number of arguments
+    const chunks: string[] = []
+    const chunkSize = 0x8000
+    for (let i = 0; i < bytes.length; i += chunkSize) {
+      chunks.push(String.fromCharCode(...bytes.subarray(i, i + chunkSize)))
+    }
+    return btoa(chunks.join(''))
   }
   else {
     throw new Error('Can not convert binary to ascii in this environment!')
@@ -108,4 +104,12 @@ export default function convertToBase64(mesh: FaceVertexData): string {
   baseString += fnBase
 
   return baseString
+}
+
+// Base64 representation of a named model as returned by `Model.getBase64()`
+export function convertModelToBase64 (
+  mesh: FaceVertexData,
+  name: string,
+): string {
+  return convertToBase64(mesh) + '|' + name
 }
